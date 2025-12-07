@@ -132,7 +132,6 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         _jumper.RequestJump();
         _state = PlayerState.Jump;
-        _anim.SetGrounded(false);
     }
     
     public void JumpRelease()
@@ -240,9 +239,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         _jumper.RequestDropThrough();
 
-        // Treat as airborne for animation / logic
+        // Treat as airborne for logic until grounded signal fires
         _state = PlayerState.Jump;
-        _anim.SetGrounded(false);
     }
 
     public void ApplyDamage(DamageInfo info)
