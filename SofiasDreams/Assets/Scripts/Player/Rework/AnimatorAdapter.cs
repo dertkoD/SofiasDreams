@@ -8,6 +8,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [Header("Refs")]
     [SerializeField] Animator animator;
     [SerializeField] Rigidbody2D rb;
+    [SerializeField] PlayerAnimatorConfig defaultConfig;
 
     [Header("Param names (как в Animator)")]
     [SerializeField] string pX = "xVelocity";
@@ -52,17 +53,25 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] float safetyTimeout = 2.0f;  
 
     SignalBus _bus;
+    PlayerAnimatorConfig _configOverride;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp;
 
-    [Inject] void Inject(SignalBus bus) => _bus = bus;
+    [Inject]
+    void Construct(SignalBus bus, [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null)
+    {
+        _bus = bus;
+        _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
+    }
 
     public void Initialize()
     {
+        ApplyConfig(_configOverride);
+
         if (!animator) animator = GetComponentInChildren<Animator>();
         if (!rb) rb = GetComponent<Rigidbody2D>();
 
-        _bus.Subscribe<GroundedChanged>(g => SetGrounded(g.grounded));
+        _bus.Subscribe<GroundedChanged>(OnGroundedChanged);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
         _bus.Subscribe<DashStarted>(OnDashStarted);
         _bus.Subscribe<GrappleStarted>(OnGrappleStarted);
@@ -71,7 +80,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
     public void Dispose()
     {
-        _bus.TryUnsubscribe<GroundedChanged>(g => SetGrounded(g.grounded));
+        _bus.TryUnsubscribe<GroundedChanged>(OnGroundedChanged);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
         _bus.TryUnsubscribe<DashStarted>(OnDashStarted);
         _bus.TryUnsubscribe<GrappleStarted>(OnGrappleStarted);
@@ -170,6 +179,45 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     // ───────── Helpers ─────────
 
     void SetBool(string name, bool v) { if (animator) animator.SetBool(name, v); }
+
+    void ApplyConfig(PlayerAnimatorConfig config)
+    {
+        if (config == null)
+            return;
+
+        pX = config.horizontalVelocityParam;
+        pY = config.verticalVelocityParam;
+        pIsJumping = config.groundedBoolParam;
+        stFlying = config.flyingStateName;
+        pHurt = config.hurtBoolParam;
+
+        pAtk1 = config.comboAttack1Bool;
+        pAtk2 = config.comboAttack2Bool;
+        pAtk3 = config.comboAttack3Bool;
+
+        trigUp = config.upAttackTrigger;
+        atkLayer = config.attackLayerIndex;
+        stateUp = config.upAttackState;
+
+        pAirFwdBool = config.airForwardBool;
+        pAirDownBool = config.airDownBool;
+        pAirUpBool = config.airUpBool;
+
+        stAirFwd = config.airForwardState;
+        stAirDown = config.airDownState;
+        stAirUp = config.airUpState;
+
+        pHealProcess = config.healProcessTrigger;
+        pHealStartTrig = config.healStartTrigger;
+        pHealEndTrig = config.healEndTrigger;
+
+        pDashTrig = config.dashTrigger;
+        pIsGrappling = config.grappleBool;
+
+        clipEndThreshold = config.clipEndThreshold;
+        enterTimeout = config.enterTimeout;
+        safetyTimeout = config.safetyTimeout;
+    }
 
     void Restart(ref Coroutine slot, IEnumerator co)
     {

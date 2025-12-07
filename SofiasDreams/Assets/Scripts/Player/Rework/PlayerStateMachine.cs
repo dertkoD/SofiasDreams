@@ -21,14 +21,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly Dasher2D       _dasher;
     readonly Grappler2D   _grappler;
 
-    // SO
-    readonly PlayerMovementConfig _moveSO;
-    readonly PlayerJumpConfig     _jumpSO;
-    readonly PlayerAttackConfig   _atkSO;
-    readonly PlayerHealConfig     _healSO;
-    readonly PlayerHealthConfig   _hpSO;
-    readonly PlayerDashConfig     _dashSO;
-    readonly PlayerGrappleConfig  _grappleSO;
+    readonly IPlayerAbilityConfigurator _abilityConfigurator;
     readonly HitReactionConfig _hitSO;
 
     float       _moveX;
@@ -39,14 +32,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         Mover2D mover, Jumper2D jumper,
         ICombat combo,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
-        Dasher2D dasher, Grappler2D grappler,                                      
-        [Inject(Optional = true)] PlayerMovementConfig moveSO,
-        [Inject(Optional = true)] PlayerJumpConfig     jumpSO,
-        [Inject(Optional = true)] PlayerAttackConfig   atkSO,
-        [Inject(Optional = true)] PlayerHealConfig     healSO,
-        [Inject(Optional = true)] PlayerDashConfig     dashSO, 
-        [Inject(Optional = true)] PlayerGrappleConfig  grappleSO,
-        PlayerHealthConfig hpSO,
+        Dasher2D dasher, Grappler2D grappler,
+        IPlayerAbilityConfigurator abilityConfigurator,
         [Inject(Optional = true)] HitReactionConfig hitSO)
     {
         _bus      = bus;
@@ -60,93 +47,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _anim     = anim;
         _dasher   = dasher;
         _grappler = grappler;
-
-        _moveSO    = moveSO;
-        _jumpSO    = jumpSO;
-        _atkSO     = atkSO;
-        _healSO    = healSO;
-        _dashSO    = dashSO;
-        _hpSO      = hpSO;
-        _grappleSO = grappleSO;
+        _abilityConfigurator = abilityConfigurator;
         _hitSO     = hitSO;
     }
 
     public void Initialize()
     {
-        if (_moveSO != null)
-            _mover.Configure(new MoveSettings { moveSpeed = _moveSO.moveSpeed });
-
-        if (_jumpSO != null)
-            _jumper.Configure(new JumpSettings {
-                jumpVelocity   = _jumpSO.jumpForce,
-                coyoteTime     = _jumpSO.coyoteTime,
-                jumpBufferTime = _jumpSO.jumpBufferTime,
-                dropDuration   = _jumpSO.dropDuration,
-                jumpCutMultiplier = _jumpSO.jumpCutMultiplier
-            });
-        _jumper.Inject(_gate, _bus);
-
-        if (_atkSO != null && _combo is Combat3 c3)
-            c3.Configure(BuildAttackSettings(_atkSO));
-
-        if (_healSO != null)
-        {
-            _healer.Configure(
-                new HealSettings {
-                    amount = _healSO.healAmount
-                },
-                _healSO.maxCharges,
-                _healSO.killsPerCharge
-            );
-        }
-
-        if (_dashSO != null)
-        {
-            _dasher.Configure(new DashSettings {
-                dashSpeed    = _dashSO.dashSpeed,
-                cooldown     = _dashSO.cooldown,
-                allowAirDash = _dashSO.allowAirDash,
-                accel        = _dashSO.accel,
-                decel        = _dashSO.decel
-            });
-        }
-
-        if (_grappleSO != null)
-        {
-            _grappler.Configure(new GrappleSettings
-            {
-                radius                    = _grappleSO.radius,
-                grappleLayer              = _grappleSO.grappleLayer,
-                obstacleLayer             = _grappleSO.obstacleLayer,
-                moveSpeed                 = _grappleSO.moveSpeed,
-                stopDistance              = _grappleSO.stopDistance,
-                arrivalClearance          = _grappleSO.arrivalClearance,
-                zeroGravityWhileGrappling = _grappleSO.zeroGravityWhileGrappling,
-                startupDelay              = _grappleSO.startupDelay,
-                exitStrength              = _grappleSO.exitStrength,
-                carryOverEntrySpeedFactor = _grappleSO.carryOverEntrySpeedFactor,
-                maxExitSpeedX             = _grappleSO.maxExitSpeedX,
-                maxExitSpeedY             = _grappleSO.maxExitSpeedY,
-                exitBlendTime             = _grappleSO.exitBlendTime,
-                blendByVelocityLerp       = _grappleSO.blendByVelocityLerp,
-                hardLockDuration          = _grappleSO.hardLockDuration,
-                softCarryMaxDuration      = _grappleSO.softCarryMaxDuration,
-                cooldown                  = _grappleSO.cooldown
-            });
-        }
-
-        _health.Configure(new HealthSettings {
-            maxHP     = _hpSO.maxHP,
-            invulnTime = _hpSO.invulnTime
-        });
-        
-        _knock.Configure(new KnockbackSettings {
-            defaultHitStop = _hitSO != null ? _hitSO.hitStun : 0.05f
-        });
-        
-        _health.Inject(_bus);
-
-        _knock.Configure(new KnockbackSettings { defaultHitStop = 0.05f });
+        _abilityConfigurator?.Configure();
 
         _bus.Subscribe<AttackStarted>(OnAttackStarted);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
@@ -563,16 +470,4 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _gate.UnblockJump(r);
     }
 
-    static AttackSettings BuildAttackSettings(PlayerAttackConfig so)
-    {
-        float d1 = (so.damages != null && so.damages.Length > 0) ? so.damages[0] : so.damage;
-        float d2 = (so.damages != null && so.damages.Length > 1) ? so.damages[1] : so.damage;
-        float d3 = (so.damages != null && so.damages.Length > 2) ? so.damages[2] : so.damage;
-
-        return new AttackSettings {
-            a1 = new AttackStep { damage = d1 },
-            a2 = new AttackStep { damage = d2 },
-            a3 = new AttackStep { damage = d3 },
-        };
-    }
 }
