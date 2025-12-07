@@ -22,10 +22,37 @@ public class EnemyInstaller : MonoInstaller
 
         Container.BindInstance(healthSettings).AsSingle();
 
-        Container.BindInstance(_facade).AsSingle();
+        BindComponent(_facade);
+        BindComponent(_facade != null ? _facade.Health : null);
+        BindComponent(_facade != null ? _facade.Movement : null);
+        BindComponent(_facade != null ? _facade.PatrolController : null);
+        BindComponent(FindOptionalComponent<EnemyDamageFeedback>(), optional: true);
+        BindComponent(FindOptionalComponent<Knockback2D>(), optional: true);
 
         Container.Bind<IMobilityGate>()
             .To<MobilityGate>()
             .AsSingle();
+    }
+
+    void BindComponent<T>(T component, bool optional = false) where T : class
+    {
+        if (component == null)
+        {
+            if (!optional)
+                Debug.LogError($"[EnemyInstaller] Missing component binding for {typeof(T).Name} on {name}");
+            return;
+        }
+
+        Container.BindInterfacesAndSelfTo<T>()
+            .FromInstance(component)
+            .AsSingle();
+    }
+
+    T FindOptionalComponent<T>() where T : Component
+    {
+        if (_facade == null)
+            return null;
+
+        return _facade.GetComponentInChildren<T>(true);
     }
 }

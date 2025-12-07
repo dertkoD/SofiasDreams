@@ -1,47 +1,55 @@
 using UnityEngine;
+using Zenject;
 
 public class EnemyDamageReceiver : MonoBehaviour, IDamageable
 {
     [Header("Refs")]
     [SerializeField] EnemyFacade _facade;
-    [SerializeField] Knockback2D _knockback;
-    [SerializeField] EnemyDamageFeedback _feedback;
-
     [Header("Config")]
     [SerializeField] HitReactionConfig _hitConfig;
+
+    IHealth _health;
+    IKnockback _knockback;
+    IEnemyDamageFeedback _feedback;
 
     public bool IsAlive
     {
         get
         {
-            var h = _facade ? _facade.Health : null;
-            return h != null && h.IsAlive;
+            return _health != null && _health.IsAlive;
         }
     }
 
-    void Awake()
+    [Inject]
+    public void Construct(
+        IHealth health,
+        [InjectOptional] IKnockback knockback = null,
+        [InjectOptional] IEnemyDamageFeedback feedback = null,
+        [InjectOptional] EnemyFacade facade = null)
     {
-        if (!_facade)    _facade   = GetComponentInParent<EnemyFacade>();
-        if (!_knockback) _knockback = GetComponentInParent<Knockback2D>();
-        if (!_feedback)  _feedback  = GetComponentInParent<EnemyDamageFeedback>();
+        _health   = health;
+        _knockback = knockback;
+        _feedback  = feedback;
+
+        if (_facade == null)
+            _facade = facade ?? GetComponentInParent<EnemyFacade>();
     }
 
     public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source)
     {
         Debug.Log($"[EnemyDamageReceiver] ApplyDamage start, amount={amount}");
         
-        var health = _facade ? _facade.Health : null;
-        if (health == null)
+        if (_health == null)
         {
             Debug.LogWarning("[EnemyDamageReceiver] No Health on facade");
             return;
         }
-        if (!health.IsAlive)
+        if (!_health.IsAlive)
         {
             Debug.Log("[EnemyDamageReceiver] Target already dead");
             return;
         }
-        if (health.IsInvincible)
+        if (_health.IsInvincible)
         {
             Debug.Log("[EnemyDamageReceiver] Hit ignored: invincible");
             return;
@@ -60,7 +68,10 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
         };
 
         Debug.Log("[EnemyDamageReceiver] -> Health.ApplyDamage");
-        _facade.ApplyDamage(info);
+        if (_facade != null)
+            _facade.ApplyDamage(info);
+        else
+            _health.ApplyDamage(info);
         
         if (_feedback != null)
         {

@@ -32,13 +32,31 @@ public class EnemyDeathHandler : MonoBehaviour
             _colliders = GetComponentsInChildren<Collider2D>(true);
     }
 
-    void Update()
+    void OnEnable()
     {
-        if (_handled || _health == null)
+        if (_health != null)
+            _health.OnHealthChanged += OnHealthChanged;
+
+        EvaluateDeath();
+    }
+
+    void OnDisable()
+    {
+        if (_health != null)
+            _health.OnHealthChanged -= OnHealthChanged;
+    }
+
+    void OnHealthChanged()
+    {
+        EvaluateDeath();
+    }
+
+    void EvaluateDeath()
+    {
+        if (_handled || _health == null || _health.IsAlive)
             return;
 
-        if (!_health.IsAlive)
-            HandleDeath();
+        HandleDeath();
     }
 
     void HandleDeath()
