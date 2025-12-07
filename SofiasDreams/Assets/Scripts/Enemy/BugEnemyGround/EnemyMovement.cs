@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -5,11 +7,10 @@ public class EnemyMovement : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] Rigidbody2D _rb;
-    [SerializeField] Knockback2D _knockback;
-    [SerializeField] EnemyDamageFeedback _damageFeedback;
 
     EnemyConfigSO _config;
     IMobilityGate _mobilityGate;
+    IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
 
     float _targetX;
     bool _hasTarget;
@@ -22,9 +23,11 @@ public class EnemyMovement : MonoBehaviour
     public Vector3 Velocity => _velocity;
 
     [Inject]
-    public void Construct(IMobilityGate mobilityGate)
+    public void Construct(IMobilityGate mobilityGate, [InjectOptional] List<IHitStunState> hitStunStates = null)
     {
         _mobilityGate = mobilityGate;
+        if (hitStunStates != null && hitStunStates.Count > 0)
+            _hitStunStates = hitStunStates;
     }
 
     public void Configure(EnemyConfigSO config)
@@ -84,8 +87,6 @@ public class EnemyMovement : MonoBehaviour
     void Awake()
     {
         if (!_rb) _rb = GetComponent<Rigidbody2D>();
-        if (!_knockback) _knockback = GetComponent<Knockback2D>();
-        if (!_damageFeedback) _damageFeedback = GetComponent<EnemyDamageFeedback>();
 
         _baseScaleX = Mathf.Abs(transform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
@@ -96,8 +97,7 @@ public class EnemyMovement : MonoBehaviour
         if (_rb == null || _config == null)
             return;
 
-        if ((_knockback != null && _knockback.IsInHitStun) ||
-            (_damageFeedback != null && _damageFeedback.InHitStun))
+        if (IsInHitStun())
         {
             _velocity = _rb.linearVelocity;
             return;
@@ -150,5 +150,19 @@ public class EnemyMovement : MonoBehaviour
         var scale = transform.localScale;
         scale.x = _baseScaleX * sign;
         transform.localScale = scale;
+    }
+
+    bool IsInHitStun()
+    {
+        if (_hitStunStates == null)
+            return false;
+
+        for (int i = 0; i < _hitStunStates.Count; i++)
+        {
+            if (_hitStunStates[i] != null && _hitStunStates[i].InHitStun)
+                return true;
+        }
+
+        return false;
     }
 }

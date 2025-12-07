@@ -1,12 +1,13 @@
 using UnityEngine;
 
-public class Knockback2D : MonoBehaviour, IKnockback
+public class Knockback2D : MonoBehaviour, IKnockback, IHitStunState
 {
     [SerializeField] Rigidbody2D _rb;
     KnockbackSettings _s; bool _inStun; float _stun;
 
     public void Configure(KnockbackSettings s) => _s = s;
     public bool IsInHitStun => _inStun;
+    public bool InHitStun => _inStun;
 
     public void Apply(DamageInfo info)
     {

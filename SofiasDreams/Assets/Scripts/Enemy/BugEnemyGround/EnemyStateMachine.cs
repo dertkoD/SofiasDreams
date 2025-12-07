@@ -28,6 +28,18 @@ public class EnemyStateMachine : MonoBehaviour
         _deadState = new EnemyDeadState(_movement);
     }
 
+    void OnEnable()
+    {
+        if (_health != null)
+            _health.OnHealthChanged += OnHealthChanged;
+    }
+
+    void OnDisable()
+    {
+        if (_health != null)
+            _health.OnHealthChanged -= OnHealthChanged;
+    }
+
     void Start()
     {
         ChangeState(_patrolState);
@@ -35,21 +47,19 @@ public class EnemyStateMachine : MonoBehaviour
 
     void Update()
     {
-        /*if (_health != null && !_isDeadNotified && !IsAlive())
-        {
-            _isDeadNotified = true;
-            ChangeState(_deadState);
-
-            if (_bus != null && _facade != null)
-                _bus.Fire(new EnemyDiedSignal(_facade));
-        }*/
-
         _current?.Tick();
     }
 
-    bool IsAlive()
+    void OnHealthChanged()
     {
-        return (_health as IHealth)?.IsAlive ?? true;
+        if (_health == null || _health.IsAlive || _isDeadNotified)
+            return;
+
+        _isDeadNotified = true;
+        ChangeState(_deadState);
+
+        if (_bus != null && _facade != null)
+            _bus.Fire(new EnemyDiedSignal(_facade));
     }
 
     void ChangeState(IEnemyState next)

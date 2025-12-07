@@ -2,7 +2,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 
-public class EnemyDamageFeedback : MonoBehaviour
+public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 {
     [Header("Refs")] [SerializeField] Rigidbody2D rb;
     [SerializeField] Animator animator;
