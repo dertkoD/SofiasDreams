@@ -92,6 +92,7 @@ public class Jumper2D : MonoBehaviour, IJumper
 
             _isJumping = true;
             IsGrounded = false;
+            BroadcastGroundedImmediate(false);
             _buffer = 0f;
             _coyote = 0f;
         }
@@ -126,6 +127,15 @@ public class Jumper2D : MonoBehaviour, IJumper
         return rb.IsTouching(filter);
     }
     
+    void BroadcastGroundedImmediate(bool grounded)
+    {
+        if (_wasGrounded == grounded)
+            return;
+
+        _wasGrounded = grounded;
+        _bus?.Fire(new GroundedChanged { grounded = grounded });
+    }
+
     IEnumerator DropRoutine()
     {
         _isDropping = true;
@@ -174,7 +184,7 @@ public class Jumper2D : MonoBehaviour, IJumper
 
         // We consider ourselves no longer grounded for logic (coyote starts ticking)
         IsGrounded = false;
-        _bus?.Fire(new GroundedChanged { grounded = false });
+        BroadcastGroundedImmediate(false);
 
         yield return new WaitForSeconds(_s.dropDuration);
 
