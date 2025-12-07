@@ -1,10 +1,22 @@
 using UnityEngine;
+using Zenject;
 
 public class Weapon : MonoBehaviour
 {
     [SerializeField] private int attackDamage = 10;
-
     [SerializeField] private LayerMask enemyHurtboxLayers;
+    [SerializeField] private PlayerWeaponConfig defaultConfig;
+
+    PlayerWeaponConfig _runtimeConfig;
+
+    int Damage => _runtimeConfig ? _runtimeConfig.baseDamage : attackDamage;
+    LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
+
+    [Inject]
+    void Construct([Inject(Optional = true)] PlayerWeaponConfig injectedConfig = null)
+    {
+        _runtimeConfig = injectedConfig ? injectedConfig : defaultConfig;
+    }
 
     private void Reset()
     {
@@ -14,16 +26,10 @@ public class Weapon : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Weapon trigger with {other.name}, layer = {other.gameObject.layer}");
-        
-        // Only react to configured hurtbox layers (enemies + shortcuts, etc.)
-        if ((enemyHurtboxLayers.value & (1 << other.gameObject.layer)) == 0)
+        if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
             return;
 
         var hb = other.GetComponent<Hurtbox2D>();
-        
-        Debug.Log($"Hurtbox: {hb}, owner: {hb?.Owner}");
-        
         var target = hb ? hb.Owner : null;
         if (target == null || !target.IsAlive)
             return;
@@ -31,8 +37,6 @@ public class Weapon : MonoBehaviour
         Vector2 hitPoint  = other.ClosestPoint(transform.position);
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
 
-        target.ApplyDamage(attackDamage, hitPoint, hitNormal, gameObject);
-
-        Debug.Log($"Hit {target} for {attackDamage}");
+        target.ApplyDamage(Damage, hitPoint, hitNormal, gameObject);
     }
 }

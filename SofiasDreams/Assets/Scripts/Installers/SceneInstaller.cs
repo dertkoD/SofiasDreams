@@ -9,23 +9,7 @@ public class SceneInstaller : MonoInstaller
     {
         // Bus + signals in THIS scene container (source of truth)
         SignalBusInstaller.Install(Container);
-        Container.DeclareSignal<AttackStarted>();
-        Container.DeclareSignal<AttackFinished>();
-        Container.DeclareSignal<HealStarted>();
-        Container.DeclareSignal<HealFinished>();
-        Container.DeclareSignal<HealInterrupted>();
-        Container.DeclareSignal<TookDamage>();
-        Container.DeclareSignal<Died>();
-        Container.DeclareSignal<PlayerSpawned>();
-        Container.DeclareSignal<EnemyKilled>();
-        Container.DeclareSignal<HealChargesChanged>();
-        Container.DeclareSignal<DashStarted>();   
-        Container.DeclareSignal<DashFinished>();
-        Container.DeclareSignal<PlayerGrappleRequested>();
-        Container.DeclareSignal<GrappleCommand>();
-        Container.DeclareSignal<GrappleStarted>();
-        Container.DeclareSignal<GrappleFinished>();
-        Container.DeclareSignal<EnemyDiedSignal>();
+        PlayerSignalRegistry.DeclareSceneSignals(Container);
 
         // Services
         Container.Bind<Spawner>().AsSingle();

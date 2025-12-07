@@ -13,16 +13,19 @@ public class PlayerInstaller : MonoInstaller
     public PlayerDashConfig    dashSO;
     public PlayerGrappleConfig grappleSO;
     public HitReactionConfig hitReactionSO;
+    public PlayerAnimatorConfig animatorSO;
+    public PlayerWeaponConfig weaponSO;
 
     public override void InstallBindings()
     {
         Container.Bind<IInputService>().To<InputService>().AsSingle();
 
         Container.BindInterfacesAndSelfTo<PlayerStateMachine>().AsSingle();
+        Container.Bind<IPlayerAbilityConfigurator>().To<PlayerAbilityConfigurator>().AsSingle();
 
         Container.Bind<IMobilityGate>().To<MobilityGate>().AsSingle();
 
-        Container.DeclareSignal<GroundedChanged>();
+        PlayerSignalRegistry.DeclarePlayerSignals(Container);
 
         Container.BindInterfacesAndSelfTo<Mover2D>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<Jumper2D>().FromComponentOnRoot().AsSingle();
@@ -46,5 +49,7 @@ public class PlayerInstaller : MonoInstaller
         if (dashSO)     Container.BindInstance(dashSO);
         if (grappleSO)  Container.BindInstance(grappleSO);
         if (hitReactionSO) Container.BindInstance(hitReactionSO);
+        if (animatorSO) Container.BindInstance(animatorSO);
+        if (weaponSO)   Container.BindInstance(weaponSO);
     }
 }
