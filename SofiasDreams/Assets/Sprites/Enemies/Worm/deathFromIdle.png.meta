@@ -1,0 +1,260 @@
+fileFormatVersion: 2
+guid: 8101f1194d11c12419dbec5f7dc3deef
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3889507159840314148
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 idle_0"
+  - first:
+      213: 4140263434233509008
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 idle_1"
+  - first:
+      213: 6902105442421625183
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 idle_2"
+  - first:
+      213: 4112720965963414823
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 idle_3"
+  - first:
+      213: -3795968918371447760
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 idle_4"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: deathFromIdle_0
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 157
+        width: 251
+        height: 66
+      alignment: 9
+      pivot: {x: 0.09927058, y: 0.5105101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9437e114a83488a4087c42d5600dc98d
+      internalID: -2143939183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromIdle_1
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 158
+        width: 251
+        height: 59
+      alignment: 9
+      pivot: {x: 0.10756121, y: 0.42945707}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58ba5b1fe99dc764a89ba42c10a78873
+      internalID: -712543228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromIdle_2
+      rect:
+        serializedVersion: 2
+        x: 1156
+        y: 153
+        width: 251
+        height: 59
+      alignment: 9
+      pivot: {x: 0.10479761, y: 0.47648543}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adb0c120c57e1fb44bcec728ace9ddfd
+      internalID: 1316394640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromIdle_3
+      rect:
+        serializedVersion: 2
+        x: 1668
+        y: 153
+        width: 266
+        height: 48
+      alignment: 9
+      pivot: {x: 0.09839739, y: 0.5433547}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 727436ba2cc549844b88d99954a26694
+      internalID: 1797027032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromIdle_4
+      rect:
+        serializedVersion: 2
+        x: 2179
+        y: 153
+        width: 294
+        height: 44
+      alignment: 9
+      pivot: {x: 0.09181597, y: 0.5630615}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 856667104a1748b429d119f32143d56d
+      internalID: 811703220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: cb5db500fea0b9a4e9f9c46c0a7e2e0d
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      deathFromIdle_0: -2143939183
+      deathFromIdle_1: -712543228
+      deathFromIdle_2: 1316394640
+      deathFromIdle_3: 1797027032
+      deathFromIdle_4: 811703220
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

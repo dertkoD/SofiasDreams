@@ -1,0 +1,416 @@
+fileFormatVersion: 2
+guid: 15fdcb51d722c084a9941013e3cf827d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6758208210611770687
+    second: trigger_0
+  - first:
+      213: -2335477406862906123
+    second: trigger_1
+  - first:
+      213: 6445564005309119847
+    second: trigger_2
+  - first:
+      213: -6971063522683169339
+    second: trigger_3
+  - first:
+      213: -1506358562310552286
+    second: trigger_4
+  - first:
+      213: 5548275326137041555
+    second: trigger_5
+  - first:
+      213: 5640700545507290423
+    second: trigger_6
+  - first:
+      213: -7531439583733597688
+    second: trigger_7
+  - first:
+      213: 7694328009612611759
+    second: trigger_8
+  - first:
+      213: 4169532274764428908
+    second: trigger_9
+  - first:
+      213: 6759762475825599748
+    second: trigger_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: trigger_0
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 158
+        width: 254
+        height: 62
+      alignment: 9
+      pivot: {x: 0.09463291, y: 0.511453}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ca6b5060750632a0800000000000000
+      internalID: -6758208210611770687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_1
+      rect:
+        serializedVersion: 2
+        x: 647
+        y: 157
+        width: 248
+        height: 70
+      alignment: 9
+      pivot: {x: 0.10669314, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fc6cfe1ca7b69fd0800000000000000
+      internalID: -2335477406862906123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_2
+      rect:
+        serializedVersion: 2
+        x: 1158
+        y: 157
+        width: 239
+        height: 88
+      alignment: 9
+      pivot: {x: 0.111471646, y: 0.4024596}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76d7e71105e337950800000000000000
+      internalID: 6445564005309119847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_3
+      rect:
+        serializedVersion: 2
+        x: 1670
+        y: 157
+        width: 248
+        height: 70
+      alignment: 9
+      pivot: {x: 0.08781433, y: 0.5222948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c559cf09aec14f90800000000000000
+      internalID: -6971063522683169339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_4
+      rect:
+        serializedVersion: 2
+        x: 2182
+        y: 157
+        width: 254
+        height: 56
+      alignment: 9
+      pivot: {x: 0.0989625, y: 0.4726467}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2258c1d5ed6581be0800000000000000
+      internalID: -1506358562310552286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_5
+      rect:
+        serializedVersion: 2
+        x: 2694
+        y: 157
+        width: 254
+        height: 62
+      alignment: 9
+      pivot: {x: 0.09447858, y: 0.52517086}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 392867a530f6ffc40800000000000000
+      internalID: 5548275326137041555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_6
+      rect:
+        serializedVersion: 2
+        x: 3205
+        y: 157
+        width: 105
+        height: 201
+      alignment: 9
+      pivot: {x: 0.23246141, y: 0.1506028}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73d605ba24bc74e40800000000000000
+      internalID: 5640700545507290423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_7
+      rect:
+        serializedVersion: 2
+        x: 3672
+        y: 162
+        width: 142
+        height: 98
+      alignment: 9
+      pivot: {x: 0.4945034, y: 0.2690886}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80a3e341a93fa7790800000000000000
+      internalID: -7531439583733597688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_8
+      rect:
+        serializedVersion: 2
+        x: 4194
+        y: 157
+        width: 129
+        height: 99
+      alignment: 9
+      pivot: {x: 0.46370444, y: 0.3187128}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa05c46fe8eb7ca60800000000000000
+      internalID: 7694328009612611759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_9
+      rect:
+        serializedVersion: 2
+        x: 4701
+        y: 154
+        width: 147
+        height: 141
+      alignment: 9
+      pivot: {x: 0.4628408, y: 0.48339725}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c663cd443872dd930800000000000000
+      internalID: 4169532274764428908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trigger_10
+      rect:
+        serializedVersion: 2
+        x: 5206
+        y: 157
+        width: 146
+        height: 144
+      alignment: 9
+      pivot: {x: 0.50534433, y: 0.49999988}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 405999138208fcd50800000000000000
+      internalID: 6759762475825599748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 38464663d26d5b149b3aaf34ca8269c1
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      trigger_0: -6758208210611770687
+      trigger_1: -2335477406862906123
+      trigger_10: 6759762475825599748
+      trigger_2: 6445564005309119847
+      trigger_3: -6971063522683169339
+      trigger_4: -1506358562310552286
+      trigger_5: 5548275326137041555
+      trigger_6: 5640700545507290423
+      trigger_7: -7531439583733597688
+      trigger_8: 7694328009612611759
+      trigger_9: 4169532274764428908
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

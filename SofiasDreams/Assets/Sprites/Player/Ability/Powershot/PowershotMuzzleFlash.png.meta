@@ -1,0 +1,312 @@
+fileFormatVersion: 2
+guid: f1b45454886af9a4bab4d6f4743f95b3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6613089175691745150
+    second: gun expl ver2_0
+  - first:
+      213: 1111054973058081562
+    second: gun expl ver2_1
+  - first:
+      213: 5606031748409789144
+    second: gun expl ver2_2
+  - first:
+      213: -2012098739404280597
+    second: gun expl ver2_3
+  - first:
+      213: 2832536772523037129
+    second: gun expl ver2_4
+  - first:
+      213: -1808574232009812871
+    second: gun expl ver2_5
+  - first:
+      213: -7291640447422045876
+    second: gun expl ver2_6
+  - first:
+      213: 9114654941900612695
+    second: gun expl ver2_7
+  - first:
+      213: -6754808888224404521
+    second: gun expl ver2_8
+  - first:
+      213: -8081470884601458681
+    second: gun expl ver2_9
+  - first:
+      213: 4054194884596450461
+    second: gun expl ver2_10
+  - first:
+      213: -6431940441222517624
+    second: gun expl ver2_11
+  - first:
+      213: 4333168614069574141
+    second: gun expl ver2_12
+  - first:
+      213: -2489237397324744873
+    second: gun expl ver2_13
+  - first:
+      213: -993714401533911554
+    second: gun expl ver2_14
+  - first:
+      213: -7292794106361097117
+    second: gun expl ver2_15
+  - first:
+      213: -4429562027175940955
+    second: gun expl ver2_16
+  - first:
+      213: 4663670095743847914
+    second: gun expl ver2_17
+  - first:
+      213: -7670295260920676382
+    second: gun expl ver2_18
+  - first:
+      213: 9148030508266411334
+    second: gun expl ver2_19
+  - first:
+      213: -2396410362352285909
+    second: gun expl ver2_20
+  - first:
+      213: -7378794203946026975
+    second: gun expl ver2_21
+  - first:
+      213: 3334493460272127033
+    second: gun expl ver2_22
+  - first:
+      213: 7673431485898463842
+    second: gun expl ver2_23
+  - first:
+      213: 7112091204951978489
+    second: gun expl ver2_24
+  - first:
+      213: -4903630969984173990
+    second: gun expl ver2_25
+  - first:
+      213: 7509705412352316816
+    second: gun expl ver2_26
+  - first:
+      213: 1827787151826245721
+    second: gun expl ver2_27
+  - first:
+      213: 3649110016610250485
+    second: gun expl ver2_28
+  - first:
+      213: 4697328936127783484
+    second: gun expl ver2_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PowershotMuzzleFlash_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d6b2aa28940455479f6c3c56a590f47
+      internalID: 182797506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotMuzzleFlash_1
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77e38a6e506105d4a922c162ca9dcfd8
+      internalID: 583934224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotMuzzleFlash_2
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0b3fcc93b65a8444b5a86b17457fb23
+      internalID: -2055170711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotMuzzleFlash_3
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51a3998838c5a3044b2855f74f6d845e
+      internalID: 1265589810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 4a9c6903bba73554fba10e8a70d67f05
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PowershotMuzzleFlash_0: 182797506
+      PowershotMuzzleFlash_1: 583934224
+      PowershotMuzzleFlash_2: -2055170711
+      PowershotMuzzleFlash_3: 1265589810
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

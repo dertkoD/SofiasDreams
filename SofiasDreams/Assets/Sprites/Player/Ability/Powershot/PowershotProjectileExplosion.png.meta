@@ -1,0 +1,406 @@
+fileFormatVersion: 2
+guid: 44bfa349b473dce4a98c18a51dd2a07d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3155755384268604274
+    second: bullet expl centered 18.09.2025 ver2_0
+  - first:
+      213: 7929267384015131610
+    second: bullet expl centered 18.09.2025 ver2_1
+  - first:
+      213: 7323694390631437642
+    second: bullet expl centered 18.09.2025 ver2_2
+  - first:
+      213: -2017299250927839237
+    second: bullet expl centered 18.09.2025 ver2_3
+  - first:
+      213: 2207483422616597061
+    second: bullet expl centered 18.09.2025 ver2_4
+  - first:
+      213: 4459805514998616759
+    second: bullet expl centered 18.09.2025 ver2_5
+  - first:
+      213: 6668434782148930078
+    second: bullet expl centered 18.09.2025 ver2_6
+  - first:
+      213: 5794875593059990702
+    second: bullet expl centered 18.09.2025 ver2_7
+  - first:
+      213: -3865932632194522010
+    second: bullet expl centered 18.09.2025 ver2_8
+  - first:
+      213: 4840573388988882965
+    second: bullet expl centered 18.09.2025 ver2_9
+  - first:
+      213: 1154611886646075262
+    second: bullet expl centered 18.09.2025 ver2_10
+  - first:
+      213: -347659667086394523
+    second: bullet expl centered 18.09.2025 ver2_11
+  - first:
+      213: 1967624637069781525
+    second: bullet expl centered 18.09.2025 ver2_12
+  - first:
+      213: -760479135163322339
+    second: bullet expl centered 18.09.2025 ver2_13
+  - first:
+      213: 1137470871713941351
+    second: bullet expl centered 18.09.2025 ver2_14
+  - first:
+      213: 6282157240708009840
+    second: bullet expl centered 18.09.2025 ver2_15
+  - first:
+      213: -5934892000861596301
+    second: bullet expl centered 18.09.2025 ver2_16
+  - first:
+      213: 7579153741428361093
+    second: bullet expl centered 18.09.2025 ver2_17
+  - first:
+      213: -7792579139320921273
+    second: bullet expl centered 18.09.2025 ver2_18
+  - first:
+      213: -1482012010289940322
+    second: bullet expl centered 18.09.2025 ver2_19
+  - first:
+      213: -9035944187646713090
+    second: bullet expl centered 18.09.2025 ver2_20
+  - first:
+      213: 5284520019680529240
+    second: bullet expl centered 18.09.2025 ver2_21
+  - first:
+      213: -6696418574070198841
+    second: bullet expl centered 18.09.2025 ver2_22
+  - first:
+      213: -3542131368806574138
+    second: bullet expl centered 18.09.2025 ver2_23
+  - first:
+      213: -8644855785933585385
+    second: bullet expl centered 18.09.2025 ver2_24
+  - first:
+      213: 4613740196510976327
+    second: bullet expl centered 18.09.2025 ver2_25
+  - first:
+      213: -2756765732856522556
+    second: bullet expl centered 18.09.2025 ver2_26
+  - first:
+      213: 5961420730456733338
+    second: bullet expl centered 18.09.2025 ver2_27
+  - first:
+      213: 6965301313662601581
+    second: bullet expl centered 18.09.2025 ver2_28
+  - first:
+      213: 8078238292999309581
+    second: bullet expl centered 18.09.2025 ver2_29
+  - first:
+      213: -2988932750253406001
+    second: bullet expl centered 18.09.2025 ver2_30
+  - first:
+      213: -3843973047469540036
+    second: bullet expl centered 18.09.2025 ver2_31
+  - first:
+      213: 8487801693726048503
+    second: bullet expl centered 18.09.2025 ver2_32
+  - first:
+      213: 5848905127167424401
+    second: bullet expl centered 18.09.2025 ver2_33
+  - first:
+      213: -7663236975497424212
+    second: bullet expl centered 18.09.2025 ver2_34
+  - first:
+      213: 4574143825806806630
+    second: bullet expl centered 18.09.2025 ver2_35
+  - first:
+      213: 6132568148833279840
+    second: bullet expl centered 18.09.2025 ver2_36
+  - first:
+      213: -7056981719201723135
+    second: bullet expl centered 18.09.2025 ver2_37
+  - first:
+      213: 3230816395165799142
+    second: bullet expl centered 18.09.2025 ver2_38
+  - first:
+      213: 6666282377859382712
+    second: bullet expl centered 18.09.2025 ver2_39
+  - first:
+      213: -4331540065574562797
+    second: bullet expl centered 18.09.2025 ver2_40
+  - first:
+      213: -1087663532951334915
+    second: bullet expl centered 18.09.2025 ver2_41
+  - first:
+      213: -4574926379346586814
+    second: bullet expl centered 18.09.2025 ver2_42
+  - first:
+      213: -6996861740082457103
+    second: bullet expl centered 18.09.2025 ver2_43
+  - first:
+      213: 6826769797567501949
+    second: bullet expl centered 18.09.2025 ver2_44
+  - first:
+      213: 5329771832135363878
+    second: bullet expl centered 18.09.2025 ver2_45
+  - first:
+      213: 3862730351447800072
+    second: bullet expl centered 18.09.2025 ver2_46
+  - first:
+      213: -4226070121355050713
+    second: bullet expl centered 18.09.2025 ver2_47
+  - first:
+      213: 6802759617168417611
+    second: bullet expl centered 18.09.2025 ver2_48
+  - first:
+      213: -2715128618158616082
+    second: bullet expl centered 18.09.2025 ver2_49
+  - first:
+      213: 8087114490935876969
+    second: bullet expl centered 18.09.2025 ver2_50
+  - first:
+      213: -3972967971397490480
+    second: bullet expl centered 18.09.2025 ver2_51
+  - first:
+      213: 4385598068771925555
+    second: bullet expl centered 18.09.2025 ver2_52
+  - first:
+      213: -6219621896948611902
+    second: bullet expl centered 18.09.2025 ver2_53
+  - first:
+      213: -228263153134244318
+    second: bullet expl centered 18.09.2025 ver2_54
+  - first:
+      213: 872446626119839458
+    second: bullet expl centered 18.09.2025 ver2_55
+  - first:
+      213: -8437483267531252948
+    second: bullet expl centered 18.09.2025 ver2_56
+  - first:
+      213: -4459963041800152819
+    second: bullet expl centered 18.09.2025 ver2_57
+  - first:
+      213: -7281132058100948857
+    second: bullet expl centered 18.09.2025 ver2_58
+  - first:
+      213: -2887592708966206173
+    second: bullet expl centered 18.09.2025 ver2_59
+  - first:
+      213: -775964349555744519
+    second: bullet expl centered 18.09.2025 ver2_60
+  - first:
+      213: -3938115985678049326
+    second: bullet expl centered 18.09.2025 ver2_61
+  - first:
+      213: -586281055744675758
+    second: bullet expl centered 18.09.2025 ver2_62
+  - first:
+      213: -4965487184179062557
+    second: bullet expl centered 18.09.2025 ver2_63
+  - first:
+      213: 3079636229742221507
+    second: bullet expl centered 18.09.2025 ver2_64
+  - first:
+      213: 6215310667832741982
+    second: bullet expl centered 18.09.2025 ver2_65
+  - first:
+      213: -4816822541285706701
+    second: bullet expl centered 18.09.2025 ver2_66
+  - first:
+      213: -6408378889767898851
+    second: bullet expl centered 18.09.2025 ver2_67
+  - first:
+      213: 3128342473516412138
+    second: bullet expl centered 18.09.2025 ver2_68
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PowershotProjectileExplosion_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 1023
+      alignment: 9
+      pivot: {x: 0.35, y: 0.46}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e2fc0e5e83e78446bf3bda5f35bbb51
+      internalID: -498693778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotProjectileExplosion_1
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 1024
+        height: 1023
+      alignment: 9
+      pivot: {x: 0.35, y: 0.46}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a6d860aab3d71047b98949ccbba5e1b
+      internalID: -1497010651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotProjectileExplosion_2
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 0
+        width: 1024
+        height: 1023
+      alignment: 9
+      pivot: {x: 0.35, y: 0.46}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63f3e4ef1487d5a4583f12b299452975
+      internalID: 1607123943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: fe8fcb3f2d3a2094d836194f70da0bcc
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PowershotProjectileExplosion_0: -498693778
+      PowershotProjectileExplosion_1: -1497010651
+      PowershotProjectileExplosion_2: 1607123943
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

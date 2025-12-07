@@ -1,0 +1,6016 @@
+fileFormatVersion: 2
+guid: 0307edac8c3fa6f48b5d173abf39dfae
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f3268c876daf4890b6af6cd462063137, type: 3}
+  _reimportOnDependencyChange: 1
+  _pixelsPerUnit: 16
+  _overrideTexture: {instanceID: 0}
+  _sprites:
+  - name: MarioTiles_0
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 9e59130e2c9be9b43ab5c4cb3f364da0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_1
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 1d008beced6ed104086187fd47759a25
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_2
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 384
+      width: 16
+      height: 16
+    spriteID: dbc73eda9aea56041940fedf667d1bb1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_3
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 96364df51a8b5764ea873eefbf290d7a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_4
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 20230d07e86eb074bab2a57fc6c30376
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_5
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 384
+      width: 16
+      height: 16
+    spriteID: b8fabca9c892e1d4a906e2248949b844
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_6
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 2655e71987c58fd4bb32989943750aaa
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_7
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 453f797a7daaae845a7b4edbe1926e5c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_8
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 9fab9df54c152f4479d1dc0b0a78786c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_9
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 8405d77d15b91c1498e733a1a9bdd4db
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_10
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 384
+      width: 16
+      height: 16
+    spriteID: b651973e77d6c5e479cd560facc06136
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_11
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 8bab31a42db5c9c41a52eb040b888694
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_12
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 28d194612e647d64383174d4ed4b179f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_13
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 384
+      width: 16
+      height: 16
+    spriteID: ded519bec32a4f744b70eb2282c7eff2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_14
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 8fba2a2869ecbfe4c9e9fc162effe93b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_15
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 384
+      width: 16
+      height: 16
+    spriteID: 8399f1358ac45734d9a31895a0e1ab6e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_16
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 368
+      width: 16
+      height: 16
+    spriteID: b1a0eca49374e394d8600a4fba6588e1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_17
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 09d4c4cc422bc544fa01bb6a63ace5ba
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_18
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 0885babf4ecc79b498cd48498db73d12
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_19
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 23407208a4d5da1478fbc3e27d50c8d3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_20
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 52cb96ccd16bc554eaf5e494b7326221
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_21
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 9e0aa3d9712214048953f70fe233d02f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_22
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 368
+      width: 16
+      height: 16
+    spriteID: b09511f835d7b954e868f5cfcd91a168
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_23
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 62b4703b7d786ab4d805bf75a5e004ee
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_24
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 368
+      width: 16
+      height: 16
+    spriteID: a0eb2c30c2814b448b5e6da76a44fea9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_25
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 368
+      width: 16
+      height: 16
+    spriteID: f3d44f89ce0ca324bb1e7534b4c725b7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_26
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 5d1050726a6a2084480d252dfa466f22
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_27
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 368
+      width: 16
+      height: 16
+    spriteID: dcc6ad19ee06f9a4aa9d198a8ad1d86b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_28
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 368
+      width: 16
+      height: 16
+    spriteID: c4bdb25533be13f4d9762723ca6ef3c6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_29
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 368
+      width: 16
+      height: 16
+    spriteID: bbbdc8ea528c58a4ab0d79df6a93944f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_30
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 368
+      width: 16
+      height: 16
+    spriteID: bd10fdf65c6b64342ad07f9882975161
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_31
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 368
+      width: 16
+      height: 16
+    spriteID: 57d63b8afb219cd4787781759226b5a9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_32
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 5e19135d17911ab45bc95b1ebd82dad1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_33
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 085f4323f0131204e8767b20418db016
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_34
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 437ddf5bbd912ee478e8dc3f4a931a24
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_35
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 352
+      width: 16
+      height: 16
+    spriteID: f56a74e5d69a9414c81a3af25b0ddb88
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_36
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 64c49893bb2da184f87ffc86d4bc780e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_37
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 731a4a4817e34514ca303f85b2fb9edd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_38
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 352
+      width: 16
+      height: 16
+    spriteID: f04532a51ef6ce14f89d4773f2e52f01
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_39
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 352
+      width: 16
+      height: 16
+    spriteID: db67e8c6196546244bb9d7f73f3fdab5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_40
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 5343c3cfd182cd24f8ea8d5918bd55ba
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_41
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 2c35d3581bcf6e548b8b40548c3d60b1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_42
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 0c4a9d5b4eaf0ac4f8ad022d2d76cbdd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_43
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 0c3f198997d8fd3408aa8f8473c7777f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_44
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 4f92a9e63e8049f41a785d0a07e2a9f3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_45
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 352
+      width: 16
+      height: 16
+    spriteID: cce675b933732c04693257260ea46e8f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_46
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 352
+      width: 16
+      height: 16
+    spriteID: 02e270a704c3bba4b800ead31fc614cf
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_47
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 352
+      width: 16
+      height: 16
+    spriteID: e2174d4b48ee4134997ec49927cd9001
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_48
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 6331c4b481d636540a4282055ea80913
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_49
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 31fc6551350c4e84a8f4b09ae453978e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_50
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 336
+      width: 16
+      height: 16
+    spriteID: f16d40547ee7f3247a5cc6f92883f8d6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_51
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 336
+      width: 16
+      height: 16
+    spriteID: bf686df46feefbe4da8aef3ed538c3f5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_52
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 3e95849a2f7ebc84bb6188beffb0f7ec
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_53
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 336
+      width: 16
+      height: 16
+    spriteID: b91fc7f96b4969944a5e2d712318d357
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_54
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 336
+      width: 16
+      height: 16
+    spriteID: ab3d003f1f3e90849b512cde57d1cf18
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_55
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 336
+      width: 16
+      height: 16
+    spriteID: bf3a073bd45592648914b62fa49c5c69
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_56
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 336
+      width: 16
+      height: 16
+    spriteID: fd533f03c84073148a7df2bffe5b73f7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_57
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 68438d646ecc99645bf2ae51be56876d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_58
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 336
+      width: 16
+      height: 16
+    spriteID: dad8d1fe6af683c4cbd7663bd9f7ef5a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_59
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 392ee2680a4be9c478f3980555fdd66d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_60
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 9eaf71986e629a047a5f7cc555e7fdb4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_61
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 73d8d00ccc1e0f743b3855589e46a08e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_62
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 336
+      width: 16
+      height: 16
+    spriteID: 6f358582ee2f0454292bfb669e1e2f43
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_63
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 336
+      width: 16
+      height: 16
+    spriteID: b45092e5a96e770439d685496dcf9d51
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_64
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 78589d2b7de445648a9268070fa1289e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_65
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 7fbaf703ad494e44c9d93a9dac553cee
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_66
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 26f05506d08210d4da2b7b443fee5d38
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_67
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 320
+      width: 16
+      height: 16
+    spriteID: e10d0823cb9ae6349b4a7c8725bf4b74
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_68
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 320
+      width: 16
+      height: 16
+    spriteID: c729eb83e3694004aa17392d9b61d9c4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_69
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 320
+      width: 16
+      height: 16
+    spriteID: d2cb3360ebe13b14487d5b8c720b9408
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_70
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 320
+      width: 16
+      height: 16
+    spriteID: aa9a552be171ba64fa9d6ec6eb0a5c24
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_71
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 0bda7cf5cb183074391fb547eb31640e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_72
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 89a0ad9eb56b95c4cac70a4b2a8ed2e4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_73
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 320
+      width: 16
+      height: 16
+    spriteID: b3b9075818ee7ec489b973cf93e19b66
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_74
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 610e3d9a6229d8d499be7e4eb84eb61e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_75
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 121e2f6fe132b9840abcf20b1398f8d2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_76
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 180ddcd2cc3a3bc448f48ea921e9f63f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_77
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 298cb00e4ef347c40bc753648252e556
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_78
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 375ea65bdee7aea4eacf826f8f0d3290
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_79
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 320
+      width: 16
+      height: 16
+    spriteID: 3e7de0b89a13f0746a50a2e9c43d1ea2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_80
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 6f03547dc963dfa4880a2673355bafc9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_81
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 228227f4ada94214589f6218009356bb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_82
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 471867ff5f4fef049b8c0041e2d65a4d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_83
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 304
+      width: 16
+      height: 16
+    spriteID: f8e901966ff623148bba02f255dc2e1e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_84
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 304
+      width: 16
+      height: 16
+    spriteID: e19d88e158561834a978bc70818b9b15
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_85
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 304
+      width: 16
+      height: 16
+    spriteID: a6a6a11092540ca4281b759d5f756fd5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_86
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 3e470da3249c6c344ae3e11a066cc5f0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_87
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 6ae1e547241abe44eafcb01ecf9545ab
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_88
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 357b30ddb0406984da1ffce0022c055e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_89
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 3452f15125a8c814d93f984845c288a1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_90
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 9252489b0d72b354cb57589dfb9dfb53
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_91
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 5af4afec20faed643a431d8cc7227ad4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_92
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 8e8b142a2876fae4692c40d8dc9229b8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_93
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 304
+      width: 16
+      height: 16
+    spriteID: be3be9763090fe545878515afd86d6da
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_94
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 304
+      width: 16
+      height: 16
+    spriteID: 9e4c989e4d9743246a16dab3638f472e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_95
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 304
+      width: 16
+      height: 16
+    spriteID: d2a3eff1c5a3bcc438422cb8884ff13c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_96
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 5afc1adad1fa44342b75a961d0e5fb09
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_97
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 93dc4b79f2667704485d69536ef33375
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_98
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 288
+      width: 16
+      height: 16
+    spriteID: cedbbb49724cd0f4eb16d10ee81cd7a2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_99
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 288
+      width: 16
+      height: 16
+    spriteID: e2942efb1d7c6e74cb956436875acffb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_100
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 464e20482a265d54eb0a848bbd5c69bc
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_101
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 497c36bebc892d244aa3807c71a880bf
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_102
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 288
+      width: 16
+      height: 16
+    spriteID: cb487baaa895e4a47b3e6f504a50862b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_103
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 288
+      width: 16
+      height: 16
+    spriteID: dcf48150ad70ad44698df656b9dfb0bc
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_104
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 38d0a15cbc4070c488cef3798fe71a56
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_105
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 61161b2ed4793834190fe76e3aca212c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_106
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 288
+      width: 16
+      height: 16
+    spriteID: da1d55b3bbe8e244a9549ae99352e9e1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_107
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 288
+      width: 16
+      height: 16
+    spriteID: d82fa877baf8ef44abada963be5b6409
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_108
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 288
+      width: 16
+      height: 16
+    spriteID: bbb6f5c9f8a3bf349a24069a1f3f3fa6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_109
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 06c9f5ffcd2500446ab4ea58d3319464
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_110
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 288
+      width: 16
+      height: 16
+    spriteID: 007d9cb50b794aa45b6dea295321d9e5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_111
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 288
+      width: 16
+      height: 16
+    spriteID: b41bb938d2023ec4f83de8d96a06819b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_112
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 272
+      width: 16
+      height: 16
+    spriteID: ad8378dee57e1864e8da329d82211ca3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_113
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 272
+      width: 16
+      height: 16
+    spriteID: ced2fefdf1ffc8e40884a9a7feaf2961
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_114
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 8529e245b9ba2ff4bb79ecae64e3af97
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_115
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 272
+      width: 16
+      height: 16
+    spriteID: e771f02d28213fd40b00165310147250
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_116
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 54e4c20ad3fe9814a8f09cba55a46213
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_117
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 076a42b1ca0570948bcc5a37ec5b39dd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_118
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 272
+      width: 16
+      height: 16
+    spriteID: a9028ab5c0970e341a5ba2d57c50fcea
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_119
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 272
+      width: 16
+      height: 16
+    spriteID: edfa5b8684d06a449877781bf67df3d7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_120
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 28e000ddd6cb6af4caf8040647895ee8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_121
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 274eed7a9dab2c343824d859fb94e283
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_122
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 2af8693be1c700347bb074f1ac61d9ef
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_123
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 9d753cd8edb46754eafae017d2854e09
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_124
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 272
+      width: 16
+      height: 16
+    spriteID: e4eaaac6e6860854ea641089241f57c2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_125
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 272
+      width: 16
+      height: 16
+    spriteID: b6d08ca2b90ad0a4b9cde6660531ed0f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_126
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 272
+      width: 16
+      height: 16
+    spriteID: 079947aa579513248a1c0387c36a63f4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_127
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 272
+      width: 16
+      height: 16
+    spriteID: dab268dee2e6eec4983d22b9e1f7a6bc
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_128
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 256
+      width: 16
+      height: 16
+    spriteID: e12555f5d5f7dc8488041291ddcf94bf
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_129
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 256
+      width: 16
+      height: 16
+    spriteID: a8ddf96ea59f31448bdee5f6b57535fd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_130
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 628edda1dcebbde49aae866d63fd771d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_131
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 1fb859f5d887e654183d264a49439b0e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_132
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 256
+      width: 16
+      height: 16
+    spriteID: dc3b1deb8548c5a489a42602e4b97715
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_133
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 335f9c0bf9eaceb4c95f326dacd85c38
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_134
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 2a2007e0ecb946b489123fed18d4cb65
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_135
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 8b74faf4191cd4a4994714a854f05efe
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_136
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 256
+      width: 16
+      height: 16
+    spriteID: bf07c439a3cef0845a349997b614bd82
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_137
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 256
+      width: 16
+      height: 16
+    spriteID: ac825ee986d47bb408790052318cc06e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_138
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 256
+      width: 16
+      height: 16
+    spriteID: e72f26195abe25c4697e03310b6afe74
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_139
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 17598c720f9aec046a4ad7fe8572a7a0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_140
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 20a5c691680140743a6404ffa3f4d4f9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_141
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 172b2259fef49f040851b752010a92ad
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_142
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 9e49fa2f4c79c6748af0edb2207a6566
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_143
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 256
+      width: 16
+      height: 16
+    spriteID: 1e65ac495fca48b4590a60149d034314
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_144
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 240
+      width: 16
+      height: 16
+    spriteID: f3ed144e3cb1aa547bf92f6a55ae9547
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_145
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 240
+      width: 16
+      height: 16
+    spriteID: b1e731ec8c8d7a64eae8921354e83e1f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_146
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 135881db0fc7e2e4e8f8277b6d29c984
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_147
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 240
+      width: 16
+      height: 16
+    spriteID: cfaab394dc645ae448ef2adea7c704ff
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_148
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 133232c6de9c93e42a9c6a55e8714120
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_149
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 240
+      width: 16
+      height: 16
+    spriteID: d87c504f52f4d4b4aa718be009db6bc5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_150
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 88c25d49716f6d94d95684f8b1435492
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_151
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 73a1678a00cec3244a638931e3615c4a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_152
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 87bef9b256d28ff4c8eeee4bdfe8b94d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_153
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 5b2ab0e4a0d16ab44ae41a73dc77d4a7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_154
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 240
+      width: 16
+      height: 16
+    spriteID: a1bca552fbee32f42885393b25f38482
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_155
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 1b8c5623c0e959744a019a61d68c6ce3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_156
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 81a75c49a7d308f4cb0c9091b3b801af
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_157
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 359190cc4ab51094293c72df54949d32
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_158
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 5b97a8f2e498825408ad7809a1322dd9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_159
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 240
+      width: 16
+      height: 16
+    spriteID: 8f0cc175e119a484f91c7699f1a3c7f5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_160
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 432aab0e8756eda469eab8c52a1431bb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_161
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 224
+      width: 16
+      height: 16
+    spriteID: dbc64ba755131fb4db7d3e3ad7b50fbf
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_162
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 224
+      width: 16
+      height: 16
+    spriteID: e3d9fd6b18b7a6347b454e323e10d3d1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_163
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 50fd0923b5d54d24c887c3186b78f93d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_164
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 224
+      width: 16
+      height: 16
+    spriteID: d29a8ea054de29042b02a1ea85791ad9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_165
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 7e46401675df05d418c2a631e5fd9d16
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_166
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 1843a280e51e1464e9dd2267964d09ed
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_167
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 977c5d7bc26623746a477f649a5822e4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_168
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 224
+      width: 16
+      height: 16
+    spriteID: f171c02a38d03be4f9df0564a3cefcdb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_169
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 224
+      width: 16
+      height: 16
+    spriteID: f1f8882f505374c4db5ad90049661cc1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_170
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 3de229d6cec17e84199e56b33461bef3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_171
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 224
+      width: 16
+      height: 16
+    spriteID: e254c7496be76a44c8c86cd4dbd9e1dd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_172
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 0d2b6ab4f3651c54f9412f46d7765f45
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_173
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 8625cc2635df0c046bb03fcc468bd5d7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_174
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 224
+      width: 16
+      height: 16
+    spriteID: 1cbfd34f48c4ae74a867e6339dea1f30
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_175
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 224
+      width: 16
+      height: 16
+    spriteID: a970c6b32b2e596478544aa04b038515
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_176
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 2d2505341faccc443bef1b02a241e322
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_177
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 3a940ddf508942542bf01dcbe8c45209
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_178
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 312aea0b444dcb64ca7b859f980b6f63
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_179
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 3576a23da93286e4cb26694ca60430bf
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_180
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 33183c42ffd7fe94298f43ba449ea0f6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_181
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 12bbda99dc704164d9cfbdd408dc2bbd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_182
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 486a289a4ad331b45839d40cacfaa192
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_183
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 84457e1d6e20e3240b2d1e560a22d93c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_184
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 208
+      width: 16
+      height: 16
+    spriteID: d91feca9240bb3144abc1823906cafec
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_185
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 208
+      width: 16
+      height: 16
+    spriteID: f4d5fa14e8bdafd4c9b5eccbfce255ab
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_186
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 0b29c6c107525e34aab9d504d8bf0f92
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_187
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 208
+      width: 16
+      height: 16
+    spriteID: bc7d0d9746fa16a4384c7eb1ee01e2ff
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_188
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 208
+      width: 16
+      height: 16
+    spriteID: b98ed76033519d6478efda571f6107c1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_189
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 2ce065a3081213e44820213d66769fd8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_190
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 3cb5180a910e6b349a90e4b8deadca1b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_191
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 208
+      width: 16
+      height: 16
+    spriteID: 8298ed199f14e264185723ab5cbbfd8e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_192
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 192
+      width: 16
+      height: 16
+    spriteID: f028c9a114e0df34aab794a019cc771e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_193
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 192
+      width: 16
+      height: 16
+    spriteID: bc4e2e1c46184ef46a3bc0aa8f971a4e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_194
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 192
+      width: 16
+      height: 16
+    spriteID: cb724deda806a7941a57da6c71a11446
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_195
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 7ba7581592693cd40b02e4085eea9a5f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_196
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 07583f3d83d8a0540a5c9b7d344dc775
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_197
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 789d417642a4c914494187cab3e3212a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_198
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 192
+      width: 16
+      height: 16
+    spriteID: f50ff6cd21f1ff34888d077f15ff2cdb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_199
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 48b74c2441abd9f409d5eca88e9baeb2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_200
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 8b4aeea15cb23b94595211fcf708828e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_201
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 4f1fc871908915041949ce97bb32b86e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_202
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 6eb3e4e8620f8e148a4e6703cb2765c4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_203
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 192
+      width: 16
+      height: 16
+    spriteID: e77f7a544c6df4a4f82b3ff24da9d996
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_204
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 192
+      width: 16
+      height: 16
+    spriteID: af946010f69efcb4cbb4211bbb6e4615
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_205
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 8e9c91bf644804f4ea413a10d4f191bb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_206
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 192
+      width: 16
+      height: 16
+    spriteID: d7ef785ddf934d74a8fbe9be1d254715
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_207
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 192
+      width: 16
+      height: 16
+    spriteID: 2350816f1a15a454bbdbebda4bb88d41
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_208
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 3da75014ff2444a4a86882fec126ebec
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_209
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 2030c2cb2c269f345aa857f06d428e52
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_210
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 9f455f2ebe1aff34c960ca91dfe3675c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_211
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 40b8a87da8dc7044786a03645caacb2c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_212
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 636ed0b9da9c5964692ef681374313f1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_213
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 176
+      width: 16
+      height: 16
+    spriteID: e8a6390087509ec42a562b358a7d4e11
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_214
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 28340c3b358b71340aadb910aa053aff
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_215
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 8ae1fced6b7cf9344a3b42e35949a4ce
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_216
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 9e2e7648ec9cf88479f660e74cda8cb7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_217
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 30599bacd425d07419723fc8b71c1394
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_218
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 176
+      width: 16
+      height: 16
+    spriteID: d7f67b9eeb5fb0843a6e18e136792aa8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_219
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 176
+      width: 16
+      height: 16
+    spriteID: eca80e8f7f781b24fabbdd79f7df08d7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_220
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 4f71872da446b824cad6aab76d327d72
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_221
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 0b7e6ad8bdf611d49b179028d0bfe683
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_222
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 176
+      width: 16
+      height: 16
+    spriteID: debaf374b2ae3434ea39f67115148616
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_223
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 176
+      width: 16
+      height: 16
+    spriteID: 69f1918d7f8a38840a6405b871ded5e3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_224
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 24afcc2b7d8192e41ba97c0582be085a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_225
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 1fb661d08b45d0d43af664424713e719
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_226
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 32d3ccd21b54ba1488ca2ec74d1be093
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_227
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 1cc6f3b6c855d4e45911f4383e0347c1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_228
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 160
+      width: 16
+      height: 16
+    spriteID: f035041e303db514b9107b5fc413c758
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_229
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 1a1176101ac066b4ea17c41aed502ab7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_230
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 0abb798e1718b524982956063c2f4093
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_231
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 76a2e82f75aeae74fb7a9bde38bf9e8e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_232
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 1a50e75e55eb60443abad40673d14294
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_233
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 160
+      width: 16
+      height: 16
+    spriteID: a0a8c2dd1598f3347b1f98399f70c4cc
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_234
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 160
+      width: 16
+      height: 16
+    spriteID: b557dc6508b4e4d4e80bc8ae1036c2ac
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_235
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 8989cce2ef4ed1e49b12bad101483fae
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_236
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 160
+      width: 16
+      height: 16
+    spriteID: f6548060362a933478575349f7628cf1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_237
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 54fececbd4e46bc47be729a0342daebe
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_238
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 160
+      width: 16
+      height: 16
+    spriteID: c0561634beeed344a8b99342b38e9c44
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_239
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 160
+      width: 16
+      height: 16
+    spriteID: 0953f30fc82347b46bccb4af67fe9f97
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_240
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 1ff26a0dd3971a74d82fcb6c1b00e101
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_241
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 72702421f3e883340be8dbe28b05106d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_242
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 183f2bbe4d1ed3b458ae51ae80dc9d24
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_243
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 73525476b3716b846b5a16c440fb8e78
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_244
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 93139f2521a1f2640b8cc2fee6c84399
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_245
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 144
+      width: 16
+      height: 16
+    spriteID: b92254067efa1ce4dbda393cf7585a59
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_246
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 38eb0ce3694455a4b9aa07bb735b1c9f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_247
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 144
+      width: 16
+      height: 16
+    spriteID: fc75edb253eed264496b47978d698e1e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_248
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 144
+      width: 16
+      height: 16
+    spriteID: b923eb8385763b54ab337185471fcaf9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_249
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 6f4b3d13ed2993b439bb698d7833ba37
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_250
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 78ca6746d82d69b43823439aff4e4208
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_251
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 23b8277efe8a08d41acefc5377b26044
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_252
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 3b2ba26edafd967468b4a84bea4d1268
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_253
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 144
+      width: 16
+      height: 16
+    spriteID: 099be49d1dc352042bd459fd4ace5720
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_254
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 144
+      width: 16
+      height: 16
+    spriteID: fe00750cfa48dba47b6a4cf2ab1bc212
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_255
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 144
+      width: 16
+      height: 16
+    spriteID: c09aa39cf46d8ca418daf98b1d264d91
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_256
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 8e15ab9a975cc2d479963b359a50e87a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_257
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 31f05d1a3dbe6144ebc90447afd938d3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_258
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 109e73cce4cbec04a863b3e82b1e1ef2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_259
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 128
+      width: 16
+      height: 16
+    spriteID: c4596c47b2c85aa4abecbb66d2b5d6c7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_260
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 2c24fd3bd7978b54385ea49d2f4f876f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_261
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 128
+      width: 16
+      height: 16
+    spriteID: d7d5d7b399d8a9945bc60b88a67ec3bb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_262
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 106fd0d8a9906fc46821f359e47dee1f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_263
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 810f933df4651134d83f5f7b6fac4c45
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_264
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 128
+      width: 16
+      height: 16
+    spriteID: c9f6e2ce6ba47574abba6088cf0bb78c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_265
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 191a508c0e838374290977b63c0c2754
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_266
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 128
+      width: 16
+      height: 16
+    spriteID: ddf129738237f6a47b23d663f005b84e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_267
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 128
+      width: 16
+      height: 16
+    spriteID: a2aae58777a8f5849a7e0e7e7ff0cf45
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_268
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 96b2037616446954ebc3f44e982ec892
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_269
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 2e6737ce4f9738f47ac6c128a9e2cf82
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_270
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 4c3ab1d9e63a63f4cbec190288379f99
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_271
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 128
+      width: 16
+      height: 16
+    spriteID: 87ad80f75a0299d4c8ac2f48666390d7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_272
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 112
+      width: 16
+      height: 16
+    spriteID: e9d31d7dd5981a346852c09ae4ee4c00
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_273
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 772fabf010e354b46abb2a13a8a26472
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_274
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 112
+      width: 16
+      height: 16
+    spriteID: f50513cdec4c75b41a4e42a8cd6d5c7d
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_275
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 112
+      width: 16
+      height: 16
+    spriteID: a78030b2b3e5cb64199fb10d9bcd56e4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_276
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 760d4245b85672e459943357d72a8eec
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_277
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 79e52d22aa9ac354e96624dc3ec88e84
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_278
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 112
+      width: 16
+      height: 16
+    spriteID: e5911aa69eede8d4cbfcc05802d90e9c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_279
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 593c9eba831e4364ea8c463d87427a71
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_280
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 112
+      width: 16
+      height: 16
+    spriteID: efb5c330f7824364fa0a619f568d0fa8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_281
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 633c17955f74a014b9daf21b7aef448f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_282
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 3b4d19f00800a7f4b9eea947c0021168
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_283
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 112
+      width: 16
+      height: 16
+    spriteID: 24d6f8856dffedb41b822f6022ef34c4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_284
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 112
+      width: 16
+      height: 16
+    spriteID: a50eba3c21208f248822abb2ab1e62fd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_285
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 112
+      width: 16
+      height: 16
+    spriteID: c1d4a77cb0cdd494f9f2fbee006c6097
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_286
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 112
+      width: 16
+      height: 16
+    spriteID: b87d707099f84ff48861fab75f38b54c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_287
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 112
+      width: 16
+      height: 16
+    spriteID: fb7ee4d0c643dd4499f94582755e6b64
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_288
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 265f41476689fc144ae36af7d04475d1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_289
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 3c65a4f4dd74d6346a392f56d5e5c6f9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_290
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 7043c320f6126f24dbe8c4b27dee07a2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_291
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 87b861623d2616b45a840d7cbf2a9f11
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_292
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 96
+      width: 16
+      height: 16
+    spriteID: db931ff20c3c6614babb16c3367eace8
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_293
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 6bf509346d468f8448358e7f53ac4ca0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_294
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 96
+      width: 16
+      height: 16
+    spriteID: e613596ccd85cd947b5fc07c2f06538c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_295
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 5bb92b9afe614ea46814acaff2c23003
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_296
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 96
+      width: 16
+      height: 16
+    spriteID: b5769789f94983e45a3bcd2cc9a23b18
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_297
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 96d355c503790d148b9d88276076dccb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_298
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 26776d0f40cb4424aaa2536b9004698f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_299
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 44b816a8b135dbe4d842821d98531376
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_300
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 8441b4de1b04fee4f86ff8c8e26a3cd9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_301
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 96
+      width: 16
+      height: 16
+    spriteID: b903d76e39e791f41b8b8f41654d58e3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_302
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 454ce3dace2c918419d0af192bf6040b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_303
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 96
+      width: 16
+      height: 16
+    spriteID: 44f58b04281ae084989722ea085e8a15
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_304
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 523d0a41f0ea5d0448de14e98cbdb875
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_305
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 80
+      width: 16
+      height: 16
+    spriteID: b06f6a33494d777478c3331f601dea1a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_306
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 80
+      width: 16
+      height: 16
+    spriteID: c05fc4d49a0a21c4a94ca967a1ca3ca7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_307
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 80
+      width: 16
+      height: 16
+    spriteID: e1437359d910eb64cb2a657bb2c9a610
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_308
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 625312f5e7f2c7e458250fd520b72f50
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_309
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 3586c489d16707848a9fa61c30ee4ad2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_310
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 2e25a4d0a3503f747b076fc0143912d9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_311
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 1f90d83b16a232048b480a4950c6993a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_312
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 772c9d838581ede4582d62fb470400e7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_313
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 80
+      width: 16
+      height: 16
+    spriteID: b6c961a1d0c5b064184bd889f5119e91
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_314
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 80
+      width: 16
+      height: 16
+    spriteID: b7ce740ecf5ea9341814f701a21cd24f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_315
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 80
+      width: 16
+      height: 16
+    spriteID: cba085da765b00a44ab5d09bffce4066
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_316
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 80
+      width: 16
+      height: 16
+    spriteID: b50331976f1bd1e4db8d2586c83247c3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_317
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 80
+      width: 16
+      height: 16
+    spriteID: cf5bb16aa0ddbd74ab8ad811db14bc34
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_318
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 2b44be519a218af45926e8a01c398564
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_319
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 80
+      width: 16
+      height: 16
+    spriteID: 7560528a65c85d9468e69c5cbb54922c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_320
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 64
+      width: 16
+      height: 16
+    spriteID: ac98b5d46c9fd0244872bd134254cd0c
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_321
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 6192502d7015df146b9f44fa918087dd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_322
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 64
+      width: 16
+      height: 16
+    spriteID: a460d122a9cefda46a02e514a18e8f05
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_323
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 64
+      width: 16
+      height: 16
+    spriteID: ddbc3e91022069e4c9213267b4a7149a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_324
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 64
+      width: 16
+      height: 16
+    spriteID: f03ccf743e175124fa308dbc917b68b5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_325
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 507933a0f784b154781427ce8b6d978a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_326
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 449d5f794774e1241a59ca3ad7912db1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_327
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 64
+      width: 16
+      height: 16
+    spriteID: ff1820f99da94d142b1e78660462300f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_328
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 276097245fac78749a251031cef8bde5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_329
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 180bc560238568649b15674549d6c641
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_330
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 64
+      width: 16
+      height: 16
+    spriteID: ddce0072ad717184ba19db1ba0cafea2
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_331
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 64
+      width: 16
+      height: 16
+    spriteID: dd7bda7219af9c24ead02961f06edc7b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_332
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 64
+      width: 16
+      height: 16
+    spriteID: c16207192e87beb44a6e7b617610ba8b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_333
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 64
+      width: 16
+      height: 16
+    spriteID: edd1939d54fa6ec45991c7be61d8837f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_334
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 32074f525c89aa34dbaa85a875e070b7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_335
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 64
+      width: 16
+      height: 16
+    spriteID: 8a122ab963bed8d4fbe1a7a13d8b2e07
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_336
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 4b9a369b1e2b6c240aff18bfa37af914
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_337
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 8e55fad145f6ad54187bf96aaa5d9476
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_338
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 48
+      width: 16
+      height: 16
+    spriteID: d7cdbe926005ce74d87f3f307f906e4b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_339
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 83c6ce445d8f9044aa46f18731c11ff7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_340
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 28906a0f30651f741aeabdca4dbcb7ac
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_341
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 34d42200c1bc567438124736bf4358f6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_342
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 830d6f7a7b0599341a14b30144c99245
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_343
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 11dcfa67f61ddd64e96761396dffb1e9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_344
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 2f513bc2328282a42bb9249bbae19b0b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_345
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 48
+      width: 16
+      height: 16
+    spriteID: a379f9f509cec3542bf39f1ab56d32f3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_346
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 3be40e01d08ec364b95088c611627d04
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_347
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 52e0f1c641dc243429fcd9dbe1699a16
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_348
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 1d7931aa75ff9a4429db17587f3c4fdb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_349
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 56b9cedd81cc79a4197ecf8f25bf936e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_350
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 48
+      width: 16
+      height: 16
+    spriteID: ab2b1655ad9c49648b1d532a86e6b099
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_351
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 48
+      width: 16
+      height: 16
+    spriteID: 03104e1a6d196e24eb30eaa65ed54b4a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_352
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 32
+      width: 16
+      height: 16
+    spriteID: e967e1129bc23f349acc84d58c1b9d18
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_353
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 2b6d22a8b0adc3948bcad215f2f36b79
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_354
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 4e5c1b2ce28f99445ab691d88e95a6c6
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_355
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 32
+      width: 16
+      height: 16
+    spriteID: bc067fc66409f5e4e804cd83e6e69db3
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_356
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 32
+      width: 16
+      height: 16
+    spriteID: d0be8557d2cfc214f8b256d27d1c4556
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_357
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 32
+      width: 16
+      height: 16
+    spriteID: e936208d01e91744e91def22ad2a0106
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_358
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 32
+      width: 16
+      height: 16
+    spriteID: ed76ae1d542435a4eb8827ef434c8b40
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_359
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 28b20878cb3fcdc4fafe7fa8bc43ffda
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_360
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 12a0d855ba4939f4180d6799494aa6ca
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_361
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 93398a4025c807444b0071c10fa41a3e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_362
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 32
+      width: 16
+      height: 16
+    spriteID: bc90a38544c79d04cbf8d0c0ce177ef7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_363
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 32
+      width: 16
+      height: 16
+    spriteID: a2645e62e609dc84aa4f56b5680ca870
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_364
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 8c77303775cc8a24c9aa22e5688998d0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_365
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 5c2157701eff9c04cb23cb39a86f4fe0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_366
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 2c7081c933c57f14cb8661c9de3d0b9b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_367
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 32
+      width: 16
+      height: 16
+    spriteID: 06ec173066a1d614bbfc36c9004b4b8b
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_368
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 16
+      width: 16
+      height: 16
+    spriteID: dc7ab2a9cb4fbe34084d2bd866e99337
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_369
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 16
+      width: 16
+      height: 16
+    spriteID: fd393b599667b9e46ad1cf840c7db7aa
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_370
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 9cd1ae112fd25804ba227c80b02881d0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_371
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 27903a7a8513fca4fb7e984822c7075e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_372
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 003e757d28ca41a41ba5d62d2f78cecb
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_373
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 16
+      width: 16
+      height: 16
+    spriteID: f5f6ab3f361f7154b93953ea57c87738
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_374
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 47314c02a36220e4e8843d38169b4314
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_375
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 2a09d65b3e73e1f4cbc86d16653eff8f
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_376
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 16
+      width: 16
+      height: 16
+    spriteID: f89118a00cffee1479151e816f41b7ba
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_377
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 17648f543fb0d3848a1ad905956f7e38
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_378
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 3da57c7c50ead644abb4e16dc2f8e2e7
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_379
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 0429f29ff9fbf0e4daacc9b7fbfe8e43
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_380
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 16
+      width: 16
+      height: 16
+    spriteID: e91ea0e261307dc47a7b600a27555105
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_381
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 16
+      width: 16
+      height: 16
+    spriteID: e91a052378ee6c54fab0da17e085b475
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_382
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 16
+      width: 16
+      height: 16
+    spriteID: f22158bef9387e642b13f72a81fc75fd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_383
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 16
+      width: 16
+      height: 16
+    spriteID: 213f1c59fdd81ae4eb75baf1bce724dd
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_384
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 03b98335ee002cb4793e67bf43fb5db1
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_385
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 16
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 0cf10cf7671206a4d991be010bfb6532
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_386
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 32
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 12b015a0a12bbb1429dd28377b416768
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_387
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 48
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 0643348b1f68fdc458adcae639f54cfc
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_388
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 64
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 0b580b5d29f7b8e47a68a269270e4bd5
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_389
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 80
+      y: 0
+      width: 16
+      height: 16
+    spriteID: f65dbfec4c571984396fae50220dfac9
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_390
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 96
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 4cbdc7fb2679cd54eae6f9248d5109a4
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_391
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 112
+      y: 0
+      width: 16
+      height: 16
+    spriteID: b87d66b4cc4dbe745bfeb5649eb876f0
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_392
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 128
+      y: 0
+      width: 16
+      height: 16
+    spriteID: fbf441b00d9393e48801ee320f08750e
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_393
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 144
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 2f5e694af1b315a4ebf753d91d675fca
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_394
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 160
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 67ae8cf7c03f0cc4a8b2087efccb59ed
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_395
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 176
+      y: 0
+      width: 16
+      height: 16
+    spriteID: c68d21e188ee27d49998a12794e36c01
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_396
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 192
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 14e35dd8e84157e4c9b1b17eec83666a
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_397
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 208
+      y: 0
+      width: 16
+      height: 16
+    spriteID: b1374d352e715fc4ab0c8bad17471944
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_398
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 224
+      y: 0
+      width: 16
+      height: 16
+    spriteID: 95927ed3502c03f4a98633e627a28f70
+    spriteOutline: []
+    tessellationDetail: 0
+  - name: MarioTiles_399
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    customData: 
+    rect:
+      serializedVersion: 2
+      x: 240
+      y: 0
+      width: 16
+      height: 16
+    spriteID: a18822247bd087e4fb20cdcae5dd1c3c
+    spriteOutline: []
+    tessellationDetail: 0
+  _secondaryTextures: []
+  _artifacts: {instanceID: 0}

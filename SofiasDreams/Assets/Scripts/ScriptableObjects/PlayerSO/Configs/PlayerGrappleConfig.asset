@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68af050b3875b4145b52ea63c234e84c, type: 3}
+  m_Name: PlayerGrappleConfig
+  m_EditorClassIdentifier: 
+  radius: 8
+  grappleLayer:
+    serializedVersion: 2
+    m_Bits: 65536
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  moveSpeed: 27
+  stopDistance: 0
+  arrivalClearance: 0
+  zeroGravityWhileGrappling: 1
+  startupDelay: 0.1
+  exitStrength: 16
+  carryOverEntrySpeedFactor: 0
+  maxExitSpeedX: 11
+  maxExitSpeedY: 16
+  exitBlendTime: 0.05
+  blendByVelocityLerp: 1
+  hardLockDuration: 0.12
+  softCarryMaxDuration: 0.5
+  cooldown: 0.1

@@ -1,0 +1,56 @@
+fileFormatVersion: 2
+guid: 523bd3e438ad4a84196f3e5dd14fa54f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: aaa16bfc62c086f4fb45da87b6acf9b1, type: 3}
+  _reimportOnDependencyChange: 1
+  _jsonFile: {fileID: -164016180542632921, guid: 523bd3e438ad4a84196f3e5dd14fa54f, type: 3}
+  _pixelsPerUnit: 16
+  _customLevelPrefab: {instanceID: 0}
+  _intGridValueColorsVisible: 0
+  _useCompositeCollider: 1
+  _geometryType: 0
+  _createBackgroundColor: 1
+  _createLevelBoundsTrigger: 0
+  _useParallax: 1
+  _scaleEntities: 1
+  _intGridValues:
+  - _key: GeneralCollision_1
+    _asset: {fileID: 11400000, guid: 650b1d7fd8fffca4d8283bdc000a0608, type: 2}
+  _entities:
+  - _key: Spawn
+    _asset: {instanceID: 0}
+  - _key: Enemy
+    _asset: {instanceID: 0}
+  - _key: Currency
+    _asset: {instanceID: 0}
+  - _key: Grappling
+    _asset: {instanceID: 0}
+  - _key: Deathzone
+    _asset: {instanceID: 0}
+  - _key: Hint
+    _asset: {instanceID: 0}
+  - _key: ClosedGrappling
+    _asset: {instanceID: 0}
+  - _key: Bonfire
+    _asset: {instanceID: 0}
+  - _key: RoomSwitch
+    _asset: {instanceID: 0}
+  - _key: GrapplingOpener
+    _asset: {instanceID: 0}
+  - _key: Item
+    _asset: {instanceID: 0}
+  - _key: ItemOpener
+    _asset: {instanceID: 0}
+  - _key: Ability
+    _asset: {instanceID: 0}
+  - _key: BreakableFloor
+    _asset: {instanceID: 0}
+  _enumGenerate: 0
+  _enumPath: 
+  _enumNamespace: 

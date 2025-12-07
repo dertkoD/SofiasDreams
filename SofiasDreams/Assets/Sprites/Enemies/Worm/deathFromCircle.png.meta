@@ -1,0 +1,390 @@
+fileFormatVersion: 2
+guid: d9dbe45b100005b4abbe77dcc925b5b0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7130445534319040674
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_0"
+  - first:
+      213: -2539253446970862597
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_1"
+  - first:
+      213: -7513810370526377792
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_2"
+  - first:
+      213: -7944326956670821611
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_3"
+  - first:
+      213: 1550999609572634254
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_4"
+  - first:
+      213: -6913961839448778024
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_5"
+  - first:
+      213: -3055373881768982527
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_6"
+  - first:
+      213: -2629189113113516551
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_7"
+  - first:
+      213: -6433451074906472998
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_8"
+  - first:
+      213: -6165022881220768396
+    second: "\u0441\u043C\u0435\u0440\u0442\u044C \u0438\u0437 \u0448\u0430\u0440\u0430_9"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: deathFromCircle_0
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 160
+        width: 143
+        height: 142
+      alignment: 9
+      pivot: {x: 0.4810839, y: 0.47460088}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fef4392017a2c3c4c8b8bde8fa16dc66
+      internalID: 1043025985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_1
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 162
+        width: 141
+        height: 137
+      alignment: 9
+      pivot: {x: 0.44244644, y: 0.48683712}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db5da67c120eb8e438b08dcf71961989
+      internalID: -657233656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_2
+      rect:
+        serializedVersion: 2
+        x: 1122
+        y: 158
+        width: 125
+        height: 99
+      alignment: 9
+      pivot: {x: 0.48557422, y: 0.29051825}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 094b1b4d16df8b64bbe81c5687569b2b
+      internalID: 36436726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_3
+      rect:
+        serializedVersion: 2
+        x: 1639
+        y: 165
+        width: 138
+        height: 98
+      alignment: 9
+      pivot: {x: 0.5326715, y: 0.26997906}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 744f653902f07b6499ef95ed0a250507
+      internalID: -236776434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_4
+      rect:
+        serializedVersion: 2
+        x: 2180
+        y: 160
+        width: 102
+        height: 200
+      alignment: 9
+      pivot: {x: 0.27016076, y: 0.14834358}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7acf1f5b0155ce42a04fb14a4bb454a
+      internalID: 875496623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_5
+      rect:
+        serializedVersion: 2
+        x: 2692
+        y: 157
+        width: 251
+        height: 66
+      alignment: 9
+      pivot: {x: 0.108433455, y: 0.48633853}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e078ca9604a71bb428a28bfb66d11554
+      internalID: 1406061226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_6
+      rect:
+        serializedVersion: 2
+        x: 3203
+        y: 157
+        width: 251
+        height: 59
+      alignment: 9
+      pivot: {x: 0.11202553, y: 0.46943536}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17216df1e5b033e4591f60b8293fafc9
+      internalID: -2121820552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_7
+      rect:
+        serializedVersion: 2
+        x: 3716
+        y: 153
+        width: 251
+        height: 59
+      alignment: 9
+      pivot: {x: 0.112026505, y: 0.45415252}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3491eb8f435afcf4b929ae03c7ea46dd
+      internalID: -445788480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_8
+      rect:
+        serializedVersion: 2
+        x: 4228
+        y: 153
+        width: 266
+        height: 48
+      alignment: 9
+      pivot: {x: 0.096617274, y: 0.5751419}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f43531ae3d1daa42982683997a05778
+      internalID: -959092013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: deathFromCircle_9
+      rect:
+        serializedVersion: 2
+        x: 4740
+        y: 152
+        width: 294
+        height: 44
+      alignment: 9
+      pivot: {x: 0.089029945, y: 0.5614794}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b328574a82e2d18469264cb2270bf30e
+      internalID: 2101505195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 594e52ad72477444abaa585845d8c603
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      deathFromCircle_0: 1043025985
+      deathFromCircle_1: -657233656
+      deathFromCircle_2: 36436726
+      deathFromCircle_3: -236776434
+      deathFromCircle_4: 875496623
+      deathFromCircle_5: 1406061226
+      deathFromCircle_6: -2121820552
+      deathFromCircle_7: -445788480
+      deathFromCircle_8: -959092013
+      deathFromCircle_9: 2101505195
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

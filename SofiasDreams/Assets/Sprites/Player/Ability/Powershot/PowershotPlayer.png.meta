@@ -1,0 +1,624 @@
+fileFormatVersion: 2
+guid: cf9ab650b8760a2458a18cd016949845
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1262544756177344642
+    second: power sprite girl_0
+  - first:
+      213: 4178047377118929618
+    second: power sprite girl_1
+  - first:
+      213: -3023270178707256498
+    second: power sprite girl_2
+  - first:
+      213: -5154572615813031255
+    second: power sprite girl_3
+  - first:
+      213: 4357865031876133444
+    second: power sprite girl_4
+  - first:
+      213: 1079000479843844478
+    second: power sprite girl_5
+  - first:
+      213: -1713334584577338356
+    second: power sprite girl_6
+  - first:
+      213: -5014601725977716226
+    second: power sprite girl_7
+  - first:
+      213: -5277121197296568799
+    second: power sprite girl_8
+  - first:
+      213: -1061714217426432362
+    second: power sprite girl_9
+  - first:
+      213: -4545539191769690133
+    second: power sprite girl_10
+  - first:
+      213: -5529685959826352900
+    second: power sprite girl_11
+  - first:
+      213: -5113652826469213841
+    second: power sprite girl_12
+  - first:
+      213: 2997215899570443069
+    second: power sprite girl_13
+  - first:
+      213: -1886452535664248458
+    second: power sprite girl_14
+  - first:
+      213: 7690558941443980257
+    second: power sprite girl_15
+  - first:
+      213: 2566673370360845570
+    second: power sprite girl_16
+  - first:
+      213: 2482695963457452621
+    second: power sprite girl_17
+  - first:
+      213: 3694573308095024348
+    second: power sprite girl_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PowershotPlayer_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a5947821d486cab4e82cd87c24d1f9c3
+      internalID: -2015245701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_1
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c806c5c0d3c6cc41bebba346c8660fe
+      internalID: -922255923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_2
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c47deb4bdf2e3294d8d5eca61be9f596
+      internalID: 655185553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_3
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13effd277f95ed24db60f637cf81361b
+      internalID: 1159456335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_4
+      rect:
+        serializedVersion: 2
+        x: 2440
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 004aa7038411b414ab4387ce9d6d57a6
+      internalID: 1608931635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_5
+      rect:
+        serializedVersion: 2
+        x: 3050
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6e6e2b673fc4a842b9a15f53df4b0ab
+      internalID: -1757573440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_6
+      rect:
+        serializedVersion: 2
+        x: 3660
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62c3c75ee19c85c45aafd92669a2b3a4
+      internalID: -235865465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_7
+      rect:
+        serializedVersion: 2
+        x: 4270
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53c9b60ce2597874bad08e8a011fb829
+      internalID: -52906424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_8
+      rect:
+        serializedVersion: 2
+        x: 4880
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 536ca67f2c7916d469fe0b308f7460e1
+      internalID: -202528971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_9
+      rect:
+        serializedVersion: 2
+        x: 5490
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2cc38eff049aba4fb83bcb4326c5fd7
+      internalID: -1623691439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_10
+      rect:
+        serializedVersion: 2
+        x: 6100
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52abfcf5043d4804eacad91a87d9dca1
+      internalID: 715299679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_11
+      rect:
+        serializedVersion: 2
+        x: 6710
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98c9f664bd177dc418e65878bef61eb7
+      internalID: 776697088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_12
+      rect:
+        serializedVersion: 2
+        x: 7320
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfd7a2e931f555d4aa13082e59f00017
+      internalID: -241780259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_13
+      rect:
+        serializedVersion: 2
+        x: 7930
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af68b29038baf2b449c6c9b5ae695ab6
+      internalID: -1581848257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_14
+      rect:
+        serializedVersion: 2
+        x: 8540
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7acd36bb50bdbba499df84bdbf3340af
+      internalID: 1943874568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_15
+      rect:
+        serializedVersion: 2
+        x: 9150
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac99f9291037210429d1113f0ff9e5a3
+      internalID: -1720467071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_16
+      rect:
+        serializedVersion: 2
+        x: 9760
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 072b9bb470350d54986fd85401bd3895
+      internalID: 104837194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_17
+      rect:
+        serializedVersion: 2
+        x: 10370
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1755e4b38eed0c5489528da65e444a7d
+      internalID: -1331155888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PowershotPlayer_18
+      rect:
+        serializedVersion: 2
+        x: 10980
+        y: 0
+        width: 610
+        height: 402
+      alignment: 9
+      pivot: {x: 0.335, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 541d6b7021465ea4e94c267ccc5bad81
+      internalID: 1333630873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f0c9a69cf7852f04fa968d2a06d6449a
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PowershotPlayer_0: -2015245701
+      PowershotPlayer_1: -922255923
+      PowershotPlayer_10: 715299679
+      PowershotPlayer_11: 776697088
+      PowershotPlayer_12: -241780259
+      PowershotPlayer_13: -1581848257
+      PowershotPlayer_14: 1943874568
+      PowershotPlayer_15: -1720467071
+      PowershotPlayer_16: 104837194
+      PowershotPlayer_17: -1331155888
+      PowershotPlayer_18: 1333630873
+      PowershotPlayer_2: 655185553
+      PowershotPlayer_3: 1159456335
+      PowershotPlayer_4: 1608931635
+      PowershotPlayer_5: -1757573440
+      PowershotPlayer_6: -235865465
+      PowershotPlayer_7: -52906424
+      PowershotPlayer_8: -202528971
+      PowershotPlayer_9: -1623691439
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
