@@ -92,7 +92,6 @@ public class Jumper2D : MonoBehaviour, IJumper
 
             _isJumping = true;
             IsGrounded = false;
-            BroadcastGroundedImmediate(false);
             _buffer = 0f;
             _coyote = 0f;
         }
