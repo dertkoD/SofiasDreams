@@ -10,6 +10,8 @@ public class Jumper2D : MonoBehaviour, IJumper
     [SerializeField] float groundRadius = 0.1f;
     [SerializeField] LayerMask groundMask = ~0;
     [SerializeField] Rigidbody2D rb;
+    [SerializeField, Tooltip("Upward velocity that immediately marks jump as airborne before contacts separate")]
+    float leaveGroundVelocity = 0.05f;
     
     [Header("Drop-through")]
     [SerializeField] Collider2D playerCollider;
@@ -113,6 +115,9 @@ public class Jumper2D : MonoBehaviour, IJumper
     
     bool CheckGrounded()
     {
+        if (_isJumping && rb && rb.linearVelocity.y > leaveGroundVelocity)
+            return false;
+
         var filter = new ContactFilter2D
         {
             useTriggers    = false,
