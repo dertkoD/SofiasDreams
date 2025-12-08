@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45b0d4fe88164714b87fea82c2b89871, type: 3}
   m_Name: HitReactionFlyingEnemyConfig
   m_EditorClassIdentifier: 
-  hitStun: 0.15
+  hitStun: 0.5
   knockbackForce: 5
   dragDuringStun: 20
   knockbackX: 4.5
