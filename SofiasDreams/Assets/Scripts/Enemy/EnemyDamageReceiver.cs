@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -11,6 +12,8 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
     IHealth _health;
     IKnockback _knockback;
     IEnemyDamageFeedback _feedback;
+
+    public event Action<DamageInfo> DamageTaken;
 
     public bool IsAlive
     {
@@ -72,6 +75,8 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             _facade.ApplyDamage(info);
         else
             _health.ApplyDamage(info);
+
+        DamageTaken?.Invoke(info);
         
         if (_feedback != null)
         {
