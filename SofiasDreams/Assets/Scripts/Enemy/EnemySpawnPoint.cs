@@ -3,13 +3,16 @@ using UnityEngine;
 public class EnemySpawnPoint : MonoBehaviour
 {
     [Header("Patrol")]
-    [SerializeField] EnemyPatrolPath _patrolPath;
+    [SerializeField] EnemyMovementMode _kind = EnemyMovementMode.GroundOnly;
+    [SerializeField] public EnemyPatrolPath _patrolPath;
 
     [Header("Gizmos")]
-    [SerializeField] Color _gizmoColor = Color.red;
+    [SerializeField] Color _gizmoColorGroundEnemy = Color.red;
+    [SerializeField] Color _gizmoColorFlyingEnemy = Color.magenta;
     [SerializeField] float _radius = 0.25f;
 
     public Vector3 Position => transform.position;
+    public EnemyMovementMode Kind      => _kind;
     public EnemyPatrolPath PatrolPath => _patrolPath;
 
     void Reset()
@@ -21,16 +24,14 @@ public class EnemySpawnPoint : MonoBehaviour
     #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Gizmos.color = _gizmoColor;
+        Gizmos.color = _kind == EnemyMovementMode.Planar2D ? _gizmoColorFlyingEnemy : _gizmoColorGroundEnemy;
 
-        // сам спавн
         Gizmos.DrawWireSphere(transform.position, _radius);
         Gizmos.DrawLine(transform.position + Vector3.left * _radius * 0.5f,
             transform.position + Vector3.right * _radius * 0.5f);
         Gizmos.DrawLine(transform.position + Vector3.up * _radius * 0.5f,
             transform.position + Vector3.down * _radius * 0.5f);
 
-        // линия к первой точке патруля, если есть путь
         if (_patrolPath != null && _patrolPath.Count > 0)
         {
             Vector3 firstPoint = _patrolPath.GetPoint(0);

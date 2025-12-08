@@ -3,7 +3,8 @@ using Zenject;
 public class SceneInstaller : MonoInstaller
 {
     public PlayerFacade playerPrefab;
-    public EnemyFacade enemyPrefab;
+    public EnemyFacade groundEnemyPrefab;
+    public EnemyFacade flyingEnemyPrefab;
 
     public override void InstallBindings()
     {
@@ -17,9 +18,14 @@ public class SceneInstaller : MonoInstaller
         // Factory that spawns the player later
         Container.BindFactory<PlayerFacade, PlayerFactory>()
             .FromComponentInNewPrefab(playerPrefab);
-        Container.BindFactory<EnemyFacade, EnemyFactory>()
-            .FromComponentInNewPrefab(enemyPrefab)
-            .UnderTransformGroup("Enemies");
+        
+        Container.BindFactory<EnemyFacade, GroundEnemyFactory>()
+            .FromComponentInNewPrefab(groundEnemyPrefab)
+            .UnderTransformGroup("Enemies_Ground");
+
+        Container.BindFactory<EnemyFacade, FlyingEnemyFactory>()
+            .FromComponentInNewPrefab(flyingEnemyPrefab)
+            .UnderTransformGroup("Enemies_Flying");
 
         // Scene MonoBehaviours that need injection
         Container.BindInterfacesAndSelfTo<CameraTargetBinder>()

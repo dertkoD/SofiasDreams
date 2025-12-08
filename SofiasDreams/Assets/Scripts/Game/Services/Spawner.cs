@@ -4,13 +4,19 @@ using Zenject;
 public class Spawner
 {
     readonly PlayerFactory _playerFactory;
-    readonly EnemyFactory _enemyFactory;
+    readonly GroundEnemyFactory _groundEnemyFactory;
+    readonly FlyingEnemyFactory _flyingEnemyFactory;
     readonly SignalBus _bus;
-
-    public Spawner(PlayerFactory playerFactory, EnemyFactory enemyFactory, SignalBus bus)
+    
+    public Spawner(
+        PlayerFactory playerFactory,
+        GroundEnemyFactory groundEnemyFactory,
+        FlyingEnemyFactory flyingEnemyFactory, 
+        SignalBus bus)
     {
-        _playerFactory = playerFactory;
-        _enemyFactory  = enemyFactory;
+        _playerFactory       = playerFactory;
+        _groundEnemyFactory  = groundEnemyFactory;
+        _flyingEnemyFactory  = flyingEnemyFactory;
         _bus           = bus;
     }
 
@@ -22,15 +28,31 @@ public class Spawner
         return player;
     }
 
-    public EnemyFacade SpawnEnemy(EnemySpawnPoint spawnPoint)
+    public EnemyFacade SpawnEnemy(EnemySpawnPoint sp)
     {
-        var enemy = _enemyFactory.Create();
-        enemy.transform.position = spawnPoint.Position;
+        if (sp == null)
+            return null;
 
-        var path = spawnPoint.PatrolPath;
+        EnemyFacade enemy;
+
+        switch (sp.Kind)
+        {
+            case EnemyMovementMode.Planar2D:
+                enemy = _flyingEnemyFactory.Create();
+                break;
+            case EnemyMovementMode.GroundOnly:
+            default:
+                enemy = _groundEnemyFactory.Create();
+                break;
+        }
+
+        var tr = enemy.transform;
+        tr.position = sp.transform.position;
+
+        var path = sp._patrolPath;
         if (path != null)
-            enemy.SetPatrolPath(path);
-        
+            enemy.SetPatrolPath(path);   
+
         return enemy;
     }
 }

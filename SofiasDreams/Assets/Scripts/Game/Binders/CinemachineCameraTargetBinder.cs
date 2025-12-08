@@ -21,5 +21,6 @@ public class CinemachineCameraTargetBinder : MonoBehaviour
     private void OnPlayerSpawned(PlayerSpawned signal)
     {
         _cmCamera.Follow = signal.facade.cameraTarget;
+        Debug.Log("Player spawned");
     }
 }
