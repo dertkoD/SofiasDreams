@@ -8,11 +8,15 @@ public class EnemyMovement : MonoBehaviour
     [Header("Refs")]
     [SerializeField] Rigidbody2D _rb;
 
+    [Header("Mode")]
+    [SerializeField] EnemyMovementMode _movementMode = EnemyMovementMode.GroundOnly;
+
     EnemyConfigSO _config;
     IMobilityGate _mobilityGate;
     IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
 
     float _targetX;
+    Vector2 _targetPosition;
     bool _hasTarget;
 
     Vector2 _velocity;
@@ -33,11 +37,25 @@ public class EnemyMovement : MonoBehaviour
     public void Configure(EnemyConfigSO config)
     {
         _config = config;
+
+        if (_config != null)
+            _movementMode = _config.movementMode;
+    }
+
+    public EnemyMovementMode MovementMode => _movementMode;
+
+    public void SetMovementMode(EnemyMovementMode mode)
+    {
+        _movementMode = mode;
     }
 
     public void MoveTo(Vector3 worldPos)
     {
-        _targetX = worldPos.x;
+        if (_movementMode == EnemyMovementMode.GroundOnly)
+            _targetX = worldPos.x;
+        else
+            _targetPosition = new Vector2(worldPos.x, worldPos.y);
+
         _hasTarget = true;
     }
 
@@ -45,15 +63,7 @@ public class EnemyMovement : MonoBehaviour
     {
         _hasTarget = false;
 
-        if (_rb != null)
-        {
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            _velocity = _rb.linearVelocity;
-        }
-        else
-        {
-            _velocity = Vector2.zero;
-        }
+        HaltVelocity();
     }
     
     public bool IsAtDestination(float tolerance)
@@ -62,10 +72,17 @@ public class EnemyMovement : MonoBehaviour
             return true;
 
         float t = Mathf.Max(tolerance, 0.001f);
-        float x = _rb != null ? _rb.position.x : transform.position.x;
-        float dx = _targetX - x;
 
-        return Mathf.Abs(dx) <= t;
+        if (_movementMode == EnemyMovementMode.GroundOnly)
+        {
+            float x = _rb != null ? _rb.position.x : transform.position.x;
+            float dx = _targetX - x;
+            return Mathf.Abs(dx) <= t;
+        }
+
+        Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
+        float distance = Vector2.Distance(_targetPosition, current);
+        return distance <= t;
     }
 
     public void WarpTo(Vector3 worldPos)
@@ -76,6 +93,7 @@ public class EnemyMovement : MonoBehaviour
             transform.position = worldPos;
 
         _targetX = worldPos.x;
+        _targetPosition = new Vector2(worldPos.x, worldPos.y);
     }
 
     void Reset()
@@ -90,6 +108,17 @@ public class EnemyMovement : MonoBehaviour
 
         _baseScaleX = Mathf.Abs(transform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
+
+        if (_rb != null)
+        {
+            _targetX = _rb.position.x;
+            _targetPosition = _rb.position;
+        }
+        else
+        {
+            _targetX = transform.position.x;
+            _targetPosition = transform.position;
+        }
     }
 
     void FixedUpdate()
@@ -105,40 +134,81 @@ public class EnemyMovement : MonoBehaviour
 
         if (_mobilityGate != null && _mobilityGate.IsMovementBlocked)
         {
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            _velocity = _rb.linearVelocity;
+            HaltVelocity();
             ApplyFlip();
             return;
         }
 
         if (!_hasTarget)
         {
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            _velocity = _rb.linearVelocity;
+            HaltVelocity();
             ApplyFlip();
             return;
         }
 
-        float x  = _rb.position.x;
+        if (_movementMode == EnemyMovementMode.GroundOnly)
+            TickHorizontalMovement();
+        else
+            TickPlanarMovement();
+
+        ApplyFlip();
+    }
+
+    void TickHorizontalMovement()
+    {
+        float x = _rb.position.x;
         float dx = _targetX - x;
 
         if (Mathf.Abs(dx) <= _config.destinationTolerance)
         {
             _hasTarget = false;
-            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
-            _velocity = _rb.linearVelocity;
-            ApplyFlip();
+            HaltVelocity();
             return;
         }
 
         float dir = Mathf.Sign(dx);
-        float vx  = dir * _config.moveSpeed;
-        float vy  = _rb.linearVelocity.y;
+        float vx = dir * _config.moveSpeed;
+        float vy = _rb.linearVelocity.y;
 
         _rb.linearVelocity = new Vector2(vx, vy);
         _velocity = _rb.linearVelocity;
+    }
 
-        ApplyFlip();
+    void TickPlanarMovement()
+    {
+        Vector2 current = _rb.position;
+        Vector2 delta = _targetPosition - current;
+
+        float tolerance = Mathf.Max(_config.destinationTolerance, 0.001f);
+        if (delta.sqrMagnitude <= tolerance * tolerance)
+        {
+            _hasTarget = false;
+            HaltVelocity();
+            return;
+        }
+
+        Vector2 dir = delta.normalized;
+        Vector2 velocity = dir * _config.moveSpeed;
+
+        _rb.linearVelocity = velocity;
+        _velocity = _rb.linearVelocity;
+    }
+
+    void HaltVelocity()
+    {
+        if (_rb != null)
+        {
+        if (_movementMode == EnemyMovementMode.GroundOnly)
+                _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+            else
+                _rb.linearVelocity = Vector2.zero;
+
+            _velocity = _rb.linearVelocity;
+        }
+        else
+        {
+            _velocity = Vector2.zero;
+        }
     }
 
     void ApplyFlip()
