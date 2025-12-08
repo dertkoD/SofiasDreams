@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemyConfigSO : ScriptableObject
 {
     [Header("Movement")]
+    public EnemyMovementMode movementMode = EnemyMovementMode.GroundOnly;
     [Min(0f)] public float moveSpeed = 3f;
     [Min(0.01f)] public float destinationTolerance = 0.1f;
 
