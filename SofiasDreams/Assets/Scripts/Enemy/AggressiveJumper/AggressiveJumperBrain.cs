@@ -42,6 +42,7 @@ public class AggressiveJumperBrain : MonoBehaviour
     float _visionTimer;
     int _nextPatrolIndex;
     BehaviourState _stateBeforeDeath;
+    bool _agroWindupActive;
 
     int _agroTriggerHash;
     int _attackTriggerHash;
@@ -80,6 +81,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _timeWithoutSight = 0f;
         _visionTimer = 0f;
         _nextPatrolIndex = 0;
+        _agroWindupActive = false;
 
         if (_config != null)
             _jumpController.Configure(_config);
@@ -191,6 +193,9 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_currentTarget == null)
             return;
 
+        if (_agroWindupActive)
+            return;
+
         Vector3 targetPos = _currentTarget.position;
         float dir = targetPos.x - transform.position.x;
 
@@ -222,6 +227,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_state != BehaviourState.Agro)
         {
             _state = BehaviourState.Agro;
+            _agroWindupActive = true;
             TriggerAnimator(_agroTriggerHash);
             Log("Enter agro");
             PublishStateSignal(true);
@@ -248,6 +254,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _currentTarget = null;
         _timeWithoutSight = 0f;
         _patrolCooldown = 0f;
+        _agroWindupActive = false;
         _jumpController.CancelPendingJump();
         EnterPatrol();
     }
@@ -287,6 +294,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         else if (_deathFromAttackHash != 0 && _stateBeforeDeath == BehaviourState.Agro)
             TriggerAnimator(_deathFromAttackHash);
 
+        _agroWindupActive = false;
         PublishStateSignal(false);
         Log("Enemy died");
     }
@@ -363,6 +371,11 @@ public class AggressiveJumperBrain : MonoBehaviour
     {
         if (_state != BehaviourState.Dead)
             EnterPatrol();
+    }
+
+    public void AnimationEvent_OnAgroReady()
+    {
+        _agroWindupActive = false;
     }
 
     #endregion

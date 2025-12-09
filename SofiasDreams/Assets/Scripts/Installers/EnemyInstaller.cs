@@ -24,8 +24,8 @@ public class EnemyInstaller : MonoInstaller
 
         BindComponent(_facade);
         BindComponent(_facade != null ? _facade.Health : null);
-        BindComponent(_facade != null ? _facade.Movement : null);
-        BindComponent(_facade != null ? _facade.PatrolController : null);
+        BindComponent(_facade != null ? _facade.Movement : null, optional: true);
+        BindComponent(_facade != null ? _facade.PatrolController : null, optional: true);
         BindComponent(FindOptionalComponent<EnemyDamageFeedback>(), optional: true);
         BindComponent(FindOptionalComponent<Knockback2D>(), optional: true);
 
