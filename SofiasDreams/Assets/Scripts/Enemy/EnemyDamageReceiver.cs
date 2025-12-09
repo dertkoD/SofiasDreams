@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -11,6 +12,8 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
     IHealth _health;
     IKnockback _knockback;
     IEnemyDamageFeedback _feedback;
+
+    public event Action<DamageInfo> DamageApplied;
 
     public bool IsAlive
     {
@@ -92,5 +95,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
         }
         else
             Debug.LogWarning("[EnemyDamageReceiver] No Knockback2D");
+
+        DamageApplied?.Invoke(info);
     }
 }
