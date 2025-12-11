@@ -83,8 +83,12 @@ public class AggressiveJumperBrain : MonoBehaviour
         _currentPatrolIndex = 0;
         _agroWindupActive = false;
 
-        if (_config != null)
-            _jumpController.Configure(_config);
+        if (_jumpController != null)
+        {
+            if (_config != null)
+                _jumpController.Configure(_config);
+            _jumpController.Landed += OnJumpLanded;
+        }
         
         if (_jumpController != null)
             _jumpController.Landed += OnJumpLanded;
@@ -375,9 +379,20 @@ public class AggressiveJumperBrain : MonoBehaviour
             return;
 
         float tolerance = Mathf.Max(0.01f, _config.patrolLandingTolerance);
-        float distance = Vector2.Distance(info.position, info.target);
+        Vector2 desired = info.target - info.start;
+        Vector2 traveled = info.position - info.start;
+        float desiredLength = desired.magnitude;
+        float distanceToTarget = Vector2.Distance(info.position, info.target);
+        bool withinTolerance = distanceToTarget <= tolerance;
+        bool passedTarget = false;
 
-        if (distance <= tolerance)
+        if (desiredLength > 0.0001f)
+        {
+            float projected = Vector2.Dot(traveled, desired.normalized);
+            passedTarget = projected >= desiredLength;
+        }
+
+        if (desiredLength < 0.0001f || withinTolerance || passedTarget)
             AdvancePatrolIndex();
     }
 

@@ -14,6 +14,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
     public struct LandingInfo
     {
         public PendingJumpType type;
+        public Vector2 start;
         public Vector2 target;
         public Vector2 position;
     }
@@ -27,6 +28,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
 
     PendingJumpType _pendingType;
     Vector2 _pendingTarget;
+    Vector2 _lastJumpStart;
     float _postJumpTimer;
     bool _wasGrounded;
     PendingJumpType _lastJumpType;
@@ -97,6 +99,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
     {
         _pendingType = PendingJumpType.None;
         _lastJumpType = PendingJumpType.None;
+        _lastJumpStart = Vector2.zero;
         _lastJumpTarget = Vector2.zero;
     }
 
@@ -125,6 +128,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         PendingJumpType executedType = _pendingType;
         Vector2 target = _pendingTarget;
 
+        _lastJumpStart = currentPos;
         float gravity = GetEffectiveGravity();
         float airTime = ResolveAirTime(profile, gravity);
         Vector2 displacement = target - currentPos;
@@ -184,11 +188,14 @@ public class AggressiveJumperJumpController : MonoBehaviour
         Landed?.Invoke(new LandingInfo
         {
             type = _lastJumpType,
+            start = _lastJumpStart,
             target = _lastJumpTarget,
             position = landingPos
         });
 
         _lastJumpType = PendingJumpType.None;
+        _lastJumpStart = Vector2.zero;
+        _lastJumpTarget = Vector2.zero;
     }
 
     float GetEffectiveGravity()
