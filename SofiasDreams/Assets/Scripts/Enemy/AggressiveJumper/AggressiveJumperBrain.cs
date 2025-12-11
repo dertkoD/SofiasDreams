@@ -250,7 +250,7 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         float maxStep = Mathf.Max(0.1f, _config.attackMaxStepDistance);
 
-        if (_jumpController.TryPlanAttackJumpSegment(currentPos, _attackGoal, maxStep))
+        if (_jumpController.TryPlanAttackJumpSegment(currentPos, _attackGoal, maxStep, _config.attackMinHorizontalOffset))
         {
             _attackCooldown = Mathf.Max(0f, _config.attackCooldown);
             Log("Attack jump queued");

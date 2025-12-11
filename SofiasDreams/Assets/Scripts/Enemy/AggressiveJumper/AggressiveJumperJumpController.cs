@@ -30,6 +30,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
     Vector2 _pendingTarget;
     bool _useMaxStep;
     float _maxStepDistance;
+    float _minHorizontalOffset;
     Vector2 _lastJumpStart;
     float _postJumpTimer;
     bool _wasGrounded;
@@ -85,6 +86,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingTarget = target;
         _useMaxStep = false;
         _maxStepDistance = 0f;
+        _minHorizontalOffset = 0f;
         _pendingType = PendingJumpType.Patrol;
         return true;
     }
@@ -97,11 +99,12 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingTarget = target;
         _useMaxStep = false;
         _maxStepDistance = 0f;
+        _minHorizontalOffset = 0f;
         _pendingType = PendingJumpType.Attack;
         return true;
     }
     
-    public bool TryPlanAttackJumpSegment(Vector2 currentPosition, Vector2 goal, float maxStepDistance)
+    public bool TryPlanAttackJumpSegment(Vector2 currentPosition, Vector2 goal, float maxStepDistance, float minHorizontalOffset)
     {
         if (_config == null || !CanQueueAttackJump)
             return false;
@@ -110,6 +113,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingTarget = goal;
         _useMaxStep = true;
         _maxStepDistance = Mathf.Max(0.1f, maxStepDistance);
+        _minHorizontalOffset = Mathf.Max(0f, minHorizontalOffset);
         _lastJumpStart = currentPosition;
         return true;
     }
@@ -119,6 +123,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingType = PendingJumpType.None;
         _useMaxStep = false;
         _maxStepDistance = 0f;
+        _minHorizontalOffset = 0f;
         _lastJumpType = PendingJumpType.None;
         _lastJumpStart = Vector2.zero;
         _lastJumpTarget = Vector2.zero;
@@ -163,11 +168,29 @@ public class AggressiveJumperJumpController : MonoBehaviour
         {
             Vector2 toGoal = goal - currentPos;
             float distance = toGoal.magnitude;
-            if (distance > _maxStepDistance)
+            if (distance > _maxStepDistance && distance > 0.0001f)
                 target = currentPos + toGoal.normalized * _maxStepDistance;
         }
 
         _lastJumpStart = currentPos;
+
+        float minHorizontal = _minHorizontalOffset;
+        if (minHorizontal > 0.0001f)
+        {
+            float deltaX = target.x - currentPos.x;
+            float sign = Mathf.Abs(deltaX) < 0.001f
+                ? Mathf.Sign(goal.x - currentPos.x)
+                : Mathf.Sign(deltaX);
+
+            if (Mathf.Abs(sign) < 0.001f)
+                sign = Mathf.Sign(_visualRoot != null ? _visualRoot.localScale.x : transform.localScale.x);
+            if (Mathf.Abs(sign) < 0.001f)
+                sign = 1f;
+
+            if (Mathf.Abs(deltaX) < minHorizontal)
+                target.x = currentPos.x + sign * minHorizontal;
+        }
+
         float gravity = GetEffectiveGravity();
         float airTime = ResolveAirTime(profile, gravity);
         Vector2 displacement = target - currentPos;
