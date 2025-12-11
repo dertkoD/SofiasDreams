@@ -327,20 +327,9 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         float sign = Mathf.Sign(dx);
 
-        if (_visualRoot != null)
-        {
-            Vector3 scale = _visualRoot.localScale;
-            scale.x = Mathf.Abs(scale.x) * sign;
-            _visualRoot.localScale = scale;
-        }
-
-        if (_vision != null && _vision.faceByScaleX)
-        {
-            var visionTransform = _vision.transform;
-            Vector3 visionScale = visionTransform.localScale;
-            visionScale.x = Mathf.Abs(visionScale.x) * sign;
-            visionTransform.localScale = visionScale;
-        }
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * sign;
+        transform.localScale = scale;
     }
 
     void CacheAnimatorHashes()
