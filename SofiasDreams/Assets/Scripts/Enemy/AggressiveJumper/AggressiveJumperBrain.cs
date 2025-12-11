@@ -41,6 +41,7 @@ public class AggressiveJumperBrain : MonoBehaviour
     float _patrolCooldown;
     float _visionTimer;
     int _currentPatrolIndex;
+    Vector2 _currentPatrolGoal;
     BehaviourState _stateBeforeDeath;
     bool _agroWindupActive;
 
@@ -81,6 +82,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _timeWithoutSight = 0f;
         _visionTimer = 0f;
         _currentPatrolIndex = 0;
+        _currentPatrolGoal = GetCurrentPatrolGoal();
         _agroWindupActive = false;
 
         if (_jumpController != null)
@@ -89,9 +91,6 @@ public class AggressiveJumperBrain : MonoBehaviour
                 _jumpController.Configure(_config);
             _jumpController.Landed += OnJumpLanded;
         }
-        
-        if (_jumpController != null)
-            _jumpController.Landed += OnJumpLanded;
 
         if (_animator != null && _deathFromPatrolHash != 0)
             _animator.SetBool(_deathFromPatrolHash, false);
@@ -178,17 +177,36 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_patrolPath == null || _patrolPath.Count == 0)
             return;
 
+        _currentPatrolGoal = GetCurrentPatrolGoal();
+
+        Vector2 currentPos = _jumpController != null
+            ? (Vector2)_jumpController.transform.position
+            : (Vector2)transform.position;
+
+        float tolerance = Mathf.Max(0.01f, _config.patrolLandingTolerance);
+        Vector2 toGoal = _currentPatrolGoal - currentPos;
+        float distance = toGoal.magnitude;
+
+        if (distance <= tolerance)
+        {
+            AdvancePatrolIndex();
+            return;
+        }
+
         if (!_jumpController.CanQueuePatrolJump)
             return;
 
         if (_patrolCooldown > 0f)
             return;
 
-        Vector3 next = _patrolPath.GetPoint(_currentPatrolIndex);
-        Vector2 target = new Vector2(next.x, next.y);
+        float maxStep = Mathf.Max(0.1f, _config.patrolMaxStepDistance);
+        Vector2 target = distance > maxStep
+            ? currentPos + toGoal.normalized * maxStep
+            : _currentPatrolGoal;
+
         if (_jumpController.TryPlanPatrolJump(target))
         {
-            FaceDirection(next.x - transform.position.x);
+            FaceDirection(target.x - transform.position.x);
             _patrolCooldown = Mathf.Max(0f, _config.patrolIdleBetweenJumps);
             Log($"Patrol jump queued -> point {_currentPatrolIndex}");
         }
@@ -378,21 +396,23 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_patrolPath == null || _patrolPath.Count == 0)
             return;
 
+        Vector2 goal = GetCurrentPatrolGoal();
+
         float tolerance = Mathf.Max(0.01f, _config.patrolLandingTolerance);
-        Vector2 desired = info.target - info.start;
+        Vector2 desired = goal - info.start;
         Vector2 traveled = info.position - info.start;
         float desiredLength = desired.magnitude;
-        float distanceToTarget = Vector2.Distance(info.position, info.target);
-        bool withinTolerance = distanceToTarget <= tolerance;
-        bool passedTarget = false;
+        float distanceToGoal = Vector2.Distance(info.position, goal);
+        bool withinTolerance = distanceToGoal <= tolerance;
+        bool passedGoal = false;
 
         if (desiredLength > 0.0001f)
         {
             float projected = Vector2.Dot(traveled, desired.normalized);
-            passedTarget = projected >= desiredLength;
+            passedGoal = projected >= desiredLength;
         }
 
-        if (desiredLength < 0.0001f || withinTolerance || passedTarget)
+        if (desiredLength < 0.0001f || withinTolerance || passedGoal)
             AdvancePatrolIndex();
     }
 
@@ -405,6 +425,17 @@ public class AggressiveJumperBrain : MonoBehaviour
             _currentPatrolIndex = 0;
         else
             _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPath.Count;
+
+        _currentPatrolGoal = GetCurrentPatrolGoal();
+    }
+
+    Vector2 GetCurrentPatrolGoal()
+    {
+        if (_patrolPath == null || _patrolPath.Count == 0)
+            return transform.position;
+
+        Vector3 p = _patrolPath.GetPoint(_currentPatrolIndex);
+        return new Vector2(p.x, p.y);
     }
 
     #region Animation Events
