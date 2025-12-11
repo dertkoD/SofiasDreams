@@ -36,9 +36,6 @@ public class AggressiveJumperJumpController : MonoBehaviour
     bool _wasGrounded;
     PendingJumpType _lastJumpType;
     Vector2 _lastJumpTarget;
-    bool _overrideVelocity;
-    Vector2 _overrideVelocityValue;
-    float _overrideVelocityTimer;
 
     public bool IsGrounded { get; private set; }
     public bool HasPendingJump => _pendingType != PendingJumpType.None;
@@ -76,16 +73,6 @@ public class AggressiveJumperJumpController : MonoBehaviour
     void FixedUpdate()
     {
         UpdateGrounded();
-
-        if (_overrideVelocity)
-        {
-            if (_rb != null)
-                _rb.linearVelocity = _overrideVelocityValue;
-
-            _overrideVelocityTimer -= Time.fixedDeltaTime;
-            if (_overrideVelocityTimer <= 0f)
-                _overrideVelocity = false;
-        }
     }
 
     public bool CanQueuePatrolJump => !HasPendingJump && !MovementLockActive && IsGrounded;
@@ -140,9 +127,6 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _lastJumpType = PendingJumpType.None;
         _lastJumpStart = Vector2.zero;
         _lastJumpTarget = Vector2.zero;
-        _overrideVelocity = false;
-        _overrideVelocityValue = Vector2.zero;
-        _overrideVelocityTimer = 0f;
     }
 
     public void StopImmediate()
@@ -233,11 +217,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
             vy = profile.verticalVelocity;
         }
 
-        Vector2 velocity = new Vector2(vx, vy);
-        _rb.linearVelocity = velocity;
-        _overrideVelocityValue = velocity;
-        _overrideVelocityTimer = Mathf.Max(0.05f, airTime);
-        _overrideVelocity = true;
+        _rb.linearVelocity = new Vector2(vx, vy);
 
         if (profile.impulse.sqrMagnitude > 0.0001f)
         {
@@ -272,10 +252,6 @@ public class AggressiveJumperJumpController : MonoBehaviour
     void NotifyLanding()
     {
         Vector2 landingPos = _rb != null ? _rb.position : (Vector2)transform.position;
-
-        _overrideVelocity = false;
-        _overrideVelocityValue = Vector2.zero;
-        _overrideVelocityTimer = 0f;
 
         Landed?.Invoke(new LandingInfo
         {
