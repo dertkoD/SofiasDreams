@@ -43,6 +43,7 @@ public class AggressiveJumperBrain : MonoBehaviour
     Vector2 _currentPatrolGoal;
     BehaviourState _stateBeforeDeath;
     bool _agroWindupActive;
+    bool _pendingAgro;
 
     int _agroTriggerHash;
     int _returnTriggerHash;
@@ -82,6 +83,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _currentPatrolIndex = 0;
         _currentPatrolGoal = GetCurrentPatrolGoal();
         _agroWindupActive = false;
+        _pendingAgro = false;
 
         if (_jumpController != null)
         {
@@ -121,6 +123,7 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         UpdateVision();
         UpdateCooldowns();
+        ProcessPendingAgroRequest();
 
         switch (_state)
         {
@@ -151,7 +154,7 @@ public class AggressiveJumperBrain : MonoBehaviour
             _timeWithoutSight = 0f;
 
             if (_state != BehaviourState.Agro)
-                EnterAgro();
+                RequestAgro();
         }
         else if (_currentTarget != null)
         {
@@ -247,6 +250,7 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         if (_state != BehaviourState.Agro)
         {
+            _pendingAgro = false;
             _jumpController?.StopImmediate();
             _state = BehaviourState.Agro;
             _agroWindupActive = true;
@@ -277,6 +281,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _timeWithoutSight = 0f;
         _patrolCooldown = 0f;
         _agroWindupActive = false;
+        _pendingAgro = false;
         _jumpController.CancelPendingJump();
         EnterPatrol();
     }
@@ -299,7 +304,7 @@ public class AggressiveJumperBrain : MonoBehaviour
             _currentTarget = info.source;
 
         _timeWithoutSight = 0f;
-        EnterAgro();
+        RequestAgro();
     }
 
     void OnHealthChanged()
@@ -317,6 +322,7 @@ public class AggressiveJumperBrain : MonoBehaviour
             TriggerAnimator(_deathFromAttackHash);
 
         _agroWindupActive = false;
+        _pendingAgro = false;
         PublishStateSignal(false);
         Log("Enemy died");
     }
@@ -378,6 +384,34 @@ public class AggressiveJumperBrain : MonoBehaviour
             enemy = _facade,
             agro = agro
         });
+    }
+
+    void RequestAgro()
+    {
+        if (_state == BehaviourState.Dead)
+            return;
+
+        if (_state == BehaviourState.Agro)
+        {
+            _pendingAgro = false;
+            return;
+        }
+
+        _pendingAgro = true;
+    }
+
+    void ProcessPendingAgroRequest()
+    {
+        if (!_pendingAgro || _state == BehaviourState.Dead || _state == BehaviourState.Agro)
+            return;
+
+        if (_jumpController == null)
+            return;
+
+        if (!_jumpController.IsGrounded || _jumpController.HasPendingJump || _jumpController.MovementLockActive)
+            return;
+
+        EnterAgro();
     }
 
     void OnJumpLanded(AggressiveJumperJumpController.LandingInfo info)
