@@ -86,7 +86,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingTarget = target;
         _useMaxStep = false;
         _maxStepDistance = 0f;
-        _minHorizontalOffset = 0f;
+        _minHorizontalOffset = Mathf.Max(0f, _config != null ? _config.patrolMinHorizontalOffset : 0f);
         _pendingType = PendingJumpType.Patrol;
         return true;
     }
@@ -99,7 +99,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _pendingTarget = target;
         _useMaxStep = false;
         _maxStepDistance = 0f;
-        _minHorizontalOffset = 0f;
+        _minHorizontalOffset = Mathf.Max(0f, _config != null ? _config.attackMinHorizontalOffset : 0f);
         _pendingType = PendingJumpType.Attack;
         return true;
     }

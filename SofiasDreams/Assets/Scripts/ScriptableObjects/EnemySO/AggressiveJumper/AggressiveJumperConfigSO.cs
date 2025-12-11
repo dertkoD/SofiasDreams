@@ -11,6 +11,7 @@ public class AggressiveJumperConfigSO : ScriptableObject
     [Min(0f)] public float patrolIdleBetweenJumps = 0.45f;
     [Min(0.01f)] public float patrolLandingTolerance = 0.35f;
     [Min(0.1f)] public float patrolMaxStepDistance = 3f;
+    [Min(0.01f)] public float patrolMinHorizontalOffset = 0.25f;
 
     [Header("Agro / Attack")]
     public JumpProfile attackJump = JumpProfile.Create(7.5f, 11f, 0.2f, 0.75f);
