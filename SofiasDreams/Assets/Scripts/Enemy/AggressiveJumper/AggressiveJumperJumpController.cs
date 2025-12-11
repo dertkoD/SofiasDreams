@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -10,6 +11,13 @@ public class AggressiveJumperJumpController : MonoBehaviour
         Attack
     }
 
+    public struct LandingInfo
+    {
+        public PendingJumpType type;
+        public Vector2 target;
+        public Vector2 position;
+    }
+
     [Header("Config")]
     [SerializeField] AggressiveJumperConfigSO _config;
 
@@ -20,14 +28,19 @@ public class AggressiveJumperJumpController : MonoBehaviour
     PendingJumpType _pendingType;
     Vector2 _pendingTarget;
     float _postJumpTimer;
+    bool _wasGrounded;
+    PendingJumpType _lastJumpType;
+    Vector2 _lastJumpTarget;
 
     public bool IsGrounded { get; private set; }
     public bool HasPendingJump => _pendingType != PendingJumpType.None;
     public bool MovementLockActive => _postJumpTimer > 0f;
+    public event Action<LandingInfo> Landed;
 
     public void Configure(AggressiveJumperConfigSO config)
     {
         _config = config;
+        _wasGrounded = IsGrounded;
     }
 
     void Reset()
@@ -83,6 +96,8 @@ public class AggressiveJumperJumpController : MonoBehaviour
     public void CancelPendingJump()
     {
         _pendingType = PendingJumpType.None;
+        _lastJumpType = PendingJumpType.None;
+        _lastJumpTarget = Vector2.zero;
     }
 
     public void AnimationEvent_PatrolJump()
@@ -106,24 +121,40 @@ public class AggressiveJumperJumpController : MonoBehaviour
         if (_rb == null)
             return;
 
-        Vector2 pos = _rb.position;
-        float dir = Mathf.Sign(_pendingTarget.x - pos.x);
-        if (Mathf.Abs(dir) < 0.001f)
-            dir = Mathf.Sign(_visualRoot != null ? _visualRoot.localScale.x : transform.localScale.x);
-        if (Mathf.Abs(dir) < 0.001f)
-            dir = 1f;
+        Vector2 currentPos = _rb.position;
+        PendingJumpType executedType = _pendingType;
+        Vector2 target = _pendingTarget;
 
-        Vector2 velocity = new Vector2(
-            dir * profile.horizontalVelocity,
-            profile.verticalVelocity);
+        float gravity = GetEffectiveGravity();
+        float airTime = ResolveAirTime(profile, gravity);
+        Vector2 displacement = target - currentPos;
+        float horizontalSign = Mathf.Sign(displacement.x == 0f ? (_visualRoot != null ? _visualRoot.localScale.x : 1f) : displacement.x);
+        if (Mathf.Abs(horizontalSign) < 0.001f)
+            horizontalSign = 1f;
 
-        _rb.linearVelocity = velocity;
+        float vx = airTime > 0.001f ? displacement.x / airTime : 0f;
+        float vy;
+
+        if (gravity > 0.0001f && airTime > 0.001f)
+        {
+            // vy * t - 0.5 * g * t^2 = displacement.y
+            vy = (displacement.y + 0.5f * gravity * airTime * airTime) / airTime;
+        }
+        else
+        {
+            vy = profile.verticalVelocity;
+        }
+
+        _rb.linearVelocity = new Vector2(vx, vy);
 
         if (profile.impulse.sqrMagnitude > 0.0001f)
         {
-            Vector2 impulse = new Vector2(dir * profile.impulse.x, profile.impulse.y);
+            Vector2 impulse = new Vector2(horizontalSign * profile.impulse.x, profile.impulse.y);
             _rb.AddForce(impulse, ForceMode2D.Impulse);
         }
+
+        _lastJumpType = executedType;
+        _lastJumpTarget = target;
 
         _pendingType = PendingJumpType.None;
         _postJumpTimer = profile.postJumpDelay;
@@ -139,6 +170,44 @@ public class AggressiveJumperJumpController : MonoBehaviour
 
         Vector2 origin = (Vector2)transform.position + _config.groundCheckOffset;
         IsGrounded = Physics2D.OverlapCircle(origin, _config.groundCheckRadius, _config.groundMask);
+
+        if (!_wasGrounded && IsGrounded && _lastJumpType != PendingJumpType.None)
+            NotifyLanding();
+
+        _wasGrounded = IsGrounded;
+    }
+
+    void NotifyLanding()
+    {
+        Vector2 landingPos = _rb != null ? _rb.position : (Vector2)transform.position;
+
+        Landed?.Invoke(new LandingInfo
+        {
+            type = _lastJumpType,
+            target = _lastJumpTarget,
+            position = landingPos
+        });
+
+        _lastJumpType = PendingJumpType.None;
+    }
+
+    float GetEffectiveGravity()
+    {
+        float gravity = Mathf.Abs(Physics2D.gravity.y);
+        if (_rb != null)
+            gravity *= Mathf.Abs(_rb.gravityScale);
+        return gravity;
+    }
+
+    float ResolveAirTime(AggressiveJumperConfigSO.JumpProfile profile, float gravity)
+    {
+        if (profile.airTime > 0.01f)
+            return profile.airTime;
+
+        if (gravity <= 0.0001f || profile.verticalVelocity <= 0.0001f)
+            return Mathf.Max(profile.airTime, 0.2f);
+
+        return Mathf.Max(0.05f, 2f * profile.verticalVelocity / gravity);
     }
 
 #if UNITY_EDITOR

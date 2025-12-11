@@ -7,11 +7,12 @@ using UnityEngine;
 public class AggressiveJumperConfigSO : ScriptableObject
 {
     [Header("Patrol")]
-    public JumpProfile patrolJump = JumpProfile.Create(5f, 8f, 0.45f);
+    public JumpProfile patrolJump = JumpProfile.Create(5f, 8f, 0.45f, 0.9f);
     [Min(0f)] public float patrolIdleBetweenJumps = 0.45f;
+    [Min(0.01f)] public float patrolLandingTolerance = 0.35f;
 
     [Header("Agro / Attack")]
-    public JumpProfile attackJump = JumpProfile.Create(7.5f, 11f, 0.2f);
+    public JumpProfile attackJump = JumpProfile.Create(7.5f, 11f, 0.2f, 0.75f);
     [Min(0f)] public float attackCooldown = 1.35f;
     [Min(0f)] public float attackLeadDistance = 0.6f;
 
@@ -36,15 +37,17 @@ public class AggressiveJumperConfigSO : ScriptableObject
     {
         [Min(0f)] public float horizontalVelocity;
         [Min(0f)] public float verticalVelocity;
+        [Min(0f)] public float airTime;
         public Vector2 impulse;
         [Min(0f)] public float postJumpDelay;
 
-        public static JumpProfile Create(float horizontal, float vertical, float postDelay = 0.3f)
+        public static JumpProfile Create(float horizontal, float vertical, float postDelay = 0.3f, float airTime = 0f)
         {
             return new JumpProfile
             {
                 horizontalVelocity = horizontal,
                 verticalVelocity = vertical,
+                airTime = airTime,
                 impulse = Vector2.zero,
                 postJumpDelay = postDelay
             };

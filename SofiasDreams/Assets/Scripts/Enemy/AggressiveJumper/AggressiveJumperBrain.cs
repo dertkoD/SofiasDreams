@@ -40,7 +40,7 @@ public class AggressiveJumperBrain : MonoBehaviour
     float _attackCooldown;
     float _patrolCooldown;
     float _visionTimer;
-    int _nextPatrolIndex;
+    int _currentPatrolIndex;
     BehaviourState _stateBeforeDeath;
     bool _agroWindupActive;
 
@@ -80,11 +80,14 @@ public class AggressiveJumperBrain : MonoBehaviour
         _patrolCooldown = 0f;
         _timeWithoutSight = 0f;
         _visionTimer = 0f;
-        _nextPatrolIndex = 0;
+        _currentPatrolIndex = 0;
         _agroWindupActive = false;
 
         if (_config != null)
             _jumpController.Configure(_config);
+        
+        if (_jumpController != null)
+            _jumpController.Landed += OnJumpLanded;
 
         if (_animator != null && _deathFromPatrolHash != 0)
             _animator.SetBool(_deathFromPatrolHash, false);
@@ -105,6 +108,9 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         if (_health != null)
             _health.OnHealthChanged -= OnHealthChanged;
+
+        if (_jumpController != null)
+            _jumpController.Landed -= OnJumpLanded;
     }
 
     void Update()
@@ -174,17 +180,13 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_patrolCooldown > 0f)
             return;
 
-        Vector3 next = _patrolPath.GetPoint(_nextPatrolIndex);
-        int nextIndex = (_patrolPath.Count <= 1)
-            ? 0
-            : (_nextPatrolIndex + 1) % _patrolPath.Count;
-
-        if (_jumpController.TryPlanPatrolJump(next))
+        Vector3 next = _patrolPath.GetPoint(_currentPatrolIndex);
+        Vector2 target = new Vector2(next.x, next.y);
+        if (_jumpController.TryPlanPatrolJump(target))
         {
-            _nextPatrolIndex = nextIndex;
             FaceDirection(next.x - transform.position.x);
             _patrolCooldown = Mathf.Max(0f, _config.patrolIdleBetweenJumps);
-            Log($"Patrol jump queued -> point {_nextPatrolIndex}");
+            Log($"Patrol jump queued -> point {_currentPatrolIndex}");
         }
     }
 
@@ -362,6 +364,32 @@ public class AggressiveJumperBrain : MonoBehaviour
             enemy = _facade,
             agro = agro
         });
+    }
+
+    void OnJumpLanded(AggressiveJumperJumpController.LandingInfo info)
+    {
+        if (info.type != AggressiveJumperJumpController.PendingJumpType.Patrol)
+            return;
+
+        if (_patrolPath == null || _patrolPath.Count == 0)
+            return;
+
+        float tolerance = Mathf.Max(0.01f, _config.patrolLandingTolerance);
+        float distance = Vector2.Distance(info.position, info.target);
+
+        if (distance <= tolerance)
+            AdvancePatrolIndex();
+    }
+
+    void AdvancePatrolIndex()
+    {
+        if (_patrolPath == null || _patrolPath.Count == 0)
+            return;
+
+        if (_patrolPath.Count <= 1)
+            _currentPatrolIndex = 0;
+        else
+            _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPath.Count;
     }
 
     #region Animation Events
