@@ -28,6 +28,8 @@ public class AggressiveJumperJumpController : MonoBehaviour
 
     PendingJumpType _pendingType;
     Vector2 _pendingTarget;
+    bool _useMaxStep;
+    float _maxStepDistance;
     Vector2 _lastJumpStart;
     float _postJumpTimer;
     bool _wasGrounded;
@@ -81,6 +83,8 @@ public class AggressiveJumperJumpController : MonoBehaviour
             return false;
 
         _pendingTarget = target;
+        _useMaxStep = false;
+        _maxStepDistance = 0f;
         _pendingType = PendingJumpType.Patrol;
         return true;
     }
@@ -91,13 +95,30 @@ public class AggressiveJumperJumpController : MonoBehaviour
             return false;
 
         _pendingTarget = target;
+        _useMaxStep = false;
+        _maxStepDistance = 0f;
         _pendingType = PendingJumpType.Attack;
+        return true;
+    }
+    
+    public bool TryPlanAttackJumpSegment(Vector2 currentPosition, Vector2 goal, float maxStepDistance)
+    {
+        if (_config == null || !CanQueueAttackJump)
+            return false;
+
+        _pendingType = PendingJumpType.Attack;
+        _pendingTarget = goal;
+        _useMaxStep = true;
+        _maxStepDistance = Mathf.Max(0.1f, maxStepDistance);
+        _lastJumpStart = currentPosition;
         return true;
     }
 
     public void CancelPendingJump()
     {
         _pendingType = PendingJumpType.None;
+        _useMaxStep = false;
+        _maxStepDistance = 0f;
         _lastJumpType = PendingJumpType.None;
         _lastJumpStart = Vector2.zero;
         _lastJumpTarget = Vector2.zero;
@@ -135,7 +156,16 @@ public class AggressiveJumperJumpController : MonoBehaviour
 
         Vector2 currentPos = _rb.position;
         PendingJumpType executedType = _pendingType;
-        Vector2 target = _pendingTarget;
+        Vector2 goal = _pendingTarget;
+        Vector2 target = goal;
+
+        if (_useMaxStep && _maxStepDistance > 0.1f)
+        {
+            Vector2 toGoal = goal - currentPos;
+            float distance = toGoal.magnitude;
+            if (distance > _maxStepDistance)
+                target = currentPos + toGoal.normalized * _maxStepDistance;
+        }
 
         _lastJumpStart = currentPos;
         float gravity = GetEffectiveGravity();

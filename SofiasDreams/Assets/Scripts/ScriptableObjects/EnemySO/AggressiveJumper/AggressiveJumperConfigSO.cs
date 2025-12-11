@@ -16,6 +16,8 @@ public class AggressiveJumperConfigSO : ScriptableObject
     public JumpProfile attackJump = JumpProfile.Create(7.5f, 11f, 0.2f, 0.75f);
     [Min(0f)] public float attackCooldown = 1.35f;
     [Min(0f)] public float attackLeadDistance = 0.6f;
+    [Min(0.1f)] public float attackMaxStepDistance = 4f;
+    [Min(0.01f)] public float attackLandingTolerance = 0.4f;
 
     [Header("Awareness")]
     [Min(0f)] public float forgetDelay = 2.5f;

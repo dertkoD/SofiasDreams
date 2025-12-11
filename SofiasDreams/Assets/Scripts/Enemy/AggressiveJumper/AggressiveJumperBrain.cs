@@ -44,6 +44,7 @@ public class AggressiveJumperBrain : MonoBehaviour
     BehaviourState _stateBeforeDeath;
     bool _agroWindupActive;
     bool _pendingAgro;
+    Vector2 _attackGoal;
 
     int _agroTriggerHash;
     int _returnTriggerHash;
@@ -84,6 +85,7 @@ public class AggressiveJumperBrain : MonoBehaviour
         _currentPatrolGoal = GetCurrentPatrolGoal();
         _agroWindupActive = false;
         _pendingAgro = false;
+        _attackGoal = Vector2.zero;
 
         if (_jumpController != null)
         {
@@ -221,6 +223,9 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_agroWindupActive)
             return;
 
+        if (_jumpController.HasPendingJump || _jumpController.MovementLockActive)
+            return;
+
         Vector3 targetPos = _currentTarget.position;
         float dir = targetPos.x - transform.position.x;
 
@@ -232,11 +237,20 @@ public class AggressiveJumperBrain : MonoBehaviour
         if (_attackCooldown > 0f)
             return;
 
-        Vector2 predicted = targetPos;
-        float lead = Mathf.Sign(dir) * _config.attackLeadDistance;
-        predicted.x += lead;
+        Vector2 currentPos = _jumpController != null
+            ? (Vector2)_jumpController.transform.position
+            : (Vector2)transform.position;
 
-        if (_jumpController.TryPlanAttackJump(predicted))
+        _attackGoal = ApplyAttackLead(targetPos, dir);
+
+        float distanceToGoal = (_attackGoal - currentPos).magnitude;
+        float attackTolerance = Mathf.Max(0.01f, _config.attackLandingTolerance);
+        if (distanceToGoal <= attackTolerance)
+            return;
+
+        float maxStep = Mathf.Max(0.1f, _config.attackMaxStepDistance);
+
+        if (_jumpController.TryPlanAttackJumpSegment(currentPos, _attackGoal, maxStep))
         {
             _attackCooldown = Mathf.Max(0f, _config.attackCooldown);
             Log("Attack jump queued");
@@ -462,6 +476,14 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         Vector3 p = _patrolPath.GetPoint(_currentPatrolIndex);
         return new Vector2(p.x, p.y);
+    }
+
+    Vector2 ApplyAttackLead(Vector3 targetPos, float dir)
+    {
+        Vector2 goal = new Vector2(targetPos.x, targetPos.y);
+        float lead = Mathf.Sign(dir) * _config.attackLeadDistance;
+        goal.x += lead;
+        return goal;
     }
 
     #region Animation Events
