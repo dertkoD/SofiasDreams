@@ -322,13 +322,25 @@ public class AggressiveJumperBrain : MonoBehaviour
 
     void FaceDirection(float dx)
     {
-        if (_visualRoot == null || Mathf.Abs(dx) < 0.001f)
+        if (Mathf.Abs(dx) < 0.001f)
             return;
 
         float sign = Mathf.Sign(dx);
-        Vector3 scale = _visualRoot.localScale;
-        scale.x = Mathf.Abs(scale.x) * sign;
-        _visualRoot.localScale = scale;
+
+        if (_visualRoot != null)
+        {
+            Vector3 scale = _visualRoot.localScale;
+            scale.x = Mathf.Abs(scale.x) * sign;
+            _visualRoot.localScale = scale;
+        }
+
+        if (_vision != null && _vision.faceByScaleX)
+        {
+            var visionTransform = _vision.transform;
+            Vector3 visionScale = visionTransform.localScale;
+            visionScale.x = Mathf.Abs(visionScale.x) * sign;
+            visionTransform.localScale = visionScale;
+        }
     }
 
     void CacheAnimatorHashes()
