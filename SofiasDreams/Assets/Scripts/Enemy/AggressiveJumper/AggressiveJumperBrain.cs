@@ -27,7 +27,6 @@ public class AggressiveJumperBrain : MonoBehaviour
 
     [Header("Animator params")]
     [SerializeField] string _agroTrigger = "Agro";
-    [SerializeField] string _attackTrigger = "Attack";
     [SerializeField] string _returnToPatrolTrigger = "Patrol";
     [SerializeField] string _deathFromPatrolBool = "DeathFromPatrol";
     [SerializeField] string _deathFromAttackTrigger = "DeathFromAttack";
@@ -46,7 +45,6 @@ public class AggressiveJumperBrain : MonoBehaviour
     bool _agroWindupActive;
 
     int _agroTriggerHash;
-    int _attackTriggerHash;
     int _returnTriggerHash;
     int _deathFromPatrolHash;
     int _deathFromAttackHash;
@@ -237,7 +235,6 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         if (_jumpController.TryPlanAttackJump(predicted))
         {
-            TriggerAttack();
             _attackCooldown = Mathf.Max(0f, _config.attackCooldown);
             Log("Attack jump queued");
         }
@@ -323,12 +320,6 @@ public class AggressiveJumperBrain : MonoBehaviour
         Log("Enemy died");
     }
 
-    void TriggerAttack()
-    {
-        if (_animator != null && _attackTriggerHash != 0)
-            TriggerAnimator(_attackTriggerHash);
-    }
-
     void FaceDirection(float dx)
     {
         if (_visualRoot == null || Mathf.Abs(dx) < 0.001f)
@@ -343,7 +334,6 @@ public class AggressiveJumperBrain : MonoBehaviour
     void CacheAnimatorHashes()
     {
         _agroTriggerHash = AnimatorStringToHash(_agroTrigger);
-        _attackTriggerHash = AnimatorStringToHash(_attackTrigger);
         _returnTriggerHash = AnimatorStringToHash(_returnToPatrolTrigger);
         _deathFromPatrolHash = AnimatorStringToHash(_deathFromPatrolBool);
         _deathFromAttackHash = AnimatorStringToHash(_deathFromAttackTrigger);
