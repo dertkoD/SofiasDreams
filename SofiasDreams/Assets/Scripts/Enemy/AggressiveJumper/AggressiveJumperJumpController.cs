@@ -176,6 +176,12 @@ public class AggressiveJumperJumpController : MonoBehaviour
             horizontalSign = 1f;
 
         float vx = airTime > 0.001f ? displacement.x / airTime : 0f;
+        float minHorizontalSpeed = Mathf.Abs(profile.horizontalVelocity);
+        if (minHorizontalSpeed > 0.01f)
+        {
+            if (Mathf.Abs(vx) < minHorizontalSpeed)
+                vx = minHorizontalSpeed * horizontalSign;
+        }
         float vy;
 
         if (gravity > 0.0001f && airTime > 0.001f)
