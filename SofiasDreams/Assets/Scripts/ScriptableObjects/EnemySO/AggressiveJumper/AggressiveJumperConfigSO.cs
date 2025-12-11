@@ -12,6 +12,7 @@ public class AggressiveJumperConfigSO : ScriptableObject
     [Min(0.01f)] public float patrolLandingTolerance = 0.35f;
     [Min(0.1f)] public float patrolMaxStepDistance = 3f;
     [Min(0.01f)] public float patrolMinHorizontalOffset = 0.25f;
+    [Min(0f)] public float patrolVelocityHoldTime = 0.15f;
 
     [Header("Agro / Attack")]
     public JumpProfile attackJump = JumpProfile.Create(7.5f, 11f, 0.2f, 0.75f);
@@ -20,6 +21,7 @@ public class AggressiveJumperConfigSO : ScriptableObject
     [Min(0.1f)] public float attackMaxStepDistance = 4f;
     [Min(0.01f)] public float attackLandingTolerance = 0.4f;
     [Min(0.01f)] public float attackMinHorizontalOffset = 0.4f;
+    [Min(0f)] public float attackVelocityHoldTime = 0.2f;
 
     [Header("Awareness")]
     [Min(0f)] public float forgetDelay = 2.5f;

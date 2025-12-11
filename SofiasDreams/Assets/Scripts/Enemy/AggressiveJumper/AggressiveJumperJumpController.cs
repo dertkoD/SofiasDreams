@@ -31,11 +31,14 @@ public class AggressiveJumperJumpController : MonoBehaviour
     bool _useMaxStep;
     float _maxStepDistance;
     float _minHorizontalOffset;
+    float _velocityHoldTime;
     Vector2 _lastJumpStart;
     float _postJumpTimer;
     bool _wasGrounded;
     PendingJumpType _lastJumpType;
     Vector2 _lastJumpTarget;
+    Vector2 _heldVelocity;
+    float _heldVelocityTimer;
 
     public bool IsGrounded { get; private set; }
     public bool HasPendingJump => _pendingType != PendingJumpType.None;
@@ -73,6 +76,14 @@ public class AggressiveJumperJumpController : MonoBehaviour
     void FixedUpdate()
     {
         UpdateGrounded();
+
+        if (_heldVelocityTimer > 0f && _rb != null)
+        {
+            _rb.linearVelocity = new Vector2(_heldVelocity.x, _rb.linearVelocity.y);
+            _heldVelocityTimer -= Time.fixedDeltaTime;
+            if (_heldVelocityTimer <= 0f)
+                _heldVelocity = Vector2.zero;
+        }
     }
 
     public bool CanQueuePatrolJump => !HasPendingJump && !MovementLockActive && IsGrounded;
@@ -87,6 +98,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _useMaxStep = false;
         _maxStepDistance = 0f;
         _minHorizontalOffset = Mathf.Max(0f, _config != null ? _config.patrolMinHorizontalOffset : 0f);
+        _velocityHoldTime = _config != null ? _config.patrolVelocityHoldTime : 0f;
         _pendingType = PendingJumpType.Patrol;
         return true;
     }
@@ -100,6 +112,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _useMaxStep = false;
         _maxStepDistance = 0f;
         _minHorizontalOffset = Mathf.Max(0f, _config != null ? _config.attackMinHorizontalOffset : 0f);
+        _velocityHoldTime = _config != null ? _config.attackVelocityHoldTime : 0f;
         _pendingType = PendingJumpType.Attack;
         return true;
     }
@@ -114,6 +127,7 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _useMaxStep = true;
         _maxStepDistance = Mathf.Max(0.1f, maxStepDistance);
         _minHorizontalOffset = Mathf.Max(0f, minHorizontalOffset);
+        _velocityHoldTime = _config != null ? _config.attackVelocityHoldTime : 0f;
         _lastJumpStart = currentPosition;
         return true;
     }
@@ -218,6 +232,8 @@ public class AggressiveJumperJumpController : MonoBehaviour
         }
 
         _rb.linearVelocity = new Vector2(vx, vy);
+        _heldVelocity = new Vector2(vx, 0f);
+        _heldVelocityTimer = Mathf.Max(0f, _velocityHoldTime);
 
         if (profile.impulse.sqrMagnitude > 0.0001f)
         {
