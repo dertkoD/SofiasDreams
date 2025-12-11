@@ -103,6 +103,15 @@ public class AggressiveJumperJumpController : MonoBehaviour
         _lastJumpTarget = Vector2.zero;
     }
 
+    public void StopImmediate()
+    {
+        CancelPendingJump();
+        _postJumpTimer = 0f;
+
+        if (_rb != null)
+            _rb.linearVelocity = Vector2.zero;
+    }
+
     public void AnimationEvent_PatrolJump()
     {
         if (_pendingType != PendingJumpType.Patrol)

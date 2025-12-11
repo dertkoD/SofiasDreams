@@ -247,6 +247,7 @@ public class AggressiveJumperBrain : MonoBehaviour
 
         if (_state != BehaviourState.Agro)
         {
+            _jumpController?.StopImmediate();
             _state = BehaviourState.Agro;
             _agroWindupActive = true;
             TriggerAnimator(_agroTriggerHash);
