@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e232a8111c5a4da5bd68d56a0a19719e, type: 3}
+  m_Name: JumpingEnemyConfig
+  m_EditorClassIdentifier: 
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 128
+  leaveGroundVelocity: 0.05
+  minGroundNormalAngle: 80
+  maxGroundNormalAngle: 100
+  groundedVelocityEpsilon: 0.05
+  airControlAcceleration: 60
+  airControlMaxDeltaVX: 0
+  patrolPathSearchRadius: 100
+  loopPath: 1
+  waypointArriveDistance: 0.2
+  patrolJumpCooldown: 0.15
+  patrolJumpHeight: 1.5
+  patrolJumpHorizontalSpeed: 3.5
+  landingStunSeconds: 0.1
+  aggroForgetSeconds: 0.3
+  aggroJumpCooldown: 0.1
+  aggroJumpHeight: 2
+  aggroJumpHorizontalSpeed: 4
