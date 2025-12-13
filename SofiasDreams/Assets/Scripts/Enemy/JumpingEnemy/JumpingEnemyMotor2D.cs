@@ -7,15 +7,12 @@ public class JumpingEnemyMotor2D : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] Rigidbody2D _rb;
-    [SerializeField] Collider2D _bodyCollider;
     [SerializeField] Transform _facingTransform;
+    [SerializeField] JumpingEnemyGroundChecker2D _groundChecker;
 
     JumpingEnemyConfigSO _config;
     IMobilityGate _mobilityGate;
     IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
-
-    readonly ContactPoint2D[] _cpBuf = new ContactPoint2D[12];
-    readonly RaycastHit2D[] _rhBuf = new RaycastHit2D[12];
 
     float _baseScaleX;
     bool _isGrounded;
@@ -42,15 +39,15 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     void Reset()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _bodyCollider = GetComponent<Collider2D>();
         _facingTransform = transform;
+        _groundChecker = GetComponentInChildren<JumpingEnemyGroundChecker2D>(true);
     }
 
     void Awake()
     {
         if (!_rb) _rb = GetComponent<Rigidbody2D>();
-        if (!_bodyCollider) _bodyCollider = GetComponent<Collider2D>();
         if (!_facingTransform) _facingTransform = transform;
+        if (!_groundChecker) _groundChecker = GetComponentInChildren<JumpingEnemyGroundChecker2D>(true);
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
@@ -64,7 +61,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
         }
-        _isGrounded = ComputeGrounded();
+        _isGrounded = _groundChecker != null && _groundChecker.IsGrounded;
     }
 
     public void StopHorizontal()
@@ -112,7 +109,8 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     {
         if (!_rb || _config == null) return false;
         if (_frozen) return false;
-        if (!_isGrounded) return false;
+        if (_groundChecker == null) return false;
+        if (!_groundChecker.IsGrounded) return false;
         if (IsInHitStun()) return false;
         if (_mobilityGate != null && _mobilityGate.IsJumpBlocked) return false;
 
@@ -130,31 +128,8 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         _rb.linearVelocity = new Vector2(horizontalSign * Mathf.Max(0f, horizontalSpeed), vy0 + vy);
         // Important: immediately mark as not grounded (FixedUpdate will catch up next physics tick).
         _isGrounded = false;
+        _groundChecker.NotifyJumpStarted();
         return true;
-    }
-
-    bool ComputeGrounded()
-    {
-        if (_config == null || !_rb || !_bodyCollider || _config.groundMask.value == 0)
-            return false;
-
-        var filter = new ContactFilter2D
-        {
-            useLayerMask = true,
-            layerMask = _config.groundMask,
-            useTriggers = false
-        };
-
-        int c = _rb.GetContacts(filter, _cpBuf);
-        for (int i = 0; i < c; i++)
-            if (_cpBuf[i].normal.y >= _config.minGroundNormalY) return true;
-
-        float dist = Mathf.Max(0.001f, _config.groundCastDistance);
-        int h = _bodyCollider.Cast(Vector2.down, filter, _rhBuf, dist);
-        for (int i = 0; i < h; i++)
-            if (_rhBuf[i].normal.y >= _config.minGroundNormalY) return true;
-
-        return false;
     }
 
     bool IsInHitStun()

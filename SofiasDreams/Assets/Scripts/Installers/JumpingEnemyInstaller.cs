@@ -11,6 +11,7 @@ public class JumpingEnemyInstaller : MonoInstaller
     [SerializeField] Health _health;
     [SerializeField] JumpingEnemyBrain _brain;
     [SerializeField] JumpingEnemyMotor2D _motor;
+    [SerializeField] JumpingEnemyGroundChecker2D _groundChecker;
     [SerializeField] JumpingEnemyAnimatorAdapter _animator;
     [SerializeField] VisionCone2D _vision;
 
@@ -40,6 +41,7 @@ public class JumpingEnemyInstaller : MonoInstaller
         BindComponent(_health);
         BindComponent(_brain);
         BindComponent(_motor);
+        BindComponent(_groundChecker, optional: true);
         BindComponent(_animator, optional: true);
         BindComponent(_vision, optional: true);
 

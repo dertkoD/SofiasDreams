@@ -5,8 +5,14 @@ public class JumpingEnemyConfigSO : ScriptableObject
 {
     [Header("Ground check")]
     public LayerMask groundMask;
-    [Min(0f)] public float groundCastDistance = 0.06f;
-    [Range(0f, 1f)] public float minGroundNormalY = 0.7f;
+    [Header("Ground check (overlap under feet)")]
+    public bool useOvalGroundCheck = true;
+    public Vector2 groundCheckOvalOffset = new(0f, -0.45f);
+    public Vector2 groundCheckOvalSize = new(0.6f, 0.2f);
+    public Vector2 groundCheckOffset = new(0f, -0.45f);
+    public float groundCheckRadius = 0.15f;
+
+    [Header("Grounded stability")]
     [Min(0f)] public float groundedVelocityEpsilon = 0.05f;
 
     [Header("Step assist (stairs / small ledges)")]
