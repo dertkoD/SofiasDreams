@@ -14,6 +14,7 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float patrolJumpCooldown = 0.15f;
     [Min(0f)] public float patrolJumpHeight = 1.5f;
     [Min(0f)] public float patrolJumpHorizontalSpeed = 3.5f;
+    [Min(0f)] public float landingStunSeconds = 0.10f;
 
     [Header("Aggro")]
     [Min(0f)] public float aggroForgetSeconds = 2.0f;

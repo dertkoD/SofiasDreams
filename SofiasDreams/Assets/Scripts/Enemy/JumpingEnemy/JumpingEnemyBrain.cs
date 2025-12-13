@@ -42,6 +42,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     bool _jumpBool;
     float _nextJumpAt;
     bool _prevGrounded;
+    float _prevY;
+    float _landingStunUntil;
+    float _lastJumpStartedAt;
 
     // Damage watch
     int _lastHp = int.MinValue;
@@ -83,6 +86,7 @@ public class JumpingEnemyBrain : MonoBehaviour
 
         _state = State.Patrol;
         _prevGrounded = _motor != null && _motor.IsGrounded;
+        _prevY = _motor != null ? _motor.Velocity.y : 0f;
     }
 
     void OnEnable()
@@ -153,47 +157,46 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_anim == null || _motor == null) return;
 
         bool grounded = _motor.IsGrounded;
-        bool inAir = !grounded;
+        float y = _motor.Velocity.y;
 
-        // Maintain Jump bool from physical state (plus our requested jumps).
-        // Rule requested: yVelocity* is only driven while Jump == true, and if yVelocity* == 0 => Jump must be false.
-        if (inAir)
-        {
-            if (!_jumpBool && _state != State.AggroTrigger)
-            {
-                _jumpBool = true;
-                _anim.SetJump(true);
-            }
-        }
+        // We only drive Jump during our own jump cycles:
+        // jumping => Jump=true and yVelocity*>0
+        // landed  => Jump=false and yVelocity*=0
+        bool landedByGround = _jumpBool && !_prevGrounded && grounded;
 
-        // Landed
-        if (_jumpBool && !_prevGrounded && grounded)
+        // Fallback landing detection (helps if groundMask is misconfigured):
+        // detect "settled after falling": was going down, now almost stopped.
+        bool landedByVelocity = _jumpBool
+            && (Time.time - _lastJumpStartedAt) > 0.05f
+            && _prevY < -0.10f
+            && Mathf.Abs(y) < 0.02f;
+
+        if (landedByGround || landedByVelocity)
         {
             _jumpBool = false;
             _anim.SetJump(false);
+
+            float stun = _config != null ? Mathf.Max(0f, _config.landingStunSeconds) : 0.10f;
+            _landingStunUntil = Mathf.Max(_landingStunUntil, Time.time + stun);
+            _nextJumpAt = Mathf.Max(_nextJumpAt, _landingStunUntil);
         }
 
-        float yParam = _jumpBool ? (Mathf.Abs(_motor.Velocity.y) + 0.01f) : 0f;
+        float yParam = _jumpBool ? (Mathf.Abs(y) + 0.01f) : 0f;
 
         if (_state == State.Aggro || _state == State.AggroTrigger)
             _anim.SetAttackYVelocity(yParam);
         else
             _anim.SetPatrolYVelocity(yParam);
 
-        // If we are not driving Y, ensure Jump is false (requested behaviour).
-        if (Mathf.Approximately(yParam, 0f) && _jumpBool)
-        {
-            _jumpBool = false;
-            _anim.SetJump(false);
-        }
-
         _prevGrounded = grounded;
+        _prevY = y;
     }
 
     void TickPatrol()
     {
         if (_config == null || _motor == null) return;
         if (!_motor.IsGrounded) return;
+        if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
         int dir = GetPatrolDirectionSign();
@@ -228,6 +231,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         if (!_motor.IsGrounded) return;
+        if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
         int dir = GetAggroDirectionSign();
@@ -261,6 +265,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         if (!_motor.IsGrounded) return;
+        if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
         int dir = (dst.x >= transform.position.x) ? +1 : -1;
@@ -270,20 +275,16 @@ public class JumpingEnemyBrain : MonoBehaviour
 
     bool StartJump(int dirSign, float height, float speed)
     {
-        if (_anim != null && !_jumpBool)
-        {
-            _jumpBool = true;
-            _anim.SetJump(true);
-        }
+        if (_config == null || _motor == null || _anim == null) return false;
+        if (Time.time < _landingStunUntil) return false;
 
         bool ok = _motor.TryJump(dirSign, height, speed);
-        if (!ok && _anim != null)
-        {
-            // rollback animator if jump didn't happen
-            _jumpBool = false;
-            _anim.SetJump(false);
-        }
-        return ok;
+        if (!ok) return false;
+
+        _jumpBool = true;
+        _lastJumpStartedAt = Time.time;
+        _anim.SetJump(true);
+        return true;
     }
 
     void EnterAggroTrigger()
