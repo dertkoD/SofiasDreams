@@ -39,6 +39,8 @@ public class JumpingEnemyBrain : MonoBehaviour
     float _forgetLeft;
     Vector2 _lastSeenPos;
     bool _hasLastSeen;
+    int _lastChaseDirSign = +1;
+    bool _hasChaseDir;
 
     // Jump loop runtime
     bool _jumpBool;
@@ -131,6 +133,12 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             _lastSeenPos = target.position;
             _hasLastSeen = true;
+            float dx = _lastSeenPos.x - transform.position.x;
+            if (Mathf.Abs(dx) > 0.01f)
+            {
+                _lastChaseDirSign = dx >= 0f ? +1 : -1;
+                _hasChaseDir = true;
+            }
         }
 
         switch (_state)
@@ -415,6 +423,7 @@ public class JumpingEnemyBrain : MonoBehaviour
 
         _state = State.ReturnToPatrol;
         _hasLastSeen = false;
+        _hasChaseDir = false;
         _jumpBool = false;
 
         // Pick route rejoin once, then follow route normally.
@@ -493,12 +502,42 @@ public class JumpingEnemyBrain : MonoBehaviour
 
     int GetAggroDirectionSign(out Vector2 target, out bool hasTarget)
     {
-        target = _hasLastSeen ? _lastSeenPos : (Vector2)_spawnPos;
-        hasTarget = true;
+        // In aggro, we chase the player while visible. If player is lost:
+        // - first move to the last seen position
+        // - after reaching it, continue moving in the last known chase direction until timer ends.
+        if (_hasLastSeen)
+        {
+            target = _lastSeenPos;
+            hasTarget = true;
 
-        float dx = target.x - transform.position.x;
-        if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
-        return dx >= 0f ? +1 : -1;
+            float dx = target.x - transform.position.x;
+            float arrive = Mathf.Max(0.01f, _config != null ? _config.returnArriveDistance : 0.25f);
+
+            // If we are basically at last seen pos and still in aggro, keep going in last direction.
+            if (Mathf.Abs(dx) <= arrive)
+            {
+                int fallbackDir = _hasChaseDir ? _lastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
+                target = (Vector2)transform.position + Vector2.right * fallbackDir; // direction only
+                hasTarget = false;
+                return fallbackDir;
+            }
+
+            if (Mathf.Abs(dx) > 0.01f)
+            {
+                _lastChaseDirSign = dx >= 0f ? +1 : -1;
+                _hasChaseDir = true;
+            }
+
+            return dx >= 0f ? +1 : -1;
+        }
+
+        // If aggro started without ever seeing the player (e.g., took damage out of FOV),
+        // keep moving forward in facing direction so we can reacquire.
+        target = (Vector2)transform.position + Vector2.right * (transform.localScale.x >= 0f ? +1 : -1);
+        hasTarget = false;
+        _lastChaseDirSign = transform.localScale.x >= 0f ? +1 : -1;
+        _hasChaseDir = true;
+        return _lastChaseDirSign;
     }
 
     int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
