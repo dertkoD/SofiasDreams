@@ -45,6 +45,8 @@ public class JumpingEnemyBrain : MonoBehaviour
     float _prevY;
     float _landingStunUntil;
     float _lastJumpStartedAt;
+    bool _pendingAggroTrigger;
+    bool _pendingPatrolTrigger;
 
     // Damage watch
     int _lastHp = int.MinValue;
@@ -130,7 +132,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         switch (_state)
         {
             case State.Patrol:
-                if (sees) { EnterAggroTrigger(); break; }
+                if (sees) { RequestAggroTrigger(); break; }
                 TickPatrol();
                 break;
 
@@ -144,7 +146,7 @@ public class JumpingEnemyBrain : MonoBehaviour
                 break;
 
             case State.ReturnToPatrol:
-                if (sees) { EnterAggroTrigger(); break; }
+                if (sees) { RequestAggroTrigger(); break; }
                 TickReturnToPatrol();
                 break;
         }
@@ -177,6 +179,19 @@ public class JumpingEnemyBrain : MonoBehaviour
             // Patrol waypoint progression should happen on landing (prevents "circling" around a point).
             if (_state == State.Patrol)
                 TryAdvancePatrolWaypointOnLanding();
+
+            // Queue triggers if they were requested mid-air (never enter trigger states in-flight)
+            if (_pendingAggroTrigger)
+            {
+                _pendingAggroTrigger = false;
+                _pendingPatrolTrigger = false; // aggro has priority
+                EnterAggroTrigger();
+            }
+            else if (_pendingPatrolTrigger)
+            {
+                _pendingPatrolTrigger = false;
+                BeginReturnToPatrol();
+            }
 
             float stun = _config != null ? Mathf.Max(0f, _config.landingStunSeconds) : 0.10f;
             _landingStunUntil = Mathf.Max(_landingStunUntil, Time.time + stun);
@@ -244,7 +259,9 @@ public class JumpingEnemyBrain : MonoBehaviour
 
         if (_forgetLeft <= 0f)
         {
-            BeginReturnToPatrol();
+            // Do not start PatrolTrigger mid-air (would freeze in air). Queue it until landing.
+            if (_motor.IsGrounded) BeginReturnToPatrol();
+            else _pendingPatrolTrigger = true;
             return;
         }
 
@@ -321,6 +338,12 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_state == State.Dead) return;
         if (_config == null) return;
+        if (_motor != null && !_motor.IsGrounded)
+        {
+            _pendingAggroTrigger = true;
+            _forgetLeft = _config.aggroForgetSeconds;
+            return;
+        }
 
         // already aggro: only refresh timer
         if (_state == State.Aggro || _state == State.AggroTrigger)
@@ -341,6 +364,11 @@ public class JumpingEnemyBrain : MonoBehaviour
     void BeginReturnToPatrol()
     {
         if (_state == State.Dead) return;
+        if (_motor != null && !_motor.IsGrounded)
+        {
+            _pendingPatrolTrigger = true;
+            return;
+        }
 
         _state = State.ReturnToPatrol;
         _hasLastSeen = false;
@@ -349,6 +377,20 @@ public class JumpingEnemyBrain : MonoBehaviour
         _anim?.SetJump(false);
         _anim?.TriggerPatrol();
         _nextJumpAt = Time.time + 0.05f;
+    }
+
+    void RequestAggroTrigger()
+    {
+        if (_state == State.Dead) return;
+        if (_motor != null && !_motor.IsGrounded)
+        {
+            _pendingAggroTrigger = true;
+            _pendingPatrolTrigger = false;
+            if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
+            return;
+        }
+
+        EnterAggroTrigger();
     }
 
     void EnterDead()
@@ -518,7 +560,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             int hp = _health.CurrentHP;
             if (_lastHp != int.MinValue && hp < _lastHp)
-                EnterAggroTrigger();
+                RequestAggroTrigger();
             _lastHp = hp;
         }
     }
