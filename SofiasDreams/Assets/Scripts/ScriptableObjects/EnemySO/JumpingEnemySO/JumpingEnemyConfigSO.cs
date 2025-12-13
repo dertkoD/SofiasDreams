@@ -34,10 +34,5 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float aggroJumpCooldown = 0.05f;
     [Min(0f)] public float aggroJumpHeight = 2.2f;
     [Min(0f)] public float aggroJumpHorizontalSpeed = 5.0f;
-
-    [Header("Return to patrol")]
-    [Tooltip("If true - after forgetting player, returns to the nearest patrol waypoint. Otherwise returns to spawn position.")]
-    public bool returnToNearestWaypoint = true;
-    [Min(0.01f)] public float returnArriveDistance = 0.25f;
 }
 

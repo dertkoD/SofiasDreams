@@ -37,6 +37,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     int _patrolDxSignAtJump;
     bool _returningToRoute;
     int _returnTargetIndex;
+    bool _returnJumpHasTarget;
+    Vector2 _returnJumpTarget;
+    int _returnDxSignAtJump;
 
     // Aggro runtime
     float _forgetLeft;
@@ -228,6 +231,8 @@ public class JumpingEnemyBrain : MonoBehaviour
             // Patrol waypoint progression should happen on landing (prevents "circling" around a point).
             if (_state == State.Patrol)
                 TryAdvancePatrolWaypointOnLanding();
+            else if (_state == State.ReturnToPatrol)
+                TryCompleteReturnToRouteOnLanding();
 
             // Queue triggers if they were requested mid-air (never enter trigger states in-flight)
             if (_pendingAggroTrigger)
@@ -387,36 +392,18 @@ public class JumpingEnemyBrain : MonoBehaviour
             float h = _config.patrolJumpHeight;
             float s = _config.patrolJumpHorizontalSpeed;
 
+            // Track return target for "passed waypoint" detection on landing.
+            _returnJumpHasTarget = true;
+            _returnJumpTarget = dst;
+            float dx = dst.x - transform.position.x;
+            _returnDxSignAtJump = Mathf.Abs(dx) < 0.001f
+                ? (transform.localScale.x >= 0f ? +1 : -1)
+                : (dx >= 0f ? +1 : -1);
+
             if (StartJump(dir, h, s))
                 _nextJumpAt = Time.time + _config.patrolJumpCooldown;
 
             return;
-        }
-
-        // Fallback (no route): return to spawn position.
-        {
-            Vector2 dstFallback = _spawnPos;
-
-            if (_motor.IsGrounded)
-            {
-                float arrive = Mathf.Max(0.01f, _config.returnArriveDistance);
-                if (Vector2.Distance(transform.position, dstFallback) <= arrive)
-                {
-                    _state = State.Patrol;
-                    return;
-                }
-            }
-
-            if (!_motor.IsGrounded) return;
-            if (Time.time < _landingStunUntil) return;
-            if (Time.time < _nextJumpAt) return;
-
-            int dirFallback = (dstFallback.x >= transform.position.x) ? +1 : -1;
-            float hFallback = _config.patrolJumpHeight;
-            float sFallback = _config.patrolJumpHorizontalSpeed;
-
-            if (StartJump(dirFallback, hFallback, sFallback))
-                _nextJumpAt = Time.time + _config.patrolJumpCooldown;
         }
     }
 
@@ -659,6 +646,31 @@ public class JumpingEnemyBrain : MonoBehaviour
         _patrolJumpHasTarget = false;
     }
 
+    void TryCompleteReturnToRouteOnLanding()
+    {
+        if (!_returningToRoute || !_returnJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
+            return;
+
+        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+        float dist = Vector2.Distance((Vector2)transform.position, _returnJumpTarget);
+
+        float dxNow = _returnJumpTarget.x - transform.position.x;
+        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _returnDxSignAtJump : (dxNow >= 0f ? +1 : -1);
+
+        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
+        bool reached = dist <= arrive || dxSignNow != _returnDxSignAtJump;
+        _returnJumpHasTarget = false;
+
+        if (!reached)
+            return;
+
+        // We are back on route: continue to next waypoint.
+        _returningToRoute = false;
+        _pathIndex = _returnTargetIndex;
+        AdvancePathIndex();
+        _state = State.Patrol;
+    }
+
     void AdvancePathIndex()
     {
         if (_path == null || _path.Count <= 1) return;
@@ -676,19 +688,6 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         _pathIndex = next;
-    }
-
-    Vector2 GetReturnDestination(out bool hasDestination)
-    {
-        hasDestination = true;
-
-        if (_config != null && _config.returnToNearestWaypoint && _path != null && _path.Count > 0)
-        {
-            int idx = FindNearestWaypointIndex(transform.position);
-            return _path.GetPoint(idx);
-        }
-
-        return _spawnPos;
     }
 
     int FindNearestWaypointIndex(Vector2 pos)
