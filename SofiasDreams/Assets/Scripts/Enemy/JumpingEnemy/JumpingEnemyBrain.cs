@@ -32,6 +32,8 @@ public class JumpingEnemyBrain : MonoBehaviour
     bool _patrolJumpHasTarget;
     Vector2 _patrolJumpTarget;
     int _patrolDxSignAtJump;
+    bool _returningToRoute;
+    int _returnTargetIndex;
 
     // Aggro runtime
     float _forgetLeft;
@@ -152,6 +154,13 @@ public class JumpingEnemyBrain : MonoBehaviour
                 TickReturnToPatrol();
                 break;
         }
+
+        // Continuous pursuit in air during aggro (player can move after takeoff)
+        if (_state == State.Aggro && _motor != null && !_motor.IsGrounded && !_motor.IsFrozen)
+        {
+            int dir = GetAggroDirectionSign(out _, out _);
+            _motor.SetAirDesiredVX(dir * Mathf.Max(0f, _config.aggroJumpHorizontalSpeed));
+        }
     }
 
     void TickAnimatorParams()
@@ -217,6 +226,10 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (!_motor.IsGrounded) return;
         if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
+
+        // If we are already at current waypoint (common after returning from aggro),
+        // advance index now so we continue along the route instead of hopping around the same point.
+        AdvancePatrolIndexIfAtWaypoint();
 
         int dir = GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
         float h = _config.patrolJumpHeight;
@@ -286,22 +299,51 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_anim != null && _anim.IsInPatrolTrigger())
             return;
 
-        Vector2 dst = GetReturnDestination(out bool hasDst);
-        if (!hasDst)
+        // Return back onto patrol route: go to a chosen rejoin waypoint, then continue route normally.
+        if (_path != null && _path.Count > 0 && _returningToRoute)
         {
-            _state = State.Patrol;
+            Vector2 dst = _path.GetPoint(_returnTargetIndex);
+
+            // While in air, keep aiming at waypoint (helps after wall cancels X at takeoff)
+            if (!_motor.IsGrounded && !_motor.IsFrozen)
+            {
+                int dirAir = dst.x >= transform.position.x ? +1 : -1;
+                _motor.SetAirDesiredVX(dirAir * Mathf.Max(0f, _config.patrolJumpHorizontalSpeed));
+            }
+
+            // If we are already at the rejoin point, finish return immediately.
+            float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+            if (_motor.IsGrounded && Vector2.Distance(transform.position, dst) <= arrive)
+            {
+                _returningToRoute = false;
+                // Next patrol jump should go to the NEXT waypoint.
+                AdvancePathIndex();
+                _state = State.Patrol;
+                return;
+            }
+
+            if (!_motor.IsGrounded) return;
+            if (Time.time < _landingStunUntil) return;
+            if (Time.time < _nextJumpAt) return;
+
+            int dir = (dst.x >= transform.position.x) ? +1 : -1;
+            float h = _config.patrolJumpHeight;
+            float s = _config.patrolJumpHorizontalSpeed;
+
+            if (StartJump(dir, h, s))
+                _nextJumpAt = Time.time + _config.patrolJumpCooldown;
+
             return;
         }
+
+        // Fallback (no route): return to spawn position.
+        Vector2 dstFallback = _spawnPos;
 
         if (_motor.IsGrounded)
         {
             float arrive = Mathf.Max(0.01f, _config.returnArriveDistance);
-            if (Vector2.Distance(transform.position, dst) <= arrive)
+            if (Vector2.Distance(transform.position, dstFallback) <= arrive)
             {
-                // snapped back to patrol zone
-                if (_path != null && _path.Count > 0)
-                    _pathIndex = FindNearestWaypointIndex(transform.position);
-
                 _state = State.Patrol;
                 return;
             }
@@ -311,7 +353,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
-        int dir = (dst.x >= transform.position.x) ? +1 : -1;
+        int dir = (dstFallback.x >= transform.position.x) ? +1 : -1;
         float h = _config.patrolJumpHeight;
         float s = _config.patrolJumpHorizontalSpeed;
 
@@ -373,9 +415,30 @@ public class JumpingEnemyBrain : MonoBehaviour
         _hasLastSeen = false;
         _jumpBool = false;
 
+        // Pick route rejoin once, then follow route normally.
+        if (_path != null && _path.Count > 0)
+        {
+            _returningToRoute = true;
+            _returnTargetIndex = FindNearestWaypointIndex(transform.position);
+            _pathIndex = _returnTargetIndex;
+        }
+        else
+        {
+            _returningToRoute = false;
+        }
+
         _anim?.SetJump(false);
         _anim?.TriggerPatrol();
         _nextJumpAt = Time.time + 0.05f;
+    }
+
+    void AdvancePatrolIndexIfAtWaypoint()
+    {
+        if (_path == null || _path.Count == 0 || _config == null) return;
+        Vector2 cur = _path.GetPoint(_pathIndex);
+        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+        if (Vector2.Distance(transform.position, cur) <= arrive)
+            AdvancePathIndex();
     }
 
     void RequestAggroTrigger()

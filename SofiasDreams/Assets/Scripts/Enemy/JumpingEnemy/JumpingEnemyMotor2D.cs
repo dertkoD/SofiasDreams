@@ -102,6 +102,18 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         _rb.linearVelocity = new Vector2(newVX, _rb.linearVelocity.y);
     }
 
+    /// <summary>
+    /// Updates desired horizontal speed for current jump (used to chase moving targets mid-air).
+    /// </summary>
+    public void SetAirDesiredVX(float desiredVX)
+    {
+        if (_rb == null) return;
+        if (_frozen) return;
+        if (_groundChecker != null && _groundChecker.IsGrounded) return;
+        _airControlActive = true;
+        _airDesiredVX = desiredVX;
+    }
+
     public void StopHorizontal()
     {
         if (!_rb) return;
