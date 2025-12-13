@@ -21,6 +21,7 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<GrappleStarted>();
         container.DeclareSignal<GrappleFinished>();
         container.DeclareSignal<EnemyDiedSignal>();
+        container.DeclareSignal<AggressiveJumperStateSignal>();
     }
 
     public static void DeclarePlayerSignals(DiContainer container)
