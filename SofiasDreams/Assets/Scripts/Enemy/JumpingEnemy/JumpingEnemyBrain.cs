@@ -29,6 +29,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     EnemyPatrolPath _path;
     int _pathIndex;
     int _pathDir = 1;
+    bool _patrolJumpHasTarget;
+    Vector2 _patrolJumpTarget;
+    int _patrolDxSignAtJump;
 
     // Aggro runtime
     float _forgetLeft;
@@ -164,6 +167,10 @@ public class JumpingEnemyBrain : MonoBehaviour
             _jumpBool = false;
             _anim.SetJump(false);
 
+            // Patrol waypoint progression should happen on landing (prevents "circling" around a point).
+            if (_state == State.Patrol)
+                TryAdvancePatrolWaypointOnLanding();
+
             float stun = _config != null ? Mathf.Max(0f, _config.landingStunSeconds) : 0.10f;
             _landingStunUntil = Mathf.Max(_landingStunUntil, Time.time + stun);
             _nextJumpAt = Mathf.Max(_nextJumpAt, _landingStunUntil);
@@ -191,6 +198,18 @@ public class JumpingEnemyBrain : MonoBehaviour
         float h = _config.patrolJumpHeight;
         float s = _config.patrolJumpHorizontalSpeed;
         if (hasTarget) ApplyStepAssist(dir, patrolTarget, ref h, ref s);
+
+        if (hasTarget)
+        {
+            _patrolJumpHasTarget = true;
+            _patrolJumpTarget = patrolTarget;
+            float dx = patrolTarget.x - transform.position.x;
+            _patrolDxSignAtJump = Mathf.Abs(dx) < 0.001f ? (transform.localScale.x >= 0f ? +1 : -1) : (dx >= 0f ? +1 : -1);
+        }
+        else
+        {
+            _patrolJumpHasTarget = false;
+        }
 
         if (StartJump(dir, h, s))
             _nextJumpAt = Time.time + _config.patrolJumpCooldown;
@@ -370,20 +389,30 @@ public class JumpingEnemyBrain : MonoBehaviour
         Vector3 t = _path.GetPoint(_pathIndex);
         float dx = t.x - transform.position.x;
 
-        float arrive = Mathf.Max(0.01f, _config != null ? _config.waypointArriveDistance : 0.2f);
-        if (Mathf.Abs(dx) <= arrive)
-        {
-            AdvancePathIndex();
-            t = _path.GetPoint(_pathIndex);
-            dx = t.x - transform.position.x;
-        }
-
         if (Mathf.Abs(dx) < 0.01f)
             dx = transform.localScale.x;
 
         target = t;
         hasTarget = true;
         return dx >= 0f ? +1 : -1;
+    }
+
+    void TryAdvancePatrolWaypointOnLanding()
+    {
+        if (!_patrolJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
+            return;
+
+        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+        float dist = Vector2.Distance((Vector2)transform.position, _patrolJumpTarget);
+
+        float dxNow = _patrolJumpTarget.x - transform.position.x;
+        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _patrolDxSignAtJump : (dxNow >= 0f ? +1 : -1);
+
+        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
+        if (dist <= arrive || dxSignNow != _patrolDxSignAtJump)
+            AdvancePathIndex();
+
+        _patrolJumpHasTarget = false;
     }
 
     void ApplyStepAssist(int dir, Vector2 target, ref float jumpHeight, ref float horizontalSpeed)
