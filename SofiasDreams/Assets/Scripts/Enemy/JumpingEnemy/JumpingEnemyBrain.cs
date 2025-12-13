@@ -153,31 +153,38 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_anim == null || _motor == null) return;
 
         bool grounded = _motor.IsGrounded;
-        float positiveY = Mathf.Abs(_motor.Velocity.y) + 0.01f;
+        bool inAir = !grounded;
 
-        if (_state == State.Aggro || _state == State.AggroTrigger)
-            _anim.SetAttackYVelocity(positiveY);
-        else
-            _anim.SetPatrolYVelocity(positiveY);
-
-        // keep Jump bool consistent with ground transitions (avoid clearing in the same frame we start a jump)
-        if (_jumpBool)
+        // Maintain Jump bool from physical state (plus our requested jumps).
+        // Rule requested: yVelocity* is only driven while Jump == true, and if yVelocity* == 0 => Jump must be false.
+        if (inAir)
         {
-            // landed
-            if (!_prevGrounded && grounded)
-            {
-                _jumpBool = false;
-                _anim.SetJump(false);
-            }
-        }
-        else
-        {
-            // became airborne unexpectedly (knockback etc)
-            if (_prevGrounded && !grounded && _state != State.AggroTrigger)
+            if (!_jumpBool && _state != State.AggroTrigger)
             {
                 _jumpBool = true;
                 _anim.SetJump(true);
             }
+        }
+
+        // Landed
+        if (_jumpBool && !_prevGrounded && grounded)
+        {
+            _jumpBool = false;
+            _anim.SetJump(false);
+        }
+
+        float yParam = _jumpBool ? (Mathf.Abs(_motor.Velocity.y) + 0.01f) : 0f;
+
+        if (_state == State.Aggro || _state == State.AggroTrigger)
+            _anim.SetAttackYVelocity(yParam);
+        else
+            _anim.SetPatrolYVelocity(yParam);
+
+        // If we are not driving Y, ensure Jump is false (requested behaviour).
+        if (Mathf.Approximately(yParam, 0f) && _jumpBool)
+        {
+            _jumpBool = false;
+            _anim.SetJump(false);
         }
 
         _prevGrounded = grounded;
