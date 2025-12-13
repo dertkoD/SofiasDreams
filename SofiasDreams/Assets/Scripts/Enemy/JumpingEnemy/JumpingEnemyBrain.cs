@@ -337,28 +337,30 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         // Fallback (no route): return to spawn position.
-        Vector2 dstFallback = _spawnPos;
-
-        if (_motor.IsGrounded)
         {
-            float arrive = Mathf.Max(0.01f, _config.returnArriveDistance);
-            if (Vector2.Distance(transform.position, dstFallback) <= arrive)
+            Vector2 dstFallback = _spawnPos;
+
+            if (_motor.IsGrounded)
             {
-                _state = State.Patrol;
-                return;
+                float arrive = Mathf.Max(0.01f, _config.returnArriveDistance);
+                if (Vector2.Distance(transform.position, dstFallback) <= arrive)
+                {
+                    _state = State.Patrol;
+                    return;
+                }
             }
+
+            if (!_motor.IsGrounded) return;
+            if (Time.time < _landingStunUntil) return;
+            if (Time.time < _nextJumpAt) return;
+
+            int dirFallback = (dstFallback.x >= transform.position.x) ? +1 : -1;
+            float hFallback = _config.patrolJumpHeight;
+            float sFallback = _config.patrolJumpHorizontalSpeed;
+
+            if (StartJump(dirFallback, hFallback, sFallback))
+                _nextJumpAt = Time.time + _config.patrolJumpCooldown;
         }
-
-        if (!_motor.IsGrounded) return;
-        if (Time.time < _landingStunUntil) return;
-        if (Time.time < _nextJumpAt) return;
-
-        int dir = (dstFallback.x >= transform.position.x) ? +1 : -1;
-        float h = _config.patrolJumpHeight;
-        float s = _config.patrolJumpHorizontalSpeed;
-
-        if (StartJump(dir, h, s))
-            _nextJumpAt = Time.time + _config.patrolJumpCooldown;
     }
 
     bool StartJump(int dirSign, float height, float speed)
