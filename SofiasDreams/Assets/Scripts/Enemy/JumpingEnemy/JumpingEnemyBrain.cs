@@ -208,9 +208,13 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_anim == null) { _state = State.Aggro; return; }
 
+        // While AgroTrigger clip plays, enemy must not move at all.
+        _motor?.SetFrozen(true);
+
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
         if (_anim.IsInAttackLoop())
         {
+            _motor?.SetFrozen(false);
             _state = State.Aggro;
             _nextJumpAt = Time.time; // allow immediate first jump if grounded
             if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
@@ -302,7 +306,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _state = State.AggroTrigger;
         _forgetLeft = _config.aggroForgetSeconds;
 
-        _motor?.StopHorizontal();
+        _motor?.SetFrozen(true);
         _jumpBool = false;
         _anim?.SetJump(false);
         _anim?.TriggerAgro();
@@ -316,6 +320,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _hasLastSeen = false;
         _jumpBool = false;
 
+        _motor?.SetFrozen(false);
         _anim?.SetJump(false);
         _anim?.TriggerPatrol();
         _nextJumpAt = Time.time + 0.05f;
@@ -327,6 +332,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         var prev = _state;
         _state = State.Dead;
 
+        _motor?.SetFrozen(false);
         _motor?.StopHorizontal();
         if (_anim != null)
         {
