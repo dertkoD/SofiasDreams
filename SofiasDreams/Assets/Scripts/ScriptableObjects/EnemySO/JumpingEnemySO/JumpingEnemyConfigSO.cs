@@ -15,18 +15,10 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Header("Grounded stability")]
     [Min(0f)] public float groundedVelocityEpsilon = 0.05f;
 
-    [Header("Step assist (stairs / small ledges)")]
-    public bool stepAssistEnabled = true;
-    [Tooltip("Layers considered as obstacles for step detection (usually same as ground).")]
-    public LayerMask obstacleMask;
-    [Min(0f)] public float obstacleCheckDistance = 0.35f;
-    [Tooltip("Ray origin offset from enemy pivot for obstacle check.")]
-    public Vector2 obstacleRayOffset = new Vector2(0f, 0.25f);
-    [Min(0f)] public float targetUpThreshold = 0.15f;
-    [Min(0f)] public float targetUpMargin = 0.25f;
-    [Min(0f)] public float extraJumpHeightOnObstacle = 0.6f;
-    [Min(0f)] public float extraHorizontalSpeedOnObstacle = 0.0f;
-    [Min(0f)] public float maxAssistedJumpHeight = 0f; // 0 => no clamp
+    [Header("Air control (horizontal while in air)")]
+    [Min(0f)] public float airControlAcceleration = 60f;
+    [Tooltip("If > 0, limits how fast X can change per fixed tick. 0 => use acceleration only.")]
+    [Min(0f)] public float airControlMaxDeltaVX = 0f;
 
     [Header("Patrol (jumping)")]
     public bool loopPath = true;

@@ -18,6 +18,10 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     bool _isGrounded;
     bool _frozen;
     RigidbodyConstraints2D _savedConstraints;
+    
+    // Air control (continuous X while in air)
+    bool _airControlActive;
+    float _airDesiredVX;
 
     public Rigidbody2D Rigidbody => _rb;
     public bool IsGrounded => _isGrounded;
@@ -62,6 +66,40 @@ public class JumpingEnemyMotor2D : MonoBehaviour
             _rb.angularVelocity = 0f;
         }
         _isGrounded = _groundChecker != null && _groundChecker.IsGrounded;
+
+        if (_isGrounded)
+            _airControlActive = false;
+
+        TickAirControl();
+    }
+
+    void TickAirControl()
+    {
+        if (!_airControlActive) return;
+        if (_frozen) return;
+        if (_rb == null) return;
+        if (_config == null) return;
+        if (_groundChecker != null && _groundChecker.IsGrounded) { _airControlActive = false; return; }
+        if (IsInHitStun()) return;
+        if (_mobilityGate != null && _mobilityGate.IsMovementBlocked) return;
+
+        float accel = Mathf.Max(0f, _config.airControlAcceleration);
+        float dt = Time.fixedDeltaTime;
+
+        float vx = _rb.linearVelocity.x;
+        float target = _airDesiredVX;
+
+        float maxDelta = accel * dt;
+        float newVX = Mathf.MoveTowards(vx, target, maxDelta);
+
+        // Optional clamp per-tick (useful if you want very snappy control but still avoid teleport-like changes)
+        if (_config.airControlMaxDeltaVX > 0f)
+        {
+            float clamp = _config.airControlMaxDeltaVX;
+            newVX = Mathf.Clamp(newVX, vx - clamp, vx + clamp);
+        }
+
+        _rb.linearVelocity = new Vector2(newVX, _rb.linearVelocity.y);
     }
 
     public void StopHorizontal()
@@ -125,7 +163,15 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         float vy = _rb.linearVelocity.y;
         if (vy < 0f) vy = 0f;
 
-        _rb.linearVelocity = new Vector2(horizontalSign * Mathf.Max(0f, horizontalSpeed), vy0 + vy);
+        // Set only Y at start. X is controlled continuously during the jump (air control),
+        // so if X gets cancelled by a wall at takeoff it can recover once we clear the wall.
+        var v0 = _rb.linearVelocity;
+        v0.y = vy0 + vy;
+        _rb.linearVelocity = v0;
+
+        _airControlActive = true;
+        _airDesiredVX = horizontalSign * Mathf.Max(0f, horizontalSpeed);
+
         // Important: immediately mark as not grounded (FixedUpdate will catch up next physics tick).
         _isGrounded = false;
         _groundChecker.NotifyJumpStarted();

@@ -221,7 +221,6 @@ public class JumpingEnemyBrain : MonoBehaviour
         int dir = GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
         float h = _config.patrolJumpHeight;
         float s = _config.patrolJumpHorizontalSpeed;
-        if (hasTarget) ApplyStepAssist(dir, patrolTarget, ref h, ref s);
 
         if (hasTarget)
         {
@@ -274,7 +273,6 @@ public class JumpingEnemyBrain : MonoBehaviour
         int dir = GetAggroDirectionSign(out var aggroTarget, out bool hasTarget);
         float h = _config.aggroJumpHeight;
         float s = _config.aggroJumpHorizontalSpeed;
-        if (hasTarget) ApplyStepAssist(dir, aggroTarget, ref h, ref s);
 
         if (StartJump(dir, h, s))
             _nextJumpAt = Time.time + _config.aggroJumpCooldown;
@@ -316,7 +314,6 @@ public class JumpingEnemyBrain : MonoBehaviour
         int dir = (dst.x >= transform.position.x) ? +1 : -1;
         float h = _config.patrolJumpHeight;
         float s = _config.patrolJumpHorizontalSpeed;
-        ApplyStepAssist(dir, dst, ref h, ref s);
 
         if (StartJump(dir, h, s))
             _nextJumpAt = Time.time + _config.patrolJumpCooldown;
@@ -475,40 +472,6 @@ public class JumpingEnemyBrain : MonoBehaviour
             AdvancePathIndex();
 
         _patrolJumpHasTarget = false;
-    }
-
-    void ApplyStepAssist(int dir, Vector2 target, ref float jumpHeight, ref float horizontalSpeed)
-    {
-        if (_config == null || !_config.stepAssistEnabled) return;
-        if (_motor == null) return;
-
-        // 1) If target is above us - ensure enough height to reach it (+margin)
-        float dy = target.y - transform.position.y;
-        if (dy > _config.targetUpThreshold)
-        {
-            float needed = dy + Mathf.Max(0f, _config.targetUpMargin);
-            if (needed > jumpHeight) jumpHeight = needed;
-        }
-
-        // 2) If small obstacle/step is directly ahead - boost jump a bit
-        var mask = _config.obstacleMask.value != 0 ? _config.obstacleMask : _config.groundMask;
-        if (mask.value != 0)
-        {
-            Vector2 origin = (Vector2)transform.position + _config.obstacleRayOffset;
-            Vector2 dirVec = new Vector2(dir >= 0 ? 1f : -1f, 0f);
-            float dist = Mathf.Max(0f, _config.obstacleCheckDistance);
-
-            var hit = Physics2D.Raycast(origin, dirVec, dist, mask);
-            if (hit.collider != null)
-            {
-                jumpHeight += Mathf.Max(0f, _config.extraJumpHeightOnObstacle);
-                horizontalSpeed += Mathf.Max(0f, _config.extraHorizontalSpeedOnObstacle);
-            }
-        }
-
-        // optional clamp
-        if (_config.maxAssistedJumpHeight > 0f)
-            jumpHeight = Mathf.Min(jumpHeight, _config.maxAssistedJumpHeight);
     }
 
     void AdvancePathIndex()
