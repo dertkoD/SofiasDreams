@@ -5,12 +5,12 @@ public class JumpingEnemyConfigSO : ScriptableObject
 {
     [Header("Ground check")]
     public LayerMask groundMask;
-    [Header("Ground check (overlap under feet)")]
-    public bool useOvalGroundCheck = true;
-    public Vector2 groundCheckOvalOffset = new(0f, -0.45f);
-    public Vector2 groundCheckOvalSize = new(0.6f, 0.2f);
-    public Vector2 groundCheckOffset = new(0f, -0.45f);
-    public float groundCheckRadius = 0.15f;
+    [Header("Ground check (like player Jumper2D)")]
+    [Tooltip("Upward velocity that immediately marks jump as airborne before contacts separate.")]
+    [Min(0f)] public float leaveGroundVelocity = 0.05f;
+    [Tooltip("Filter by surface normal angle (degrees). 90 is 'up'.")]
+    [Range(0f, 180f)] public float minGroundNormalAngle = 80f;
+    [Range(0f, 180f)] public float maxGroundNormalAngle = 100f;
 
     [Header("Grounded stability")]
     [Min(0f)] public float groundedVelocityEpsilon = 0.05f;

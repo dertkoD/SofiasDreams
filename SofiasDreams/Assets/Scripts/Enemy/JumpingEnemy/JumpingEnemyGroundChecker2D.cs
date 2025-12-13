@@ -2,22 +2,21 @@ using UnityEngine;
 using Zenject;
 
 /// <summary>
-/// Robust ground checker for jumping enemy:
-/// uses a small overlap shape under feet (no "near ground" false positives).
+/// Ground checker implemented like player Jumper2D:
+/// Rigidbody2D.IsTouching(ContactFilter2D) with normal-angle filter,
+/// plus "leaveGroundVelocity" to avoid 1-frame stale grounded after jump starts.
 /// </summary>
 public class JumpingEnemyGroundChecker2D : MonoBehaviour
 {
+    [Header("Refs")]
+    [SerializeField] Rigidbody2D _rb;
+
     [Header("Config overrides (optional, prefer SO via DI)")]
-    [SerializeField] LayerMask _groundMaskOverride;
-    [SerializeField] bool _useOval = true;
-    [SerializeField] Vector2 _ovalOffset = new(0f, -0.45f);
-    [SerializeField] Vector2 _ovalSize = new(0.6f, 0.2f);
-    [SerializeField] Vector2 _circleOffset = new(0f, -0.45f);
-    [SerializeField] float _circleRadius = 0.15f;
+    [SerializeField] LayerMask _groundMaskOverride = ~0;
 
     JumpingEnemyConfigSO _config;
     bool _grounded;
-    float _lastUngroundedAt;
+    bool _isJumping;
 
     public bool IsGrounded => _grounded;
 
@@ -27,46 +26,54 @@ public class JumpingEnemyGroundChecker2D : MonoBehaviour
         _config = config;
     }
 
+    void Reset()
+    {
+        _rb = GetComponentInParent<Rigidbody2D>();
+    }
+
+    void Awake()
+    {
+        if (!_rb) _rb = GetComponentInParent<Rigidbody2D>();
+    }
+
     void FixedUpdate()
     {
         _grounded = ComputeGrounded();
-        if (!_grounded) _lastUngroundedAt = Time.time;
+        if (_grounded) _isJumping = false;
     }
 
     /// <summary>Call when jump starts to prevent same-frame stale grounded state.</summary>
     public void NotifyJumpStarted()
     {
         _grounded = false;
-        _lastUngroundedAt = Time.time;
+        _isJumping = true;
     }
 
     bool ComputeGrounded()
     {
-        LayerMask mask = _config != null && _config.groundMask.value != 0 ? _config.groundMask : _groundMaskOverride;
+        if (!_rb) return false;
+
+        LayerMask mask = (_config != null && _config.groundMask.value != 0) ? _config.groundMask : _groundMaskOverride;
         if (mask.value == 0) return false;
 
-        bool useOval = _config != null ? _config.useOvalGroundCheck : _useOval;
+        float leaveVel = _config != null ? _config.leaveGroundVelocity : 0.05f;
+        if (_isJumping && _rb.linearVelocity.y > leaveVel)
+            return false;
 
-        if (useOval)
+        float minA = _config != null ? _config.minGroundNormalAngle : 80f;
+        float maxA = _config != null ? _config.maxGroundNormalAngle : 100f;
+
+        var filter = new ContactFilter2D
         {
-            Vector2 offset = _config != null ? _config.groundCheckOvalOffset : _ovalOffset;
-            Vector2 size = _config != null ? _config.groundCheckOvalSize : _ovalSize;
-            Vector2 p = (Vector2)transform.position + offset;
-            return Physics2D.OverlapCapsule(
-                p,
-                new Vector2(Mathf.Max(0.001f, size.x), Mathf.Max(0.001f, size.y)),
-                CapsuleDirection2D.Horizontal,
-                0f,
-                mask
-            );
-        }
-        else
-        {
-            Vector2 offset = _config != null ? _config.groundCheckOffset : _circleOffset;
-            float r = _config != null ? _config.groundCheckRadius : _circleRadius;
-            Vector2 p = (Vector2)transform.position + offset;
-            return Physics2D.OverlapCircle(p, Mathf.Max(0.001f, r), mask);
-        }
+            useTriggers = false,
+            useLayerMask = true,
+            layerMask = mask,
+            useNormalAngle = true,
+            minNormalAngle = minA,
+            maxNormalAngle = maxA
+        };
+
+        return _rb.IsTouching(filter);
     }
 }
 
