@@ -10,6 +10,9 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     [SerializeField] Collider2D _bodyCollider;
     [SerializeField] Transform _facingTransform;
 
+    [Header("Config (fallback if DI is not used)")]
+    [SerializeField] JumpingEnemyConfigSO _configOverride;
+
     JumpingEnemyConfigSO _config;
     IMobilityGate _mobilityGate;
     IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
@@ -26,11 +29,11 @@ public class JumpingEnemyMotor2D : MonoBehaviour
 
     [Inject]
     public void Construct(
-        JumpingEnemyConfigSO config,
+        [InjectOptional] JumpingEnemyConfigSO config = null,
         IMobilityGate mobilityGate,
         [InjectOptional] List<IHitStunState> hitStunStates = null)
     {
-        _config = config;
+        _config = config != null ? config : _configOverride;
         _mobilityGate = mobilityGate;
         if (hitStunStates != null && hitStunStates.Count > 0)
             _hitStunStates = hitStunStates;
@@ -48,6 +51,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         if (!_rb) _rb = GetComponent<Rigidbody2D>();
         if (!_bodyCollider) _bodyCollider = GetComponent<Collider2D>();
         if (!_facingTransform) _facingTransform = transform;
+        if (_config == null) _config = _configOverride;
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;

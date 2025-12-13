@@ -18,6 +18,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     [SerializeField] VisionCone2D _vision;
     [SerializeField] Health _health;
     [SerializeField] EnemyPatrolPath _patrolPath;
+    
+    [Header("Config (fallback if DI is not used)")]
+    [SerializeField] JumpingEnemyConfigSO _configOverride;
 
     JumpingEnemyConfigSO _config;
     IHealth _iHealth;
@@ -45,9 +48,11 @@ public class JumpingEnemyBrain : MonoBehaviour
     bool _armedHpWatch;
 
     [Inject]
-    public void Construct(JumpingEnemyConfigSO config, IHealth health)
+    public void Construct(
+        [InjectOptional] JumpingEnemyConfigSO config = null,
+        [InjectOptional] IHealth health = null)
     {
-        _config = config;
+        _config = config != null ? config : _configOverride;
         _iHealth = health;
     }
 
@@ -67,6 +72,8 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>(true);
         if (!_anim) _anim = GetComponentInChildren<JumpingEnemyAnimatorAdapter>(true);
         if (!_patrolPath) _patrolPath = GetComponentInChildren<EnemyPatrolPath>(true);
+        if (_config == null) _config = _configOverride;
+        if (_iHealth == null) _iHealth = _health as IHealth;
 
         _spawnPos = transform.position;
 
@@ -94,7 +101,15 @@ public class JumpingEnemyBrain : MonoBehaviour
 
     void Update()
     {
-        if (_iHealth != null && !_iHealth.IsAlive)
+        if (_config == null || _iHealth == null)
+        {
+            // Can't operate without config/health; log once and stop.
+            Debug.LogError($"[JumpingEnemyBrain] Missing config/health on {name}. Assign JumpingEnemyConfigSO on this component (fallback) or use JumpingEnemyInstaller.");
+            enabled = false;
+            return;
+        }
+
+        if (!_iHealth.IsAlive)
         {
             EnterDead();
             return;
