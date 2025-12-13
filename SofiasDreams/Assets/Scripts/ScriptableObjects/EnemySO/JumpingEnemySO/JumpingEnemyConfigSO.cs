@@ -7,6 +7,7 @@ public class JumpingEnemyConfigSO : ScriptableObject
     public LayerMask groundMask;
     [Min(0f)] public float groundCastDistance = 0.06f;
     [Range(0f, 1f)] public float minGroundNormalY = 0.7f;
+    [Min(0f)] public float groundedVelocityEpsilon = 0.05f;
 
     [Header("Step assist (stairs / small ledges)")]
     public bool stepAssistEnabled = true;

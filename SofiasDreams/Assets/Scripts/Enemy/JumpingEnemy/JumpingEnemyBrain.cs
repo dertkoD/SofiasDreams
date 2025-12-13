@@ -113,10 +113,12 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         // While trigger-clips play, enemy must not move at all.
+        // But NEVER freeze in mid-air (otherwise it hangs). Only freeze when stably grounded.
         if (_anim != null && _motor != null)
         {
-            bool lockMove = _anim.IsInAgroTrigger() || _anim.IsInPatrolTrigger();
-            _motor.SetFrozen(lockMove);
+            bool inTrigger = _anim.IsInAgroTrigger() || _anim.IsInPatrolTrigger();
+            bool stableGround = IsStableOnGround();
+            _motor.SetFrozen(inTrigger && stableGround);
         }
 
         TickAnimatorParams();
@@ -338,7 +340,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_state == State.Dead) return;
         if (_config == null) return;
-        if (_motor != null && !_motor.IsGrounded)
+        if (!IsStableOnGround())
         {
             _pendingAggroTrigger = true;
             _forgetLeft = _config.aggroForgetSeconds;
@@ -364,7 +366,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     void BeginReturnToPatrol()
     {
         if (_state == State.Dead) return;
-        if (_motor != null && !_motor.IsGrounded)
+        if (!IsStableOnGround())
         {
             _pendingPatrolTrigger = true;
             return;
@@ -382,7 +384,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     void RequestAggroTrigger()
     {
         if (_state == State.Dead) return;
-        if (_motor != null && !_motor.IsGrounded)
+        if (!IsStableOnGround())
         {
             _pendingAggroTrigger = true;
             _pendingPatrolTrigger = false;
@@ -391,6 +393,13 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         EnterAggroTrigger();
+    }
+
+    bool IsStableOnGround()
+    {
+        if (_motor == null || _config == null) return false;
+        if (!_motor.IsGrounded) return false;
+        return Mathf.Abs(_motor.Velocity.y) <= Mathf.Max(0f, _config.groundedVelocityEpsilon);
     }
 
     void EnterDead()

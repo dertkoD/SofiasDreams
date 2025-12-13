@@ -128,6 +128,8 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         if (vy < 0f) vy = 0f;
 
         _rb.linearVelocity = new Vector2(horizontalSign * Mathf.Max(0f, horizontalSpeed), vy0 + vy);
+        // Important: immediately mark as not grounded (FixedUpdate will catch up next physics tick).
+        _isGrounded = false;
         return true;
     }
 
