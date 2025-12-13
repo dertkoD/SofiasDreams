@@ -122,7 +122,8 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             bool inTrigger = _anim.IsInAgroTrigger() || _anim.IsInPatrolTrigger();
             bool stableGround = IsStableOnGround();
-            _motor.SetFrozen(inTrigger && stableGround);
+            // Hard safety: never freeze while our jump cycle is active (prevents hanging in air).
+            _motor.SetFrozen(inTrigger && stableGround && !_jumpBool);
         }
 
         TickAnimatorParams();
@@ -415,7 +416,8 @@ public class JumpingEnemyBrain : MonoBehaviour
     void BeginReturnToPatrol()
     {
         if (_state == State.Dead) return;
-        if (!IsStableOnGround())
+        // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
+        if (_jumpBool || !IsStableOnGround())
         {
             _pendingPatrolTrigger = true;
             return;
@@ -455,7 +457,8 @@ public class JumpingEnemyBrain : MonoBehaviour
     void RequestAggroTrigger()
     {
         if (_state == State.Dead) return;
-        if (!IsStableOnGround())
+        // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
+        if (_jumpBool || !IsStableOnGround())
         {
             _pendingAggroTrigger = true;
             _pendingPatrolTrigger = false;
@@ -470,6 +473,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_motor == null || _config == null) return false;
         if (!_motor.IsGrounded) return false;
+        if (_jumpBool) return false;
         return Mathf.Abs(_motor.Velocity.y) <= Mathf.Max(0f, _config.groundedVelocityEpsilon);
     }
 
