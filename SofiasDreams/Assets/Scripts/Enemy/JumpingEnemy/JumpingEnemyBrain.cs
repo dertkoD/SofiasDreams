@@ -21,6 +21,9 @@ public class JumpingEnemyBrain : MonoBehaviour
 
     JumpingEnemyConfigSO _config;
     IHealth _iHealth;
+    SignalBus _bus;
+    Transform _player;
+    bool _hasSeenPlayerAtLeastOnce;
 
     State _state;
     Vector2 _spawnPos;
@@ -57,10 +60,11 @@ public class JumpingEnemyBrain : MonoBehaviour
     bool _armedHpWatch;
 
     [Inject]
-    public void Construct(JumpingEnemyConfigSO config, IHealth health)
+    public void Construct(JumpingEnemyConfigSO config, IHealth health, SignalBus bus)
     {
         _config = config;
         _iHealth = health;
+        _bus = bus;
     }
 
     void Reset()
@@ -97,6 +101,9 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_health != null)
             _health.OnHealthChanged += OnHealthChanged;
 
+        if (_bus != null)
+            _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
+
         ArmHpWatch();
     }
 
@@ -104,6 +111,20 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_health != null)
             _health.OnHealthChanged -= OnHealthChanged;
+
+        if (_bus != null)
+            _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
+    }
+
+    void Start()
+    {
+        // Bootstrapper spawns player before enemies, but if this enemy enabled earlier, it can miss the signal.
+        // Fallback: try to grab existing player once.
+        if (_player == null)
+        {
+            var pf = FindObjectOfType<PlayerFacade>();
+            if (pf != null) _player = pf.transform;
+        }
     }
 
     void Update()
@@ -140,6 +161,10 @@ public class JumpingEnemyBrain : MonoBehaviour
                 _lastChaseDirSign = dx >= 0f ? +1 : -1;
                 _hasChaseDir = true;
             }
+
+            _hasSeenPlayerAtLeastOnce = true;
+            if (_player == null)
+                _player = target;
         }
 
         switch (_state)
@@ -167,7 +192,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         // Continuous pursuit in air during aggro (player can move after takeoff)
         if (_state == State.Aggro && _motor != null && !_motor.IsGrounded && !_motor.IsFrozen)
         {
-            int dir = GetAggroDirectionSign(out _, out _);
+            int dir = GetAggroDirectionSign();
             _motor.SetAirDesiredVX(dir * Mathf.Max(0f, _config.aggroJumpHorizontalSpeed));
         }
     }
@@ -292,7 +317,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
-        int dir = GetAggroDirectionSign(out var aggroTarget, out bool hasTarget);
+        int dir = GetAggroDirectionSign();
         float h = _config.aggroJumpHeight;
         float s = _config.aggroJumpHorizontalSpeed;
 
@@ -426,6 +451,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _state = State.ReturnToPatrol;
         _hasLastSeen = false;
         _hasChaseDir = false;
+        _hasSeenPlayerAtLeastOnce = false;
         _jumpBool = false;
 
         // Pick route rejoin once, then follow route normally.
@@ -504,44 +530,38 @@ public class JumpingEnemyBrain : MonoBehaviour
         return _vision.TryGetClosestTarget(out target);
     }
 
-    int GetAggroDirectionSign(out Vector2 target, out bool hasTarget)
+    int GetAggroDirectionSign()
     {
-        // In aggro, we chase the player while visible. If player is lost:
-        // - first move to the last seen position
-        // - after reaching it, continue moving in the last known chase direction until timer ends.
-        if (_hasLastSeen)
+        // Requirement: once enemy has seen player at least once, it keeps chasing him
+        // until timer ends or enemy dies (even if player is out of vision).
+        if (_hasSeenPlayerAtLeastOnce && _player != null)
         {
-            target = _lastSeenPos;
-            hasTarget = true;
-
-            float dx = target.x - transform.position.x;
-            float arrive = Mathf.Max(0.01f, _config != null ? _config.returnArriveDistance : 0.25f);
-
-            // If we are basically at last seen pos and still in aggro, keep going in last direction.
-            if (Mathf.Abs(dx) <= arrive)
-            {
-                int fallbackDir = _hasChaseDir ? _lastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
-                target = (Vector2)transform.position + Vector2.right * fallbackDir; // direction only
-                hasTarget = false;
-                return fallbackDir;
-            }
-
-            if (Mathf.Abs(dx) > 0.01f)
-            {
-                _lastChaseDirSign = dx >= 0f ? +1 : -1;
-                _hasChaseDir = true;
-            }
-
-            return dx >= 0f ? +1 : -1;
+            float dx = _player.position.x - transform.position.x;
+            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
+            int sign = dx >= 0f ? +1 : -1;
+            _lastChaseDirSign = sign;
+            _hasChaseDir = true;
+            return sign;
         }
 
-        // If aggro started without ever seeing the player (e.g., took damage out of FOV),
-        // keep moving forward in facing direction so we can reacquire.
-        target = (Vector2)transform.position + Vector2.right * (transform.localScale.x >= 0f ? +1 : -1);
-        hasTarget = false;
-        _lastChaseDirSign = transform.localScale.x >= 0f ? +1 : -1;
-        _hasChaseDir = true;
-        return _lastChaseDirSign;
+        // Before first visual contact: use last seen (if any) or keep moving in facing direction.
+        if (_hasLastSeen)
+        {
+            float dx = _lastSeenPos.x - transform.position.x;
+            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
+            int sign = dx >= 0f ? +1 : -1;
+            _lastChaseDirSign = sign;
+            _hasChaseDir = true;
+            return sign;
+        }
+
+        return _hasChaseDir ? _lastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
+    }
+
+    void OnPlayerSpawned(PlayerSpawned s)
+    {
+        if (s.facade != null)
+            _player = s.facade.transform;
     }
 
     int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
