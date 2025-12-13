@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: PlayerMovementConfig
   m_EditorClassIdentifier: 
   moveSpeed: 8
+  accelerationTime: 0.06
+  decelerationTime: 0.1

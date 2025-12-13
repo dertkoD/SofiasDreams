@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PlayerDashConfig
   m_EditorClassIdentifier: 
   dashSpeed: 20
-  dashTime: 0.25
   cooldown: 0.5
   allowAirDash: 1
+  accel: 80
+  decel: 80

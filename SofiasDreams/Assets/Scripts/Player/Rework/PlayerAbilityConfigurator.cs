@@ -91,7 +91,12 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         if (_movementConfig == null)
             return;
 
-        _mover.Configure(new MoveSettings { moveSpeed = _movementConfig.moveSpeed });
+        _mover.Configure(new MoveSettings
+        {
+            moveSpeed = _movementConfig.moveSpeed,
+            accelerationTime = _movementConfig.accelerationTime,
+            decelerationTime = _movementConfig.decelerationTime
+        });
     }
 
     void ConfigureJump()

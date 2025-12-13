@@ -64,12 +64,6 @@ public class Mover2D : MonoBehaviour, IMover
         }
     }
 
-    /// <summary>
-    /// Used by external systems (e.g. Grappler2D, knockback) to directly
-    /// set the rigidbody velocity. Durations are accepted for API
-    /// compatibility but currently not used – grapple protects the
-    /// momentum via IMobilityGate.
-    /// </summary>
     public void SetExternalVelocity(
         Vector2 velocity,
         float hardLockDuration,
@@ -104,8 +98,7 @@ public class Mover2D : MonoBehaviour, IMover
 
         rb.linearVelocity = v;
     }
-    
-    // explicit facing control for grapple, dashes, etc.
+
     public void ForceFacing(int dir)
     {
         if (dir == 0) return;
@@ -116,6 +109,7 @@ public class Mover2D : MonoBehaviour, IMover
         _dir = newDir;
         ApplyFlip();
     }
+
     void Reset()
     {
         if (!rb)       rb       = GetComponent<Rigidbody2D>();
@@ -125,16 +119,49 @@ public class Mover2D : MonoBehaviour, IMover
     void FixedUpdate()
     {
         if (!rb) return;
-
-        if (IsMovementLocked)
-            return;
+        if (IsMovementLocked) return;
 
         float x = Mathf.Abs(_inputX) > inputDeadzone ? _inputX : 0f;
-
         float targetVx = x * _s.moveSpeed;
 
         var v = rb.linearVelocity;
-        v.x = targetVx;
+        float currentVx = v.x;
+        float dt = Time.fixedDeltaTime;
+
+        // --- 1. Instant turnaround to avoid ice feeling on L/R spam ---
+        bool hasInput        = Mathf.Abs(targetVx) > 0.001f;
+        bool isMoving        = Mathf.Abs(currentVx) > 0.001f;
+        bool directionChanged = hasInput && isMoving &&
+                                Mathf.Sign(targetVx) != Mathf.Sign(currentVx);
+
+        if (directionChanged)
+        {
+            // Snap to full speed in the new direction
+            currentVx = targetVx;
+        }
+        else
+        {
+            // --- 2. Normal accel/decel when starting/stopping ---
+            float accelTime;
+
+            if (hasInput)
+            {
+                // accelerating toward non-zero target
+                accelTime = Mathf.Max(_s.accelerationTime, 0.0001f);
+            }
+            else
+            {
+                // decelerating toward zero
+                accelTime = Mathf.Max(_s.decelerationTime, 0.0001f);
+            }
+
+            float accel    = _s.moveSpeed / accelTime;
+            float maxDelta = accel * dt;
+
+            currentVx = Mathf.MoveTowards(currentVx, targetVx, maxDelta);
+        }
+
+        v.x = currentVx;
         rb.linearVelocity = v;
     }
 
@@ -146,7 +173,7 @@ public class Mover2D : MonoBehaviour, IMover
         sc.x = Mathf.Abs(sc.x) * _dir;
         flipRoot.localScale = sc;
     }
-    
+
     public void StopHorizontal()
     {
         if (!rb) return;
