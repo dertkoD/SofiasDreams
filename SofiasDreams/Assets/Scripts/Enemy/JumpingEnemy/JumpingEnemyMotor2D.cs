@@ -19,10 +19,13 @@ public class JumpingEnemyMotor2D : MonoBehaviour
 
     float _baseScaleX;
     bool _isGrounded;
+    bool _frozen;
+    RigidbodyConstraints2D _savedConstraints;
 
     public Rigidbody2D Rigidbody => _rb;
     public bool IsGrounded => _isGrounded;
     public Vector2 Velocity => _rb ? _rb.linearVelocity : Vector2.zero;
+    public bool IsFrozen => _frozen;
 
     [Inject]
     public void Construct(
@@ -51,10 +54,16 @@ public class JumpingEnemyMotor2D : MonoBehaviour
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
+        if (_rb) _savedConstraints = _rb.constraints;
     }
 
     void FixedUpdate()
     {
+        if (_frozen && _rb)
+        {
+            _rb.linearVelocity = Vector2.zero;
+            _rb.angularVelocity = 0f;
+        }
         _isGrounded = ComputeGrounded();
     }
 
@@ -62,6 +71,32 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     {
         if (!_rb) return;
         _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+    }
+
+    public void StopAll()
+    {
+        if (!_rb) return;
+        _rb.linearVelocity = Vector2.zero;
+        _rb.angularVelocity = 0f;
+    }
+
+    /// <summary>Полная блокировка физ. движения на время триггер-клипов.</summary>
+    public void SetFrozen(bool frozen)
+    {
+        if (!_rb) return;
+        if (_frozen == frozen) return;
+
+        _frozen = frozen;
+        if (frozen)
+        {
+            _savedConstraints = _rb.constraints;
+            StopAll();
+            _rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+        else
+        {
+            _rb.constraints = _savedConstraints;
+        }
     }
 
     public void Face(int sign)
@@ -76,6 +111,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     public bool TryJump(int horizontalSign, float jumpHeight, float horizontalSpeed)
     {
         if (!_rb || _config == null) return false;
+        if (_frozen) return false;
         if (!_isGrounded) return false;
         if (IsInHitStun()) return false;
         if (_mobilityGate != null && _mobilityGate.IsJumpBlocked) return false;

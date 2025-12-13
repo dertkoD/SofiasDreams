@@ -16,6 +16,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
 
     [Header("Animator states (names must match controller)")]
     [SerializeField] string _patrolStateName = "Patrol";
+    [SerializeField] string _patrolTriggerStateName = "PatrolTrigger";
     [SerializeField] string _agroTriggerStateName = "AgroTrigger";
     [SerializeField] string _attackStateName = "Attack";
     [SerializeField] string _agroBlendStateName = "Blend Tree Agro";
@@ -94,6 +95,12 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     {
         if (!_animator) return false;
         return _animator.GetCurrentAnimatorStateInfo(0).IsName(_agroTriggerStateName);
+    }
+
+    public bool IsInPatrolTrigger()
+    {
+        if (!_animator) return false;
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_patrolTriggerStateName);
     }
 
     public bool IsInPatrolLoop()

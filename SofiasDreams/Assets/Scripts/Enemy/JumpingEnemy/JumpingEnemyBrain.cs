@@ -110,6 +110,13 @@ public class JumpingEnemyBrain : MonoBehaviour
             return;
         }
 
+        // While trigger-clips play, enemy must not move at all.
+        if (_anim != null && _motor != null)
+        {
+            bool lockMove = _anim.IsInAgroTrigger() || _anim.IsInPatrolTrigger();
+            _motor.SetFrozen(lockMove);
+        }
+
         TickAnimatorParams();
 
         // Sensing / aggro extension
@@ -258,6 +265,10 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_config == null || _motor == null) return;
 
+        // Animator can be in PatrolTrigger after Attack->PatrolTrigger transition: stay locked until it ends.
+        if (_anim != null && _anim.IsInPatrolTrigger())
+            return;
+
         Vector2 dst = GetReturnDestination(out bool hasDst);
         if (!hasDst)
         {
@@ -321,7 +332,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _state = State.AggroTrigger;
         _forgetLeft = _config.aggroForgetSeconds;
 
-        _motor?.StopHorizontal();
+        _motor?.StopAll();
         _jumpBool = false;
         _anim?.SetJump(false);
         _anim?.TriggerAgro();
