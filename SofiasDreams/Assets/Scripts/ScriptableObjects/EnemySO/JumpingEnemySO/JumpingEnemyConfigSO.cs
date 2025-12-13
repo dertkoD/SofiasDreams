@@ -21,6 +21,7 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float airControlMaxDeltaVX = 0f;
 
     [Header("Patrol (jumping)")]
+    [Min(0f)] public float patrolPathSearchRadius = 100f;
     public bool loopPath = true;
     [Min(0.01f)] public float waypointArriveDistance = 0.2f;
     [Min(0f)] public float patrolJumpCooldown = 0.15f;

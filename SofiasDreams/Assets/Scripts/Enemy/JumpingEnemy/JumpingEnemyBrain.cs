@@ -40,6 +40,7 @@ public class JumpingEnemyBrain : MonoBehaviour
 
     // Aggro runtime
     float _forgetLeft;
+    bool _lostSightTimerRunning;
     Vector2 _lastSeenPos;
     bool _hasLastSeen;
     int _lastChaseDirSign = +1;
@@ -86,6 +87,9 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_iHealth == null) _iHealth = _health as IHealth;
 
         _spawnPos = transform.position;
+
+        if (_patrolPath == null)
+            _patrolPath = FindNearestPatrolPath();
 
         _path = _patrolPath;
         if (_path != null && _path.Count > 0)
@@ -295,6 +299,7 @@ public class JumpingEnemyBrain : MonoBehaviour
             _state = State.Aggro;
             _nextJumpAt = Time.time; // allow immediate first jump if grounded
             if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
+            _lostSightTimerRunning = false;
         }
     }
 
@@ -302,8 +307,26 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_config == null || _motor == null) return;
 
-        if (sees) _forgetLeft = _config.aggroForgetSeconds;
-        else _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
+        // Forget timer behaviour:
+        // - while player is visible: refresh timer and stop countdown
+        // - when player becomes NOT visible: start countdown
+        // - if player is seen again: refresh + stop countdown
+        if (sees)
+        {
+            _forgetLeft = _config.aggroForgetSeconds;
+            _lostSightTimerRunning = false;
+        }
+        else
+        {
+            if (!_lostSightTimerRunning)
+            {
+                _lostSightTimerRunning = true; // start countdown from next frame
+            }
+            else
+            {
+                _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
+            }
+        }
 
         if (_forgetLeft <= 0f)
         {
@@ -431,6 +454,7 @@ public class JumpingEnemyBrain : MonoBehaviour
 
         _state = State.AggroTrigger;
         _forgetLeft = _config.aggroForgetSeconds;
+        _lostSightTimerRunning = false;
 
         _motor?.StopAll();
         _jumpBool = false;
@@ -452,9 +476,17 @@ public class JumpingEnemyBrain : MonoBehaviour
         _hasLastSeen = false;
         _hasChaseDir = false;
         _hasSeenPlayerAtLeastOnce = false;
+        _lostSightTimerRunning = false;
         _jumpBool = false;
 
         // Pick route rejoin once, then follow route normally.
+        if (_path == null || _path.Count == 0)
+        {
+            if (_patrolPath == null)
+                _patrolPath = FindNearestPatrolPath();
+            _path = _patrolPath;
+        }
+
         if (_path != null && _path.Count > 0)
         {
             _returningToRoute = true;
@@ -562,6 +594,31 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (s.facade != null)
             _player = s.facade.transform;
+    }
+
+    EnemyPatrolPath FindNearestPatrolPath()
+    {
+        var all = FindObjectsOfType<EnemyPatrolPath>(true);
+        if (all == null || all.Length == 0) return null;
+
+        float best = float.PositiveInfinity;
+        EnemyPatrolPath bestPath = null;
+        Vector2 pos = transform.position;
+        float radius = _config != null ? Mathf.Max(0f, _config.patrolPathSearchRadius) : 100f;
+
+        for (int i = 0; i < all.Length; i++)
+        {
+            var p = all[i];
+            if (p == null || p.Count == 0) continue;
+            float d = Vector2.Distance(pos, p.transform.position);
+            if (d <= radius && d < best)
+            {
+                best = d;
+                bestPath = p;
+            }
+        }
+
+        return bestPath;
     }
 
     int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
