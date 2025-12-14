@@ -32,14 +32,17 @@ public class JumpingEnemyBrain : MonoBehaviour
     EnemyPatrolPath _path;
     int _pathIndex;
     int _pathDir = 1;
-    bool _patrolJumpHasTarget;
-    Vector2 _patrolJumpTarget;
-    int _patrolDxSignAtJump;
-    bool _returningToRoute;
-    int _returnTargetIndex;
-    bool _returnJumpHasTarget;
-    Vector2 _returnJumpTarget;
-    int _returnDxSignAtJump;
+
+    // Patrol X-bounds (hard limits in Patrol state)
+    bool _hasPatrolBounds;
+    float _patrolMinX;
+    float _patrolMaxX;
+
+    // Resume patrol after aggro
+    bool _hasSavedPatrolResume;
+    EnemyPatrolPath _savedPath;
+    int _savedPathIndex;
+    int _savedPathDir;
 
     // Aggro runtime
     float _forgetLeft;
@@ -97,6 +100,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _path = _patrolPath;
         if (_path != null && _path.Count > 0)
             _pathIndex = FindNearestWaypointIndex(_spawnPos);
+        CachePatrolBounds();
 
         _state = State.Patrol;
         _prevGrounded = _motor != null && _motor.IsGrounded;
@@ -178,20 +182,24 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             case State.Patrol:
                 if (sees) { RequestAggroTrigger(); break; }
+                ApplyPatrolXBounds(true);
                 TickPatrol();
                 break;
 
             case State.AggroTrigger:
+                ApplyPatrolXBounds(false);
                 if (sees) _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
                 TickAggroTrigger();
                 break;
 
             case State.Aggro:
+                ApplyPatrolXBounds(false);
                 TickAggro(sees);
                 break;
 
             case State.ReturnToPatrol:
                 if (sees) { RequestAggroTrigger(); break; }
+                ApplyPatrolXBounds(false);
                 TickReturnToPatrol();
                 break;
         }
@@ -228,11 +236,7 @@ public class JumpingEnemyBrain : MonoBehaviour
             _jumpBool = false;
             _anim.SetJump(false);
 
-            // Patrol waypoint progression should happen on landing (prevents "circling" around a point).
-            if (_state == State.Patrol)
-                TryAdvancePatrolWaypointOnLanding();
-            else if (_state == State.ReturnToPatrol)
-                TryCompleteReturnToRouteOnLanding();
+            // Patrol progression uses X-boundaries, handled in TickPatrol / TickReturnToPatrol.
 
             // Queue triggers if they were requested mid-air (never enter trigger states in-flight)
             if (_pendingAggroTrigger)
@@ -270,24 +274,40 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
 
-        // If we are already at current waypoint (common after returning from aggro),
-        // advance index now so we continue along the route instead of hopping around the same point.
-        AdvancePatrolIndexIfAtWaypoint();
+        // Patrol points are treated as X-boundaries. Enemy doesn't need to "touch" the point,
+        // but must never cross it in X.
+        if (_path == null || _path.Count == 0) return;
 
-        int dir = GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
-        float h = _config.patrolJumpHeight;
-        float s = _config.patrolJumpHorizontalSpeed;
+        float x = transform.position.x;
+        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+        float veryClose = Mathf.Max(arrive, 0.15f);
 
-        if (hasTarget)
+        // If we're already close to one (or many) boundaries, consume them without hopping,
+        // but avoid an infinite loop if all points are clustered.
+        float boundaryX = _path.GetPoint(_pathIndex).x;
+        float dx = boundaryX - x;
+        int guard = 0;
+        while (Mathf.Abs(dx) <= veryClose && guard++ < _path.Count)
         {
-            _patrolJumpHasTarget = true;
-            _patrolJumpTarget = patrolTarget;
-            float dx = patrolTarget.x - transform.position.x;
-            _patrolDxSignAtJump = Mathf.Abs(dx) < 0.001f ? (transform.localScale.x >= 0f ? +1 : -1) : (dx >= 0f ? +1 : -1);
+            AdvancePathIndex();
+            boundaryX = _path.GetPoint(_pathIndex).x;
+            dx = boundaryX - x;
         }
-        else
+
+        // Still close after consuming many points => do nothing this tick.
+        if (Mathf.Abs(dx) <= veryClose)
+            return;
+
+        float h = _config.patrolJumpHeight;
+        float flightTime = EstimateFlightTimeSeconds(h);
+
+        int dir = dx >= 0f ? +1 : -1;
+        float s = _config.patrolJumpHorizontalSpeed;
+        if (flightTime > 0.0001f)
         {
-            _patrolJumpHasTarget = false;
+            // Cap speed so even full-flight horizontal travel cannot cross boundary.
+            float maxSafeSpeed = Mathf.Abs(dx) / flightTime;
+            s = Mathf.Min(s, maxSafeSpeed);
         }
 
         if (StartJump(dir, h, s))
@@ -361,50 +381,45 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_anim != null && _anim.IsInPatrolTrigger())
             return;
 
-        // Return back onto patrol route: go to a chosen rejoin waypoint, then continue route normally.
-        if (_path != null && _path.Count > 0 && _returningToRoute)
+        if (_path == null || _path.Count == 0) return;
+
+        // Return to the saved patrol target boundary (by X), then continue Patrol.
+        float boundaryX = _path.GetPoint(_pathIndex).x;
+        float x = transform.position.x;
+        float dx = boundaryX - x;
+
+        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
+        if (_motor.IsGrounded && Mathf.Abs(dx) <= arrive)
         {
-            Vector2 dst = _path.GetPoint(_returnTargetIndex);
-
-            // While in air, keep aiming at waypoint (helps after wall cancels X at takeoff)
-            if (!_motor.IsGrounded && !_motor.IsFrozen)
-            {
-                int dirAir = dst.x >= transform.position.x ? +1 : -1;
-                _motor.SetAirDesiredVX(dirAir * Mathf.Max(0f, _config.patrolJumpHorizontalSpeed));
-            }
-
-            // If we are already at the rejoin point, finish return immediately.
-            float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-            if (_motor.IsGrounded && Vector2.Distance(transform.position, dst) <= arrive)
-            {
-                _returningToRoute = false;
-                // Next patrol jump should go to the NEXT waypoint.
-                AdvancePathIndex();
-                _state = State.Patrol;
-                return;
-            }
-
-            if (!_motor.IsGrounded) return;
-            if (Time.time < _landingStunUntil) return;
-            if (Time.time < _nextJumpAt) return;
-
-            int dir = (dst.x >= transform.position.x) ? +1 : -1;
-            float h = _config.patrolJumpHeight;
-            float s = _config.patrolJumpHorizontalSpeed;
-
-            // Track return target for "passed waypoint" detection on landing.
-            _returnJumpHasTarget = true;
-            _returnJumpTarget = dst;
-            float dx = dst.x - transform.position.x;
-            _returnDxSignAtJump = Mathf.Abs(dx) < 0.001f
-                ? (transform.localScale.x >= 0f ? +1 : -1)
-                : (dx >= 0f ? +1 : -1);
-
-            if (StartJump(dir, h, s))
-                _nextJumpAt = Time.time + _config.patrolJumpCooldown;
-
+            _state = State.Patrol;
+            _nextJumpAt = Time.time;
             return;
         }
+
+        // While in air, keep aiming at boundary.
+        if (!_motor.IsGrounded && !_motor.IsFrozen)
+        {
+            int dirAir = dx >= 0f ? +1 : -1;
+            _motor.SetAirDesiredVX(dirAir * Mathf.Max(0f, _config.patrolJumpHorizontalSpeed));
+            return;
+        }
+
+        if (Time.time < _landingStunUntil) return;
+        if (Time.time < _nextJumpAt) return;
+
+        int dir = dx >= 0f ? +1 : -1;
+        float h = _config.patrolJumpHeight;
+        float flightTime = EstimateFlightTimeSeconds(h);
+
+        float s = _config.patrolJumpHorizontalSpeed;
+        if (flightTime > 0.0001f)
+        {
+            float maxSafeSpeed = Mathf.Abs(dx) / flightTime;
+            s = Mathf.Min(s, maxSafeSpeed);
+        }
+
+        if (StartJump(dir, h, s))
+            _nextJumpAt = Time.time + _config.patrolJumpCooldown;
     }
 
     bool StartJump(int dirSign, float height, float speed)
@@ -439,6 +454,8 @@ public class JumpingEnemyBrain : MonoBehaviour
             return;
         }
 
+        SavePatrolResumeStateIfNeeded();
+
         _state = State.AggroTrigger;
         _forgetLeft = _config.aggroForgetSeconds;
         _lostSightTimerRunning = false;
@@ -466,37 +483,31 @@ public class JumpingEnemyBrain : MonoBehaviour
         _lostSightTimerRunning = false;
         _jumpBool = false;
 
-        // Pick route rejoin once, then follow route normally.
-        if (_path == null || _path.Count == 0)
+        // Restore patrol route we had before aggro (resume from same target index + direction).
+        if (_hasSavedPatrolResume && _savedPath != null && _savedPath.Count > 0)
         {
-            if (_patrolPath == null)
-                _patrolPath = FindNearestPatrolPath();
-            _path = _patrolPath;
-        }
-
-        if (_path != null && _path.Count > 0)
-        {
-            _returningToRoute = true;
-            _returnTargetIndex = FindNearestWaypointIndex(transform.position);
-            _pathIndex = _returnTargetIndex;
+            _path = _savedPath;
+            CachePatrolBounds();
+            _pathIndex = Mathf.Clamp(_savedPathIndex, 0, _path.Count - 1);
+            _pathDir = _savedPathDir == 0 ? 1 : (_savedPathDir > 0 ? 1 : -1);
         }
         else
         {
-            _returningToRoute = false;
+            if (_path == null || _path.Count == 0)
+            {
+                if (_patrolPath == null)
+                    _patrolPath = FindNearestPatrolPath();
+                _path = _patrolPath;
+                CachePatrolBounds();
+            }
+
+            if (_path != null && _path.Count > 0)
+                _pathIndex = FindNearestWaypointIndex(transform.position);
         }
 
         _anim?.SetJump(false);
         _anim?.TriggerPatrol();
         _nextJumpAt = Time.time + 0.05f;
-    }
-
-    void AdvancePatrolIndexIfAtWaypoint()
-    {
-        if (_path == null || _path.Count == 0 || _config == null) return;
-        Vector2 cur = _path.GetPoint(_pathIndex);
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        if (Vector2.Distance(transform.position, cur) <= arrive)
-            AdvancePathIndex();
     }
 
     void RequestAggroTrigger()
@@ -527,6 +538,8 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_state == State.Dead) return;
         var prev = _state;
         _state = State.Dead;
+
+        ApplyPatrolXBounds(false);
 
         _motor?.StopHorizontal();
         if (_anim != null)
@@ -608,67 +621,69 @@ public class JumpingEnemyBrain : MonoBehaviour
         return bestPath;
     }
 
-    int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
+    void SavePatrolResumeStateIfNeeded()
     {
+        // Save only when leaving patrol-ish states. This is our "return to the same route" anchor.
+        if (_state != State.Patrol && _state != State.ReturnToPatrol)
+            return;
         if (_path == null || _path.Count == 0)
+            return;
+
+        _hasSavedPatrolResume = true;
+        _savedPath = _path;
+        _savedPathIndex = _pathIndex;
+        _savedPathDir = _pathDir;
+    }
+
+    void CachePatrolBounds()
+    {
+        _hasPatrolBounds = false;
+        if (_path == null || _path.Count == 0) return;
+
+        float min = float.PositiveInfinity;
+        float max = float.NegativeInfinity;
+        for (int i = 0; i < _path.Count; i++)
         {
-            target = _spawnPos;
-            hasTarget = false;
-            return transform.localScale.x >= 0f ? +1 : -1;
+            float x = _path.GetPoint(i).x;
+            if (x < min) min = x;
+            if (x > max) max = x;
         }
 
-        Vector3 t = _path.GetPoint(_pathIndex);
-        float dx = t.x - transform.position.x;
-
-        if (Mathf.Abs(dx) < 0.01f)
-            dx = transform.localScale.x;
-
-        target = t;
-        hasTarget = true;
-        return dx >= 0f ? +1 : -1;
+        if (!float.IsInfinity(min) && !float.IsInfinity(max))
+        {
+            _hasPatrolBounds = true;
+            _patrolMinX = min;
+            _patrolMaxX = max;
+        }
     }
 
-    void TryAdvancePatrolWaypointOnLanding()
+    void ApplyPatrolXBounds(bool enabled)
     {
-        if (!_patrolJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
+        if (_motor == null) return;
+        if (!_hasPatrolBounds)
+        {
+            if (_path != null && _path.Count > 0)
+                CachePatrolBounds();
+        }
+
+        if (!_hasPatrolBounds)
+        {
+            _motor.SetXBounds(false, 0f, 0f);
             return;
+        }
 
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        float dist = Vector2.Distance((Vector2)transform.position, _patrolJumpTarget);
-
-        float dxNow = _patrolJumpTarget.x - transform.position.x;
-        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _patrolDxSignAtJump : (dxNow >= 0f ? +1 : -1);
-
-        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
-        if (dist <= arrive || dxSignNow != _patrolDxSignAtJump)
-            AdvancePathIndex();
-
-        _patrolJumpHasTarget = false;
+        float eps = Mathf.Max(0.01f, (_config != null ? _config.waypointArriveDistance : 0.05f));
+        _motor.SetXBounds(enabled, _patrolMinX, _patrolMaxX, epsilon: eps);
     }
 
-    void TryCompleteReturnToRouteOnLanding()
+    float EstimateFlightTimeSeconds(float jumpHeight)
     {
-        if (!_returningToRoute || !_returnJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
-            return;
-
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        float dist = Vector2.Distance((Vector2)transform.position, _returnJumpTarget);
-
-        float dxNow = _returnJumpTarget.x - transform.position.x;
-        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _returnDxSignAtJump : (dxNow >= 0f ? +1 : -1);
-
-        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
-        bool reached = dist <= arrive || dxSignNow != _returnDxSignAtJump;
-        _returnJumpHasTarget = false;
-
-        if (!reached)
-            return;
-
-        // We are back on route: continue to next waypoint.
-        _returningToRoute = false;
-        _pathIndex = _returnTargetIndex;
-        AdvancePathIndex();
-        _state = State.Patrol;
+        if (_motor == null || _motor.Rigidbody == null) return 0f;
+        float g = Mathf.Abs(Physics2D.gravity.y * Mathf.Max(0f, _motor.Rigidbody.gravityScale));
+        float H = Mathf.Max(0f, jumpHeight);
+        if (g <= 0.0001f || H <= 0.0001f) return 0f;
+        float tUp = Mathf.Sqrt(2f * H / g);
+        return 2f * tUp;
     }
 
     void AdvancePathIndex()

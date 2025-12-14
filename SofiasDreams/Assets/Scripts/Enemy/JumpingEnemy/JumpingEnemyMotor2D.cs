@@ -23,6 +23,12 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     bool _airControlActive;
     float _airDesiredVX;
 
+    // Optional X-bounds clamp (used by patrol to prevent leaving route)
+    bool _xBoundsActive;
+    float _minX;
+    float _maxX;
+    float _xBoundsEpsilon;
+
     public Rigidbody2D Rigidbody => _rb;
     public bool IsGrounded => _isGrounded;
     public Vector2 Velocity => _rb ? _rb.linearVelocity : Vector2.zero;
@@ -71,6 +77,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
             _airControlActive = false;
 
         TickAirControl();
+        TickXBoundsClamp();
     }
 
     void TickAirControl()
@@ -112,6 +119,18 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         if (_groundChecker != null && _groundChecker.IsGrounded) return;
         _airControlActive = true;
         _airDesiredVX = desiredVX;
+    }
+
+    /// <summary>
+    /// Enables/disables patrol X-bounds. When enabled, Rigidbody X is clamped inside [minX, maxX]
+    /// and outward velocity is cancelled to guarantee we never cross the patrol limits.
+    /// </summary>
+    public void SetXBounds(bool active, float minX, float maxX, float epsilon = 0.02f)
+    {
+        _xBoundsActive = active;
+        _minX = Mathf.Min(minX, maxX);
+        _maxX = Mathf.Max(minX, maxX);
+        _xBoundsEpsilon = Mathf.Max(0f, epsilon);
     }
 
     public void StopHorizontal()
@@ -188,6 +207,30 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         _isGrounded = false;
         _groundChecker.NotifyJumpStarted();
         return true;
+    }
+
+    void TickXBoundsClamp()
+    {
+        if (!_xBoundsActive) return;
+        if (_rb == null) return;
+        if (_frozen) return;
+
+        var p = _rb.position;
+        float x = p.x;
+
+        // Hard clamp position (guarantee no boundary crossing).
+        float clamped = Mathf.Clamp(x, _minX, _maxX);
+        if (!Mathf.Approximately(clamped, x))
+        {
+            p.x = clamped;
+            _rb.position = p;
+        }
+
+        // Cancel outward velocity at the edges (prevents drift).
+        var v = _rb.linearVelocity;
+        if (p.x <= _minX + _xBoundsEpsilon && v.x < 0f) v.x = 0f;
+        if (p.x >= _maxX - _xBoundsEpsilon && v.x > 0f) v.x = 0f;
+        _rb.linearVelocity = v;
     }
 
     bool IsInHitStun()
