@@ -318,26 +318,6 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_anim == null) { _state = State.Aggro; return; }
 
-        // While AgroTrigger animation plays, we still must forget the player by timer.
-        // Otherwise long trigger clips make "aggroForgetSeconds" feel much larger than configured.
-        bool sees = TrySense(out _);
-        if (sees)
-        {
-            _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
-            _lostSightTimerRunning = false;
-        }
-        else
-        {
-            if (!_lostSightTimerRunning) _lostSightTimerRunning = true;
-            else _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
-        }
-
-        if (_forgetLeft <= 0f)
-        {
-            BeginReturnToPatrol();
-            return;
-        }
-
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
         if (_anim.IsInAttackLoop())
         {
@@ -352,32 +332,25 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_config == null || _motor == null) return;
 
-        // Forget timer behaviour:
-        // - while player is visible: refresh timer and stop countdown
-        // - when player becomes NOT visible: start countdown
-        // - if player is seen again: refresh + stop countdown
-        if (sees)
-        {
-            _forgetLeft = _config.aggroForgetSeconds;
-            _lostSightTimerRunning = false;
-        }
-        else
-        {
-            if (!_lostSightTimerRunning)
-            {
-                _lostSightTimerRunning = true; // start countdown from next frame
-            }
-            else
-            {
-                _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
-            }
-        }
+        // Desired behaviour:
+        // - if player is visible: keep timer refreshed (not counting down)
+        // - if player is NOT visible: countdown starts immediately
+        if (sees) _forgetLeft = _config.aggroForgetSeconds;
+        else _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
 
         if (_forgetLeft <= 0f)
         {
-            // Do not start PatrolTrigger mid-air (would freeze in air). Queue it until landing.
-            if (_motor.IsGrounded) BeginReturnToPatrol();
-            else _pendingPatrolTrigger = true;
+            // Stop chasing immediately even mid-air.
+            // But do not play PatrolTrigger mid-air (it can freeze), queue it until landing.
+            if (_motor.IsGrounded && IsStableOnGround())
+            {
+                BeginReturnToPatrol(playTrigger: true);
+            }
+            else
+            {
+                _pendingPatrolTrigger = true;
+                BeginReturnToPatrol(playTrigger: false);
+            }
             return;
         }
 
@@ -486,11 +459,11 @@ public class JumpingEnemyBrain : MonoBehaviour
         _anim?.TriggerAgro();
     }
 
-    void BeginReturnToPatrol()
+    void BeginReturnToPatrol(bool playTrigger = true)
     {
         if (_state == State.Dead) return;
-        // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
-        if (_jumpBool || !IsStableOnGround())
+        // If we want to play trigger clips, NEVER trigger mid-air; queue until landing.
+        if (playTrigger && (_jumpBool || !IsStableOnGround()))
         {
             _pendingPatrolTrigger = true;
             return;
@@ -501,7 +474,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _hasChaseDir = false;
         _hasSeenPlayerAtLeastOnce = false;
         _lostSightTimerRunning = false;
-        _jumpBool = false;
+        if (playTrigger) _jumpBool = false;
 
         // Restore patrol route we had before aggro (resume from same target index + direction).
         if (_hasSavedPatrolResume && _savedPath != null && _savedPath.Count > 0)
@@ -525,9 +498,12 @@ public class JumpingEnemyBrain : MonoBehaviour
                 _pathIndex = FindNearestWaypointIndex(transform.position);
         }
 
-        _anim?.SetJump(false);
-        _anim?.TriggerPatrol();
-        _nextJumpAt = Time.time + 0.05f;
+        if (playTrigger)
+        {
+            _anim?.SetJump(false);
+            _anim?.TriggerPatrol();
+            _nextJumpAt = Time.time + 0.05f;
+        }
     }
 
     void RequestAggroTrigger()
