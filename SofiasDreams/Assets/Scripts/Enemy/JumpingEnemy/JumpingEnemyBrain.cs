@@ -318,6 +318,26 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_anim == null) { _state = State.Aggro; return; }
 
+        // While AgroTrigger animation plays, we still must forget the player by timer.
+        // Otherwise long trigger clips make "aggroForgetSeconds" feel much larger than configured.
+        bool sees = TrySense(out _);
+        if (sees)
+        {
+            _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
+            _lostSightTimerRunning = false;
+        }
+        else
+        {
+            if (!_lostSightTimerRunning) _lostSightTimerRunning = true;
+            else _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
+        }
+
+        if (_forgetLeft <= 0f)
+        {
+            BeginReturnToPatrol();
+            return;
+        }
+
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
         if (_anim.IsInAttackLoop())
         {
