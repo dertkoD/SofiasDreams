@@ -19,6 +19,16 @@ public class JumpingEnemyBrain : MonoBehaviour
     [SerializeField] Health _health;
     [SerializeField] EnemyPatrolPath _patrolPath;
 
+    public void SetPatrolPath(EnemyPatrolPath path)
+    {
+        _patrolPath = path;
+        _path = _patrolPath;
+        if (_path != null && _path.Count > 0)
+        {
+            _pathIndex = FindNearestWaypointIndex(transform.position);
+        }
+    }
+
     JumpingEnemyConfigSO _config;
     IHealth _iHealth;
     SignalBus _bus;

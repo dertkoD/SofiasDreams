@@ -6,17 +6,20 @@ public class Spawner
     readonly PlayerFactory _playerFactory;
     readonly GroundEnemyFactory _groundEnemyFactory;
     readonly FlyingEnemyFactory _flyingEnemyFactory;
+    readonly JumpingEnemyFactory _jumpingEnemyFactory;
     readonly SignalBus _bus;
     
     public Spawner(
         PlayerFactory playerFactory,
         GroundEnemyFactory groundEnemyFactory,
         FlyingEnemyFactory flyingEnemyFactory, 
+        JumpingEnemyFactory jumpingEnemyFactory,
         SignalBus bus)
     {
         _playerFactory       = playerFactory;
         _groundEnemyFactory  = groundEnemyFactory;
         _flyingEnemyFactory  = flyingEnemyFactory;
+        _jumpingEnemyFactory = jumpingEnemyFactory;
         _bus           = bus;
     }
 
@@ -39,6 +42,9 @@ public class Spawner
         {
             case EnemyMovementMode.Planar2D:
                 enemy = _flyingEnemyFactory.Create();
+                break;
+            case EnemyMovementMode.Jumping:
+                enemy = _jumpingEnemyFactory.Create();
                 break;
             case EnemyMovementMode.GroundOnly:
             default:

@@ -5,6 +5,7 @@ public class SceneInstaller : MonoInstaller
     public PlayerFacade playerPrefab;
     public EnemyFacade groundEnemyPrefab;
     public EnemyFacade flyingEnemyPrefab;
+    public EnemyFacade jumpingEnemyPrefab;
 
     public override void InstallBindings()
     {
@@ -26,6 +27,10 @@ public class SceneInstaller : MonoInstaller
         Container.BindFactory<EnemyFacade, FlyingEnemyFactory>()
             .FromComponentInNewPrefab(flyingEnemyPrefab)
             .UnderTransformGroup("Enemies_Flying");
+
+        Container.BindFactory<EnemyFacade, JumpingEnemyFactory>()
+            .FromComponentInNewPrefab(jumpingEnemyPrefab)
+            .UnderTransformGroup("Enemies_Jumping");
 
         // Scene MonoBehaviours that need injection
         Container.BindInterfacesAndSelfTo<CameraTargetBinder>()
