@@ -278,9 +278,9 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_path != null && _path.Count > 0)
         {
             Vector2 targetPt = _path.GetPoint(_pathIndex);
-            float h = _config.patrolJumpHeight;
-            float s = _config.patrolJumpHorizontalSpeed;
-            float jumpDist = CalculateJumpDistance(h, s);
+            float checkH = _config.patrolJumpHeight;
+            float checkS = _config.patrolJumpHorizontalSpeed;
+            float jumpDist = CalculateJumpDistance(checkH, checkS);
 
             float distX = Mathf.Abs(targetPt.x - transform.position.x);
 
