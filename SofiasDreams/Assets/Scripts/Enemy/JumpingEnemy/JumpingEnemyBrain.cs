@@ -318,6 +318,18 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_anim == null) { _state = State.Aggro; return; }
 
+        // While AgroTrigger plays, we still consider ourselves in "aggro state":
+        // - if player is visible => refresh timer
+        // - if NOT visible       => countdown
+        // This prevents long trigger clips from inflating the forget time.
+        if (TickForgetTimer(TrySense(out _)))
+        {
+            // Don't freeze mid-air; queue patrol trigger until landing if needed.
+            if (_motor != null && _motor.IsGrounded && IsStableOnGround()) BeginReturnToPatrol(playTrigger: true);
+            else { _pendingPatrolTrigger = true; BeginReturnToPatrol(playTrigger: false); }
+            return;
+        }
+
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
         if (_anim.IsInAttackLoop())
         {
@@ -332,25 +344,12 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_config == null || _motor == null) return;
 
-        // Desired behaviour:
-        // - if player is visible: keep timer refreshed (not counting down)
-        // - if player is NOT visible: countdown starts immediately
-        if (sees) _forgetLeft = _config.aggroForgetSeconds;
-        else _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
-
-        if (_forgetLeft <= 0f)
+        if (TickForgetTimer(sees))
         {
             // Stop chasing immediately even mid-air.
             // But do not play PatrolTrigger mid-air (it can freeze), queue it until landing.
-            if (_motor.IsGrounded && IsStableOnGround())
-            {
-                BeginReturnToPatrol(playTrigger: true);
-            }
-            else
-            {
-                _pendingPatrolTrigger = true;
-                BeginReturnToPatrol(playTrigger: false);
-            }
+            if (_motor.IsGrounded && IsStableOnGround()) BeginReturnToPatrol(playTrigger: true);
+            else { _pendingPatrolTrigger = true; BeginReturnToPatrol(playTrigger: false); }
             return;
         }
 
@@ -433,6 +432,10 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_state == State.Dead) return;
         if (_config == null) return;
+
+        // Leaving patrol constraints immediately: aggro chase must be allowed to go outside patrol bounds.
+        ApplyPatrolXBounds(false);
+
         if (!IsStableOnGround())
         {
             _pendingAggroTrigger = true;
@@ -502,8 +505,29 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             _anim?.SetJump(false);
             _anim?.TriggerPatrol();
-            _nextJumpAt = Time.time + 0.05f;
         }
+
+        // Ensure return movement isn't blocked by a leftover aggro cooldown.
+        _nextJumpAt = Time.time + 0.05f;
+    }
+
+    /// <summary>
+    /// Updates forget timer. Returns true when timer has expired (should return to patrol).
+    /// </summary>
+    bool TickForgetTimer(bool sees)
+    {
+        if (_config == null) return false;
+
+        if (sees)
+        {
+            _forgetLeft = _config.aggroForgetSeconds;
+            _lostSightTimerRunning = false;
+            return false;
+        }
+
+        _lostSightTimerRunning = true;
+        _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
+        return _forgetLeft <= 0f;
     }
 
     void RequestAggroTrigger()
