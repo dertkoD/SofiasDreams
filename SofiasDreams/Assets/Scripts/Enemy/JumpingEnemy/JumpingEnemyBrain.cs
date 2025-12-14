@@ -189,7 +189,7 @@ public class JumpingEnemyBrain : MonoBehaviour
             case State.AggroTrigger:
                 ApplyPatrolXBounds(false);
                 if (sees) _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
-                TickAggroTrigger();
+                TickAggroTrigger(sees);
                 break;
 
             case State.Aggro:
@@ -314,7 +314,7 @@ public class JumpingEnemyBrain : MonoBehaviour
             _nextJumpAt = Time.time + _config.patrolJumpCooldown;
     }
 
-    void TickAggroTrigger()
+    void TickAggroTrigger(bool sees)
     {
         if (_anim == null) { _state = State.Aggro; return; }
 
@@ -322,7 +322,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         // - if player is visible => refresh timer
         // - if NOT visible       => countdown
         // This prevents long trigger clips from inflating the forget time.
-        if (TickForgetTimer(TrySense(out _)))
+        if (TickForgetTimer(sees))
         {
             // Don't freeze mid-air; queue patrol trigger until landing if needed.
             if (_motor != null && _motor.IsGrounded && IsStableOnGround()) BeginReturnToPatrol(playTrigger: true);
