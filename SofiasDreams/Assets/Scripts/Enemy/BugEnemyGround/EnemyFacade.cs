@@ -7,6 +7,7 @@ public class EnemyFacade : MonoBehaviour
     [SerializeField] EnemyStateMachine _stateMachine;
     [SerializeField] EnemyPatrolController _patrolController;
     [SerializeField] Health _health;
+    [SerializeField] JumpingEnemyBrain _jumpingBrain;
 
     EnemyConfigSO _config;
 
@@ -17,15 +18,15 @@ public class EnemyFacade : MonoBehaviour
     public EnemyConfigSO Config => _config;
 
     [Inject]
-    public void Construct(EnemyConfigSO config, HealthSettings healthSettings)
+    public void Construct([InjectOptional] EnemyConfigSO config, HealthSettings healthSettings)
     {
         _config = config;
 
-        if (_movement != null)
-            _movement.Configure(config);
+        if (_movement != null && _config != null)
+            _movement.Configure(_config);
 
-        if (_patrolController != null)
-            _patrolController.Configure(config);
+        if (_patrolController != null && _config != null)
+            _patrolController.Configure(_config);
 
         if (_health != null)
             _health.Configure(healthSettings);
@@ -34,6 +35,7 @@ public class EnemyFacade : MonoBehaviour
     public void SetPatrolPath(EnemyPatrolPath path)
     {
         _patrolController?.SetPath(path);
+        _jumpingBrain?.SetPatrolPath(path);
     }
     
     public void ApplyDamage(DamageInfo info)

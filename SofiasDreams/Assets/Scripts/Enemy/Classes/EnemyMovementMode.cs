@@ -1,5 +1,6 @@
 public enum EnemyMovementMode
 {
     GroundOnly,
-    Planar2D
+    Planar2D,
+    Jumping
 }

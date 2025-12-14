@@ -9,6 +9,7 @@ public class EnemySpawnPoint : MonoBehaviour
     [Header("Gizmos")]
     [SerializeField] Color _gizmoColorGroundEnemy = Color.red;
     [SerializeField] Color _gizmoColorFlyingEnemy = Color.magenta;
+    [SerializeField] Color _gizmoColorJumpingEnemy = Color.yellow;
     [SerializeField] float _radius = 0.25f;
 
     public Vector3 Position => transform.position;
@@ -24,7 +25,9 @@ public class EnemySpawnPoint : MonoBehaviour
     #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Gizmos.color = _kind == EnemyMovementMode.Planar2D ? _gizmoColorFlyingEnemy : _gizmoColorGroundEnemy;
+        Gizmos.color = _kind == EnemyMovementMode.Planar2D 
+            ? _gizmoColorFlyingEnemy 
+            : (_kind == EnemyMovementMode.Jumping ? _gizmoColorJumpingEnemy : _gizmoColorGroundEnemy);
 
         Gizmos.DrawWireSphere(transform.position, _radius);
         Gizmos.DrawLine(transform.position + Vector3.left * _radius * 0.5f,
