@@ -274,6 +274,24 @@ public class JumpingEnemyBrain : MonoBehaviour
         // advance index now so we continue along the route instead of hopping around the same point.
         AdvancePatrolIndexIfAtWaypoint();
 
+        // Check if next jump would cross the boundary (target point)
+        if (_path != null && _path.Count > 0)
+        {
+            Vector2 targetPt = _path.GetPoint(_pathIndex);
+            float h = _config.patrolJumpHeight;
+            float s = _config.patrolJumpHorizontalSpeed;
+            float jumpDist = CalculateJumpDistance(h, s);
+
+            float distX = Mathf.Abs(targetPt.x - transform.position.x);
+
+            // If less than one jump remains to the boundary, turn around.
+            if (distX < jumpDist)
+            {
+                AdvancePathIndex();
+                return;
+            }
+        }
+
         int dir = GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
         float h = _config.patrolJumpHeight;
         float s = _config.patrolJumpHorizontalSpeed;
@@ -361,6 +379,27 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_anim != null && _anim.IsInPatrolTrigger())
             return;
 
+        // Check if we are inside boundaries - if so, resume patrol immediately
+        if (_path != null && _path.Count > 0 && _motor.IsGrounded)
+        {
+            float minX = float.MaxValue;
+            float maxX = float.MinValue;
+            for (int i = 0; i < _path.Count; i++)
+            {
+                float px = _path.GetPoint(i).x;
+                if (px < minX) minX = px;
+                if (px > maxX) maxX = px;
+            }
+
+            if (transform.position.x >= minX && transform.position.x <= maxX)
+            {
+                _returningToRoute = false;
+                _pathIndex = FindNearestWaypointIndex(transform.position);
+                _state = State.Patrol;
+                return;
+            }
+        }
+
         // Return back onto patrol route: go to a chosen rejoin waypoint, then continue route normally.
         if (_path != null && _path.Count > 0 && _returningToRoute)
         {
@@ -405,6 +444,16 @@ public class JumpingEnemyBrain : MonoBehaviour
 
             return;
         }
+    }
+
+    float CalculateJumpDistance(float height, float speed)
+    {
+        if (_motor == null || _motor.Rigidbody == null) return 0f;
+        float g = Mathf.Abs(Physics2D.gravity.y * _motor.Rigidbody.gravityScale);
+        if (g <= 0.0001f) return 0f;
+        // Time to apex = sqrt(2h/g). Total air time = 2 * time to apex.
+        float t = 2f * Mathf.Sqrt(2f * height / g);
+        return speed * t;
     }
 
     bool StartJump(int dirSign, float height, float speed)
