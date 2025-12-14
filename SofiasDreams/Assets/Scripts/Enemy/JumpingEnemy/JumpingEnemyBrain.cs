@@ -338,6 +338,8 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             _forgetLeft = _config.aggroForgetSeconds;
             _lostSightTimerRunning = false;
+            // If we regained sight mid-air after timer expired, cancel the pending return.
+            _pendingPatrolTrigger = false;
         }
         else
         {
