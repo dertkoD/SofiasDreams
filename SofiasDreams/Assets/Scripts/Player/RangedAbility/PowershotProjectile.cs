@@ -107,7 +107,11 @@ public class PowershotProjectile : MonoBehaviour
                     return;
 
                 Vector2 hitPoint = other.ClosestPoint(transform.position);
-                target.ApplyDamage(damage, hitPoint, Vector2.zero, gameObject);
+                
+                // Pass owner as source if possible so kills are attributed to player
+                GameObject source = (_owner != null) ? _owner.gameObject : gameObject;
+
+                target.ApplyDamage(damage, hitPoint, Vector2.zero, source);
             }
         }
     }

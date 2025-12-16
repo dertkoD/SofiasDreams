@@ -40,14 +40,24 @@ public class Healer : MonoBehaviour, IHealer
         _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
     }
 
-    void OnEnable()  => _bus.Subscribe<EnemyKilled>(OnEnemyKilled);
-    void OnDisable() => _bus.Unsubscribe<EnemyKilled>(OnEnemyKilled);
+    void OnEnable()  => _bus.Subscribe<EnemyDiedSignal>(OnEnemyDied);
+    void OnDisable() => _bus.Unsubscribe<EnemyDiedSignal>(OnEnemyDied);
 
-    void OnEnemyKilled(EnemyKilled _)
+    void OnEnemyDied(EnemyDiedSignal s)
     {
-        if (_charges >= _maxCharges) return;
+
+        if (!s.KilledByPlayer) 
+        {
+            return;
+        }
+        
+        if (_charges >= _maxCharges) 
+        {
+            return;
+        }
 
         _kills++;
+
         if (_kills >= _killsPerCharge)
         {
             _kills = 0;
@@ -71,7 +81,7 @@ public class Healer : MonoBehaviour, IHealer
 
         _gate.BlockMovement(MobilityBlockReason.Heal);
         _gate.BlockJump(MobilityBlockReason.Heal);
-
+        
         _bus.Fire(new HealStarted());
     }
 
@@ -80,9 +90,6 @@ public class Healer : MonoBehaviour, IHealer
         if (!_healing) return;
 
         _healing = false;
-
-        _gate.UnblockMovement(MobilityBlockReason.Heal);
-        _gate.UnblockJump(MobilityBlockReason.Heal);
 
         _bus.Fire(new HealInterrupted());
     }
@@ -95,10 +102,7 @@ public class Healer : MonoBehaviour, IHealer
         _healing = false;
 
         if (_health.CanHeal())
-            _health.Heal(_s.amount);
-
-        _gate.UnblockMovement(MobilityBlockReason.Heal);
-        _gate.UnblockJump(MobilityBlockReason.Heal);
+            _health.Heal(1);
 
         _bus.Fire(new HealFinished());
     }

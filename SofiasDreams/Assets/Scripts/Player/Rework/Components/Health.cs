@@ -9,8 +9,11 @@ public class Health : MonoBehaviour, IHealth
 
     int   _hp;
     float _inv;
+    DamageInfo _lastHit;
 
     public event Action OnHealthChanged;
+
+    public DamageInfo LastHit => _lastHit;
     
     public void Configure(HealthSettings s)
     {
@@ -69,11 +72,12 @@ public class Health : MonoBehaviour, IHealth
         if (!IsAlive) return;
         if (IsInvincible && !info.bypassInvuln)
         {
-            Debug.Log("[Health] Hit ignored: invincible");
             return;
         }
 
-        Debug.Log($"[Health] ApplyDamage: {info.amount}, hp before = {_hp}");
+        _lastHit = info;
+
+        Debug.Log($"[Health] ApplyDamage: {info.amount}, hp before = {_hp}, source: {(info.source ? info.source.name : "null")}");
         TakeDamage(info.amount);
     }
 

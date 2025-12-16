@@ -10,7 +10,7 @@ public interface IPlayerAnimator
     void PlayAirUpAttack(); 
     
     void PlayHealStart();
-    void PlayHealEnd(bool interrupted);
+    void PlayHealEnd(bool interrupted, System.Action onComplete = null);
     void PlayHurt();
     void PlayDeath();
 }

@@ -33,6 +33,7 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string healProcessTrigger = "HealingProcess";
     public string healStartTrigger   = "StartHealing";
     public string healEndTrigger     = "EndHealing";
+    public string healEndState       = "EndHealing";
 
     [Header("Dash & Grapple")]
     public string dashTrigger   = "Dash";

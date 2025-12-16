@@ -348,22 +348,21 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnHealStarted(HealStarted _)
     {
         _state = PlayerState.Heal;
+        _mover.StopHorizontal(); // Immediately stop moving when healing starts
         _anim.PlayHealStart();
     }
 
     void OnHealFinished(HealFinished _)
     {
-        Unblock(MobilityBlockReason.Heal);
         _state = PlayerState.Idle;
-        _anim.PlayHealEnd(false);
+        _anim.PlayHealEnd(false, () => Unblock(MobilityBlockReason.Heal));
     }
 
     void OnHealInterrupted(HealInterrupted _)
     {
-        Unblock(MobilityBlockReason.Heal);
         if (_state != PlayerState.Hurt)
             _state = PlayerState.Idle;
-        _anim.PlayHealEnd(true);
+        _anim.PlayHealEnd(true, () => Unblock(MobilityBlockReason.Heal));
     }
 
     void OnTookDamage(TookDamage _)
