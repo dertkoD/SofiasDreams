@@ -83,37 +83,19 @@ public class EnemyDeathHandler : MonoBehaviour
             bool killedByPlayer = false;
             if (_health != null && _health.LastHit != null && _health.LastHit.source != null)
             {
-                Debug.Log($"[EnemyDeathHandler] Checking kill source: {_health.LastHit.source.name}");
-                
-                // PlayerStateMachine is NOT a MonoBehaviour, so GetComponentInParent<PlayerStateMachine>() won't work.
-                // We should check for components that are on the player object (like Mover2D, Health, Healer, etc.)
-                // or check for a tag if "Player" tag is used.
-                
-                // Method 1: Check for known player MonoBehaviour components
                 bool isPlayer = _health.LastHit.source.GetComponentInParent<Weapon>() != null ||
                                 _health.LastHit.source.GetComponentInParent<Grappler2D>() != null;
 
-                // Method 2: Check tag (common practice)
-                if (!isPlayer && _health.LastHit.source.CompareTag("Player"))
+                if (!isPlayer && _health.LastHit.source.CompareTag("Weapon"))
                     isPlayer = true;
 
-                // Method 3: Check root name (fallback)
                 if (!isPlayer && _health.LastHit.source.transform.root.name.Contains("Player"))
                     isPlayer = true;
 
                 if (isPlayer)
                 {
-                   Debug.Log("[EnemyDeathHandler] Source identified as Player");
                     killedByPlayer = true;
                 } 
-                else 
-                {
-                    Debug.Log("[EnemyDeathHandler] Source is NOT identified as Player.");
-                }
-            }
-            else 
-            {
-               Debug.Log($"[EnemyDeathHandler] LastHit or source is null. Health: {_health != null}, LastHit: {_health?.LastHit != null}, Source: {_health?.LastHit?.source != null}");
             }
 
             _bus.Fire(new EnemyDiedSignal(_facade, killedByPlayer));

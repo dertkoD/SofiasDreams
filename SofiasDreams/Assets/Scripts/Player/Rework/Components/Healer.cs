@@ -45,28 +45,23 @@ public class Healer : MonoBehaviour, IHealer
 
     void OnEnemyDied(EnemyDiedSignal s)
     {
-        Debug.Log($"[Healer] EnemyDiedSignal received. KilledByPlayer: {s.KilledByPlayer}. Current Kills: {_kills}. Charges: {_charges}/{_maxCharges}");
 
         if (!s.KilledByPlayer) 
         {
-            Debug.Log("[Healer] Ignoring death - not killed by player.");
             return;
         }
         
         if (_charges >= _maxCharges) 
         {
-            Debug.Log("[Healer] Ignoring death - max charges reached.");
             return;
         }
 
         _kills++;
-        Debug.Log($"[Healer] Healer Kills: {_kills}/{_killsPerCharge}");
 
         if (_kills >= _killsPerCharge)
         {
             _kills = 0;
             _charges = Mathf.Min(_charges + 1, _maxCharges);
-            Debug.Log("[Healer] ++heal (Charge Added)");
             _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
         }
     }
@@ -87,7 +82,6 @@ public class Healer : MonoBehaviour, IHealer
         _gate.BlockMovement(MobilityBlockReason.Heal);
         _gate.BlockJump(MobilityBlockReason.Heal);
         
-        // Force stop movement immediately
         _bus.Fire(new HealStarted());
     }
 
