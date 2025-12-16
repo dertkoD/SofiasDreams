@@ -79,7 +79,15 @@ public class EnemyDeathHandler : MonoBehaviour
         }
 
         if (_facade != null && _bus != null)
-            _bus.Fire(new EnemyDiedSignal(_facade));
+        {
+            bool killedByPlayer = false;
+            if (_health != null && _health.LastHit != null && _health.LastHit.source != null)
+            {
+                if (_health.LastHit.source.GetComponentInParent<PlayerStateMachine>() != null)
+                    killedByPlayer = true;
+            }
+            _bus.Fire(new EnemyDiedSignal(_facade, killedByPlayer));
+        }
 
         Destroy(gameObject, _destroyDelay);
     }

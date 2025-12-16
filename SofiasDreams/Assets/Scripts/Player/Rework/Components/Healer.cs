@@ -40,11 +40,13 @@ public class Healer : MonoBehaviour, IHealer
         _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
     }
 
-    void OnEnable()  => _bus.Subscribe<EnemyKilled>(OnEnemyKilled);
-    void OnDisable() => _bus.Unsubscribe<EnemyKilled>(OnEnemyKilled);
+    void OnEnable()  => _bus.Subscribe<EnemyDiedSignal>(OnEnemyDied);
+    void OnDisable() => _bus.Unsubscribe<EnemyDiedSignal>(OnEnemyDied);
 
-    void OnEnemyKilled(EnemyKilled _)
+    void OnEnemyDied(EnemyDiedSignal s)
     {
+        if (!s.KilledByPlayer) return;
+        
         if (_charges >= _maxCharges) return;
 
         _kills++;
