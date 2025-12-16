@@ -85,15 +85,31 @@ public class EnemyDeathHandler : MonoBehaviour
             {
                 Debug.Log($"[EnemyDeathHandler] Checking kill source: {_health.LastHit.source.name}");
                 
-                // Check direct component
-                if (_health.LastHit.source.GetComponentInParent<PlayerStateMachine>() != null)
+                // PlayerStateMachine is NOT a MonoBehaviour, so GetComponentInParent<PlayerStateMachine>() won't work.
+                // We should check for components that are on the player object (like Mover2D, Health, Healer, etc.)
+                // or check for a tag if "Player" tag is used.
+                
+                // Method 1: Check for known player MonoBehaviour components
+                bool isPlayer = _health.LastHit.source.GetComponentInParent<Mover2D>() != null ||
+                                _health.LastHit.source.GetComponentInParent<Healer>() != null ||
+                                _health.LastHit.source.GetComponentInParent<Grappler2D>() != null;
+
+                // Method 2: Check tag (common practice)
+                if (!isPlayer && _health.LastHit.source.CompareTag("Player"))
+                    isPlayer = true;
+
+                // Method 3: Check root name (fallback)
+                if (!isPlayer && _health.LastHit.source.transform.root.name.Contains("Player"))
+                    isPlayer = true;
+
+                if (isPlayer)
                 {
-                   Debug.Log("[EnemyDeathHandler] Source has PlayerStateMachine");
+                   Debug.Log("[EnemyDeathHandler] Source identified as Player");
                     killedByPlayer = true;
                 } 
                 else 
                 {
-                    Debug.Log("[EnemyDeathHandler] Source DOES NOT have PlayerStateMachine in parent.");
+                    Debug.Log("[EnemyDeathHandler] Source is NOT identified as Player.");
                 }
             }
             else 
