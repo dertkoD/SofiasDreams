@@ -238,6 +238,7 @@ GameObject:
   - component: {fileID: 8552340765770750309}
   - component: {fileID: 2927966826410712086}
   - component: {fileID: 2648787401972596842}
+  - component: {fileID: -4872943389680325650}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -397,6 +398,7 @@ MonoBehaviour:
   healSO: {fileID: 11400000, guid: c879fef3665c92643bdab9c47f77d034, type: 2}
   healthSO: {fileID: 11400000, guid: 3668611c3bb347849b7338223a1b71df, type: 2}
   upAttackSO: {fileID: 11400000, guid: 91662b03251149d4795af6a367b7402b, type: 2}
+  jumpAttackSO: {fileID: 11400000, guid: ddc499d6fee5a924dbb7599b20479030, type: 2}
   dashSO: {fileID: 11400000, guid: 61b2a81812f8f2e4fb17648f87027e9b, type: 2}
   grappleSO: {fileID: 11400000, guid: 58c974169938bf84a815d53ced627cbf, type: 2}
   hitReactionSO: {fileID: 11400000, guid: 090a314edf72f964b86c8157b7e15900, type: 2}
@@ -469,6 +471,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32896
   rb: {fileID: 5395965832727822489}
+  leaveGroundVelocity: 0.05
   playerCollider: {fileID: 118208662920549255}
 --- !u!114 &8361781951972979786
 MonoBehaviour:
@@ -534,6 +537,7 @@ MonoBehaviour:
   pHealProcess: HealingProcess
   pHealStartTrig: StartHealing
   pHealEndTrig: EndHealing
+  stHealEnd: EndHealing
   pDashTrig: Dash
   pIsGrappling: isGrappling
   clipEndThreshold: 0.98
@@ -625,6 +629,18 @@ MonoBehaviour:
   segmentWorldLength: 0.1
   maxSegments: 128
   growDuration: 0.1
+--- !u!114 &-4872943389680325650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f9c56933a1ba9e4e97af9f8b59c7bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
