@@ -168,17 +168,19 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        Block(MobilityBlockReason.Attack);
-
         if (_jumper.IsGrounded)
         {
+            Block(MobilityBlockReason.Attack);
             _mover.StopHorizontal();
             // _anim.PlayUpAttack(); // Handled in OnAttackStarted
             _bus.Fire(new AttackStarted { mode = AttackMode.Up, index = 0 });
         }
         else
         {
-            _jumpAttack.Request(AttackMode.AirUp);
+            if (_jumpAttack.Request(AttackMode.AirUp))
+            {
+                Block(MobilityBlockReason.Attack);
+            }
         }
     }
 
@@ -187,8 +189,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        Block(MobilityBlockReason.Attack);
-        _jumpAttack.Request(AttackMode.AirFwd);
+        if (_jumpAttack.Request(AttackMode.AirFwd))
+        {
+            Block(MobilityBlockReason.Attack);
+        }
     }
 
     public void UpJumpAttack()
@@ -196,8 +200,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        Block(MobilityBlockReason.Attack);
-        _jumpAttack.Request(AttackMode.AirUp);
+        if (_jumpAttack.Request(AttackMode.AirUp))
+        {
+            Block(MobilityBlockReason.Attack);
+        }
     }
 
     public void DownJumpAttack()
@@ -205,8 +211,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        Block(MobilityBlockReason.Attack);
-        _jumpAttack.Request(AttackMode.AirDown);
+        if (_jumpAttack.Request(AttackMode.AirDown))
+        {
+            Block(MobilityBlockReason.Attack);
+        }
     }
 
     public void HealBegin()

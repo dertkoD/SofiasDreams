@@ -28,13 +28,14 @@ public class JumpAttack : MonoBehaviour, IJumpAttack, IInitializable, IDisposabl
         _bus.Unsubscribe<AttackFinished>(OnAttackFinished);
     }
 
-    public void Request(AttackMode mode)
+    public bool Request(AttackMode mode)
     {
-        if (_cfg == null || _attacking || _cd > 0f) return;
+        if (_attacking || _cd > 0f) return false;
 
         _attacking = true;
         _currentMode = mode;
         _bus.Fire(new AttackStarted { mode = mode, index = 0 });
+        return true;
     }
 
     public void Interrupt()
@@ -63,7 +64,7 @@ public class JumpAttack : MonoBehaviour, IJumpAttack, IInitializable, IDisposabl
 
     IEnumerator Cooldown()
     {
-        _cd = _cfg.cooldown;
+        _cd = _cfg != null ? _cfg.cooldown : 0.2f;
         while (_cd > 0f) { _cd -= Time.deltaTime; yield return null; }
         _cd = 0f;
     }
