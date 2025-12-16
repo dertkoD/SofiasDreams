@@ -86,7 +86,8 @@ public class Healer : MonoBehaviour, IHealer
 
         _gate.BlockMovement(MobilityBlockReason.Heal);
         _gate.BlockJump(MobilityBlockReason.Heal);
-
+        
+        // Force stop movement immediately
         _bus.Fire(new HealStarted());
     }
 

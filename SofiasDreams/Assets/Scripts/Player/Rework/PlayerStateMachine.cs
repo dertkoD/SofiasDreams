@@ -348,6 +348,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnHealStarted(HealStarted _)
     {
         _state = PlayerState.Heal;
+        _mover.StopHorizontal(); // Immediately stop moving when healing starts
         _anim.PlayHealStart();
     }
 
