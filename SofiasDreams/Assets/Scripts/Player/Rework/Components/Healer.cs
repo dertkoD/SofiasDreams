@@ -52,7 +52,7 @@ public class Healer : MonoBehaviour, IHealer
         if (_charges >= _maxCharges) return;
 
         _kills++;
-        // Debug.Log($"Healer Kills: {_kills}/{_killsPerCharge}");
+        Debug.Log($"Healer Kills: {_kills}/{_killsPerCharge}");
 
         if (_kills >= _killsPerCharge)
         {

@@ -37,21 +37,16 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
 
     public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source)
     {
-        Debug.Log($"[EnemyDamageReceiver] ApplyDamage start, amount={amount}");
-        
         if (_health == null)
         {
-            Debug.LogWarning("[EnemyDamageReceiver] No Health on facade");
             return;
         }
         if (!_health.IsAlive)
         {
-            Debug.Log("[EnemyDamageReceiver] Target already dead");
             return;
         }
         if (_health.IsInvincible)
         {
-            Debug.Log("[EnemyDamageReceiver] Hit ignored: invincible");
             return;
         }
 
@@ -67,7 +62,6 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             bypassInvuln = false
         };
 
-        Debug.Log("[EnemyDamageReceiver] -> Health.ApplyDamage");
         if (_facade != null)
             _facade.ApplyDamage(info);
         else
@@ -79,18 +73,12 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
                 ? hitPoint
                 : (source ? (Vector2)source.transform.position : (Vector2)transform.position);
 
-            Debug.Log("[EnemyDamageReceiver] -> Feedback.OnDamage");
             _feedback.OnDamage(src);
         }
-        else
-            Debug.LogWarning("[EnemyDamageReceiver] No EnemyDamageFeedback");
 
         if (_knockback != null)
         {
-            Debug.Log($"[EnemyDamageReceiver] -> Knockback.Apply, impulse={info.impulse}, stun={info.stunSeconds}");
             _knockback.Apply(info);
         }
-        else
-            Debug.LogWarning("[EnemyDamageReceiver] No Knockback2D");
     }
 }

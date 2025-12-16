@@ -42,15 +42,12 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 
     public void OnDamage(Vector2 sourcePos)
     {
-        Debug.Log("[EnemyDamageFeedback] OnDamage, source=" + sourcePos);
         if (!InHitStun)
             StartCoroutine(HitCR(sourcePos));
     }
 
     IEnumerator HitCR(Vector2 sourcePos)
     {
-        Debug.Log("[EnemyDamageFeedback] HitCR start");
-
         InHitStun = true;
 
         foreach (var h in hurtboxes)
@@ -74,7 +71,6 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
         if (stunHost != null)
             stunHost.ExternalHitStunActive = true;
 
-        Debug.Log("[EnemyDamageFeedback] Start flash coroutine");
         StartCoroutine(FlashWhileInvincibleCR());
 
         float stun = _hitConfig != null ? _hitConfig.hitStun : 0.15f;
@@ -91,17 +87,14 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
             stunHost.ExternalHitStunActive = false;
 
         InHitStun = false;
-        Debug.Log("[EnemyDamageFeedback] HitCR end");
     }
 
     IEnumerator FlashWhileInvincibleCR()
     {
-        Debug.Log("[EnemyDamageFeedback] FlashWhileInvincible start");
         yield return null;
 
         if (_hitConfig == null || sprites == null || sprites.Length == 0)
         {
-            Debug.LogWarning("[EnemyDamageFeedback] No hitConfig or sprites for flashing");
             yield break;
         }
 
@@ -117,8 +110,7 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
         while (_health != null && _health.IsInvincible)
         {
             tick++;
-            Debug.Log($"[EnemyDamageFeedback] Flash tick {tick}, IsInv={_health.IsInvincible}");
-
+            
             if (doToggle)
             {
                 SetEnabled(false);
@@ -144,8 +136,6 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 
         RestoreColors();
         SetEnabled(true);
-
-        Debug.Log("[EnemyDamageFeedback] FlashWhileInvincible end");
     }
 
     static bool ApproximatelyWhite(Color c) =>

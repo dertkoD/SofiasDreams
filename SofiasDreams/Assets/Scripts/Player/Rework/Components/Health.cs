@@ -72,7 +72,6 @@ public class Health : MonoBehaviour, IHealth
         if (!IsAlive) return;
         if (IsInvincible && !info.bypassInvuln)
         {
-            Debug.Log("[Health] Hit ignored: invincible");
             return;
         }
 

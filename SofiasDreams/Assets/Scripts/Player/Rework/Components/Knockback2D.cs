@@ -13,11 +13,9 @@ public class Knockback2D : MonoBehaviour, IKnockback, IHitStunState
     {
         if (_rb == null)
         {
-            Debug.LogWarning("[Knockback2D] No Rigidbody2D");
             return;
         }
 
-        Debug.Log($"[Knockback2D] AddForce {info.impulse}, stun={info.stunSeconds}");
         _rb.AddForce(info.impulse, ForceMode2D.Impulse);        
         _stun = Mathf.Max(_stun, info.stunSeconds>0?info.stunSeconds:_s.defaultHitStop);
         _inStun = _stun > 0;
