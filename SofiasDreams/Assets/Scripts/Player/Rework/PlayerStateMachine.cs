@@ -93,9 +93,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             return;
         
         _moveX = x;
-        _mover.SetInput(x);
 
         if (_gate.IsMovementBlocked) return;
+
+        _mover.SetInput(x);
         _anim.SetMoveSpeed(Mathf.Abs(x));
 
         if (Mathf.Abs(x) > 0.01f)
@@ -169,6 +170,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_jumper.IsGrounded)
         {
+            _mover.StopHorizontal();
             _anim.PlayUpAttack();
             _bus.Fire(new AttackStarted { mode = AttackMode.Up, index = 0 });
         }
