@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PlayerHitReactionConfig
   m_EditorClassIdentifier: 
   hitStun: 0.5
-  knockbackForce: 60
+  knockbackForce: 30
   dragDuringStun: 2
   knockbackX: 30
-  knockbackY: 15
+  knockbackY: 20
   zeroHorizontalBeforeKnockback: 1
   flashInterval: 0.05
   flashColor: {r: 1, g: 1, b: 1, a: 1}
