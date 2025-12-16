@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c8cbeca93c41ee4089e68277421468d, type: 3}
   m_Name: PlayerJumpAttackConfig
   m_EditorClassIdentifier: 
-  damage: 1
+  damage: 10
   cooldown: 0.2
