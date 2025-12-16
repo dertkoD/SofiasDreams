@@ -10,6 +10,7 @@ public class PlayerInstaller : MonoInstaller
     public PlayerHealConfig    healSO;
     public PlayerHealthConfig  healthSO;
     public PlayerUpAttackConfig upAttackSO;
+    public PlayerJumpAttackConfig jumpAttackSO;
     public PlayerDashConfig    dashSO;
     public PlayerGrappleConfig grappleSO;
     public HitReactionConfig hitReactionSO;
@@ -38,6 +39,7 @@ public class PlayerInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<Dasher2D>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<Grappler2D>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<UpAttack>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<JumpAttack>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<GrappleHairTrailSprites>().FromComponentOnRoot().AsSingle();
 
         if (moveSO)     Container.BindInstance(moveSO);
@@ -46,6 +48,7 @@ public class PlayerInstaller : MonoInstaller
         if (healSO)     Container.BindInstance(healSO);
         if (healthSO)   Container.BindInstance(healthSO);
         if (upAttackSO) Container.BindInstance(upAttackSO);
+        if (jumpAttackSO) Container.BindInstance(jumpAttackSO);
         if (dashSO)     Container.BindInstance(dashSO);
         if (grappleSO)  Container.BindInstance(grappleSO);
         if (hitReactionSO) Container.BindInstance(hitReactionSO);

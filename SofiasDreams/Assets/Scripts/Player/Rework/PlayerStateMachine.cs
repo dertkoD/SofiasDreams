@@ -20,6 +20,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly IPlayerAnimator _anim;
     readonly Dasher2D       _dasher;
     readonly Grappler2D   _grappler;
+    readonly IJumpAttack    _jumpAttack;
 
     readonly IPlayerAbilityConfigurator _abilityConfigurator;
     readonly HitReactionConfig _hitSO;
@@ -32,7 +33,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         Mover2D mover, Jumper2D jumper,
         ICombat combo,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
-        Dasher2D dasher, Grappler2D grappler,
+        Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack,
         IPlayerAbilityConfigurator abilityConfigurator,
         [Inject(Optional = true)] HitReactionConfig hitSO)
     {
@@ -47,6 +48,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _anim     = anim;
         _dasher   = dasher;
         _grappler = grappler;
+        _jumpAttack = jumpAttack;
         _abilityConfigurator = abilityConfigurator;
         _hitSO     = hitSO;
     }
@@ -171,16 +173,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_jumper.IsGrounded)
         {
             _mover.StopHorizontal();
-            _anim.PlayUpAttack();
+            // _anim.PlayUpAttack(); // Handled in OnAttackStarted
             _bus.Fire(new AttackStarted { mode = AttackMode.Up, index = 0 });
         }
         else
         {
-            _anim.PlayAirUpAttack();
-            _bus.Fire(new AttackStarted { mode = AttackMode.AirUp, index = 0 });
+            _jumpAttack.Request(AttackMode.AirUp);
         }
-
-        _state = PlayerState.Attack;
     }
 
     public void ForwardJumpAttack()
@@ -188,9 +187,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        _anim.PlayAirForwardAttack();
-        _bus.Fire(new AttackStarted { mode = AttackMode.AirFwd, index = 0 });
-        _state = PlayerState.Attack;
+        Block(MobilityBlockReason.Attack);
+        _jumpAttack.Request(AttackMode.AirFwd);
     }
 
     public void UpJumpAttack()
@@ -198,9 +196,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        _anim.PlayAirUpAttack();
-        _bus.Fire(new AttackStarted { mode = AttackMode.AirUp, index = 0 });
-        _state = PlayerState.Attack;
+        Block(MobilityBlockReason.Attack);
+        _jumpAttack.Request(AttackMode.AirUp);
     }
 
     public void DownJumpAttack()
@@ -208,9 +205,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        _anim.PlayAirDownAttack();
-        _bus.Fire(new AttackStarted { mode = AttackMode.AirDown, index = 0 });
-        _state = PlayerState.Attack;
+        Block(MobilityBlockReason.Attack);
+        _jumpAttack.Request(AttackMode.AirDown);
     }
 
     public void HealBegin()
@@ -329,8 +325,24 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _state = PlayerState.Attack;
         _activeAttack = s.mode;
 
-        if (s.mode == AttackMode.Combo)
-            _anim.PlayAttack(s.index);
+        switch (s.mode)
+        {
+            case AttackMode.Combo:
+                _anim.PlayAttack(s.index);
+                break;
+            case AttackMode.Up:
+                _anim.PlayUpAttack();
+                break;
+            case AttackMode.AirUp:
+                _anim.PlayAirUpAttack();
+                break;
+            case AttackMode.AirDown:
+                _anim.PlayAirDownAttack();
+                break;
+            case AttackMode.AirFwd:
+                _anim.PlayAirForwardAttack();
+                break;
+        }
     }
 
     void OnAttackFinished(AttackFinished s)
