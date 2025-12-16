@@ -90,7 +90,7 @@ public class EnemyDeathHandler : MonoBehaviour
                 // or check for a tag if "Player" tag is used.
                 
                 // Method 1: Check for known player MonoBehaviour components
-                bool isPlayer = _health.LastHit.source.GetComponentInParent<Combat3>() != null ||
+                bool isPlayer = _health.LastHit.source.GetComponentInParent<Weapon>() != null ||
                                 _health.LastHit.source.GetComponentInParent<Grappler2D>() != null;
 
                 // Method 2: Check tag (common practice)
