@@ -81,9 +81,6 @@ public class Healer : MonoBehaviour, IHealer
 
         _healing = false;
 
-        _gate.UnblockMovement(MobilityBlockReason.Heal);
-        _gate.UnblockJump(MobilityBlockReason.Heal);
-
         _bus.Fire(new HealInterrupted());
     }
 
@@ -95,10 +92,7 @@ public class Healer : MonoBehaviour, IHealer
         _healing = false;
 
         if (_health.CanHeal())
-            _health.Heal(_s.amount);
-
-        _gate.UnblockMovement(MobilityBlockReason.Heal);
-        _gate.UnblockJump(MobilityBlockReason.Heal);
+            _health.Heal(1);
 
         _bus.Fire(new HealFinished());
     }

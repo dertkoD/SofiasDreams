@@ -40,6 +40,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string pHealProcess = "HealingProcess";
     [SerializeField] string pHealStartTrig = "StartHealing";
     [SerializeField] string pHealEndTrig   = "EndHealing";
+    [SerializeField] string stHealEnd      = "EndHealing";
     
     [Header("Dashing")]
     [SerializeField] string pDashTrig = "Dash";
@@ -55,7 +56,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     SignalBus _bus;
     PlayerAnimatorConfig _configOverride;
 
-    Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp;
+    Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
 
     [Inject]
     void Construct(SignalBus bus, [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null)
@@ -142,12 +143,18 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         animator.SetTrigger(pHealStartTrig);
     }
 
-    public void PlayHealEnd(bool interrupted)
+    public void PlayHealEnd(bool interrupted, Action onComplete = null)
     {
-        if (!animator) return;
+        if (!animator) 
+        {
+            onComplete?.Invoke();
+            return;
+        }
 
         animator.SetTrigger(pHealProcess);
         animator.SetTrigger(pHealEndTrig);
+        
+        Restart(ref _tHealEnd, TrackExitByName(stHealEnd, onComplete));
     }
     
     void OnDashStarted(DashStarted s)
@@ -210,6 +217,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         pHealProcess = config.healProcessTrigger;
         pHealStartTrig = config.healStartTrigger;
         pHealEndTrig = config.healEndTrigger;
+        stHealEnd    = config.healEndState;
 
         pDashTrig = config.dashTrigger;
         pIsGrappling = config.grappleBool;
