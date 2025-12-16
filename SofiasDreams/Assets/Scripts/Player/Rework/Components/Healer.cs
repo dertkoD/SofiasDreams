@@ -45,11 +45,15 @@ public class Healer : MonoBehaviour, IHealer
 
     void OnEnemyDied(EnemyDiedSignal s)
     {
+        // Debug.Log($"EnemyDiedSignal received. KilledByPlayer: {s.KilledByPlayer}");
+
         if (!s.KilledByPlayer) return;
         
         if (_charges >= _maxCharges) return;
 
         _kills++;
+        // Debug.Log($"Healer Kills: {_kills}/{_killsPerCharge}");
+
         if (_kills >= _killsPerCharge)
         {
             _kills = 0;

@@ -78,7 +78,7 @@ public class Health : MonoBehaviour, IHealth
 
         _lastHit = info;
 
-        Debug.Log($"[Health] ApplyDamage: {info.amount}, hp before = {_hp}");
+        // Debug.Log($"[Health] ApplyDamage: {info.amount}, hp before = {_hp}, source: {info.source}");
         TakeDamage(info.amount);
     }
 
