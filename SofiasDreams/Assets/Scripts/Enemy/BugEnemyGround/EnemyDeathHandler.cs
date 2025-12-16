@@ -83,17 +83,23 @@ public class EnemyDeathHandler : MonoBehaviour
             bool killedByPlayer = false;
             if (_health != null && _health.LastHit != null && _health.LastHit.source != null)
             {
-                // Debug.Log($"Checking kill source: {_health.LastHit.source.name}");
+                Debug.Log($"[EnemyDeathHandler] Checking kill source: {_health.LastHit.source.name}");
+                
+                // Check direct component
                 if (_health.LastHit.source.GetComponentInParent<PlayerStateMachine>() != null)
                 {
-                   // Debug.Log("Source has PlayerStateMachine");
+                   Debug.Log("[EnemyDeathHandler] Source has PlayerStateMachine");
                     killedByPlayer = true;
+                } 
+                else 
+                {
+                    Debug.Log("[EnemyDeathHandler] Source DOES NOT have PlayerStateMachine in parent.");
                 }
             }
-            // else 
-            // {
-            //    Debug.Log("LastHit or source is null");
-            // }
+            else 
+            {
+               Debug.Log($"[EnemyDeathHandler] LastHit or source is null. Health: {_health != null}, LastHit: {_health?.LastHit != null}, Source: {_health?.LastHit?.source != null}");
+            }
 
             _bus.Fire(new EnemyDiedSignal(_facade, killedByPlayer));
         }
