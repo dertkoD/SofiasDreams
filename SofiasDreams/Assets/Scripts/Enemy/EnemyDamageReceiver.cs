@@ -55,6 +55,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             amount      = amount,
             hitPoint    = hitPoint,
             hitNormal   = hitNormal,
+            source      = source ? source.transform : null,
             impulse     = hitNormal != Vector2.zero
                 ? hitNormal.normalized * _hitConfig.knockbackForce
                 : Vector2.zero,
