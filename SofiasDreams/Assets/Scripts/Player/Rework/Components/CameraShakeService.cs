@@ -195,13 +195,16 @@ public class CameraShakeService : MonoBehaviour
         float t = 0;
         float halfDuration = _config.vignetteDuration * 0.5f;
         
+        Debug.Log($"[CameraShakeService] Start Vignette. Target: {targetIntensity}, Duration: {_config.vignetteDuration}");
+
         // Fade In
         while (t < halfDuration)
         {
             t += Time.deltaTime;
             float progress = t / halfDuration;
-            // Use Override to set value
-            _vignette.intensity.Override(Mathf.Lerp(0f, targetIntensity, progress));
+            float val = Mathf.Lerp(0f, targetIntensity, progress);
+            _vignette.intensity.Override(val);
+            // Debug.Log($"[Vignette] In: {val}"); 
             yield return null;
         }
         
@@ -211,11 +214,14 @@ public class CameraShakeService : MonoBehaviour
         {
             t += Time.deltaTime;
             float progress = t / halfDuration;
-            _vignette.intensity.Override(Mathf.Lerp(targetIntensity, 0f, progress));
+            float val = Mathf.Lerp(targetIntensity, 0f, progress);
+            _vignette.intensity.Override(val);
+            // Debug.Log($"[Vignette] Out: {val}");
             yield return null;
         }
         
         _vignette.intensity.Override(0f);
         _vignette.active = false;
+        Debug.Log("[CameraShakeService] End Vignette");
     }
 }
