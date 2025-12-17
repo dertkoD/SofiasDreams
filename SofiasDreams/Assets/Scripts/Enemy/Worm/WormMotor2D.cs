@@ -113,7 +113,6 @@ public class WormMotor2D : MonoBehaviour
     public bool IsLedgeAhead(int dir)
     {
         if (!_ledgeGuard) return false;
-        // _config is a class field, should be accessible. Check if it's injected.
         LayerMask mask = _config != null ? _config.solidLayers : default;
         return _ledgeGuard.IsLedgeAhead(transform.position, dir, mask);
     }
@@ -124,7 +123,6 @@ public class WormMotor2D : MonoBehaviour
         
         float checkDist = 0.2f;
         Vector2 origin = transform.position;
-        // Simple raycast for wall check
         RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right * dir, checkDist, _config.solidLayers);
         return hit.collider != null;
     }
@@ -139,7 +137,6 @@ public class WormMotor2D : MonoBehaviour
         
         for(int i=0; i<n; i++)
         {
-            // Simple check: horizontal normal opposing movement
             if (Mathf.Abs(contacts[i].normal.x) > 0.5f)
             {
                 normal = contacts[i].normal;
