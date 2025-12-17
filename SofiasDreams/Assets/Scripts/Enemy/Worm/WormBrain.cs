@@ -162,7 +162,7 @@ public class WormBrain : MonoBehaviour
             _patrolDir = dx >= 0 ? 1 : -1;
         }
         
-        // Ledge/Wall Check ONLY if we don't have a valid path (or path logic failed)
+        // Ledge/Wall Check
         bool hasPath = _path != null && _path.Count > 0;
         
         if (!hasPath)
@@ -191,7 +191,8 @@ public class WormBrain : MonoBehaviour
         
         if (_isBouncing)
         {
-            // Wait for ground logic using robust ground checker
+            // Robust ground check via Motor->GroundChecker
+            // We use a small velocity threshold to ensure we are not moving UP
             if (_motor.Velocity.y <= 0.1f && _motor.IsGrounded)
             {
                 EnterStun();
@@ -207,14 +208,14 @@ public class WormBrain : MonoBehaviour
         {
             if (_motor.CheckWallHit(out Vector2 wallNormal))
             {
-                //Debug.Log($"[Worm] Hit Wall! Normal: {wallNormal}");
+                Debug.Log($"[Worm] Hit Wall! Normal: {wallNormal}");
                 Bounce(wallNormal);
                 return;
             }
 
             if (CheckPlayerHit(out Vector2 away))
             {
-                //Debug.Log($"[Worm] Hit Player! Away: {away}");
+                Debug.Log($"[Worm] Hit Player! Away: {away}");
                 Bounce(away);
                 return;
             }
@@ -261,7 +262,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterPatrol()
     {
-        //Debug.Log("[Worm] Enter Patrol");
+        Debug.Log("[Worm] Enter Patrol");
         _state = State.Patrol;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
@@ -271,7 +272,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterTrigger()
     {
-        //Debug.Log("[Worm] Enter Trigger (Windup)");
+        Debug.Log("[Worm] Enter Trigger (Windup)");
         _state = State.Trigger;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
@@ -298,7 +299,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterSpinning()
     {
-        //Debug.Log("[Worm] Enter Spinning");
+        Debug.Log("[Worm] Enter Spinning");
         _state = State.Spinning;
         _stateTimer = 0;
         _isBouncing = false;
@@ -309,7 +310,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterStun()
     {
-        //Debug.Log("[Worm] Enter Stun");
+        Debug.Log("[Worm] Enter Stun");
         _state = State.Stun;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
@@ -319,7 +320,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterDead()
     {
-        //Debug.Log("[Worm] Dead");
+        Debug.Log("[Worm] Dead");
         var prevState = _state;
         _state = State.Dead;
         _motor.SetFrozen(true);

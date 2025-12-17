@@ -89,7 +89,6 @@ public class WormMotor2D : MonoBehaviour
             _facingTransform.localScale = s;
         }
         
-        // Update LedgeGuard facing if connected
         if (_ledgeGuard) _ledgeGuard.SetFacingSign(sign);
     }
 
@@ -111,44 +110,36 @@ public class WormMotor2D : MonoBehaviour
         }
     }
 
-    public void NotifyBounceStarted()
+    public bool IsLedgeAhead(int dir)
     {
-        if (_groundChecker) _groundChecker.NotifyBounceStarted();
-    }
         if (!_ledgeGuard) return false;
-        return _ledgeGuard.IsLedgeAhead(transform.position, dir, _config != null ? _config.solidLayers : default);
+        // _config is a class field, should be accessible. Check if it's injected.
+        LayerMask mask = _config != null ? _config.solidLayers : default;
+        return _ledgeGuard.IsLedgeAhead(transform.position, dir, mask);
     }
 
     public bool IsWallAhead(int dir)
     {
-        // Simple wall check using Raycast or Collider Cast
-        // Reusing logic from GroundPatrolMovement2D or similar
         if (_config == null) return false;
         
         float checkDist = 0.2f;
         Vector2 origin = transform.position;
-        // Assume origin is center-bottom or adjust
-        // Let's use a circle cast or similar
-        
+        // Simple raycast for wall check
         RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right * dir, checkDist, _config.solidLayers);
         return hit.collider != null;
     }
     
-    // Check for wall using collision contacts for reliability during slide
     public bool CheckWallHit(out Vector2 normal)
     {
         normal = Vector2.zero;
         if (!_rb || _config == null) return false;
 
-        // Check contacts
-        int count = _rb.GetContacts(new ContactFilter2D { layerMask = _config.solidLayers, useLayerMask = true }, new List<ContactPoint2D>());
-        // If we have contacts with normal.x opposing velocity
-        
         ContactPoint2D[] contacts = new ContactPoint2D[10];
         int n = _rb.GetContacts(contacts);
         
         for(int i=0; i<n; i++)
         {
+            // Simple check: horizontal normal opposing movement
             if (Mathf.Abs(contacts[i].normal.x) > 0.5f)
             {
                 normal = contacts[i].normal;
@@ -156,6 +147,11 @@ public class WormMotor2D : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void NotifyBounceStarted()
+    {
+        if (_groundChecker) _groundChecker.NotifyBounceStarted();
     }
 
     bool IsInHitStun()
