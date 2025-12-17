@@ -46,7 +46,6 @@ public class WormBrain : MonoBehaviour
     
     // Spin/Bounce
     bool _isBouncing;
-    float _stunTimer;
 
     public void SetPatrolPath(EnemyPatrolPath path)
     {
@@ -77,6 +76,7 @@ public class WormBrain : MonoBehaviour
         }
         
         _state = State.Patrol;
+        _anim?.ResetAllTriggers();
         _anim?.TriggerPatrol();
         
         if (_patrolPath == null)
@@ -215,16 +215,15 @@ public class WormBrain : MonoBehaviour
                 return;
             }
 
-            // Player Hit (Hitbox check)
-            // Ideally we use a Trigger collider on the enemy to detect player
-            // But here we can use OverlapBox or similar if we don't have the event
-            // Let's assume we rely on collisions or a simple check
+            // Player Hit
             if (CheckPlayerHit(out Vector2 away))
             {
                 Bounce(away);
                 return;
             }
         }
+        
+        // Note: We DO NOT exit Spinning by timer. Only by impact.
     }
 
     void TickStun(bool seesPlayer)
@@ -234,7 +233,7 @@ public class WormBrain : MonoBehaviour
         // Always wait for minimum config duration
         if (_stateTimer < _config.stunDuration) return;
 
-        // Optionally wait for animation if it's longer than config duration
+        // Optionally wait for animation
         bool animFinished = _anim == null || _anim.IsStunFinished();
         
         // Safety timeout
@@ -244,16 +243,28 @@ public class WormBrain : MonoBehaviour
         {
             _motor.ResetDrag();
             
-            // Re-eval aggression logic:
+            // Re-eval aggression logic
             if (_forgetTimer > 0f)
             {
-                // Simple Ping-Pong: reverse direction from current facing
+                // Timer still active -> Attack again!
+                
+                // If we see player (or saw recently and hit player), try to face them.
+                // If we just hit a wall and reversed, we might not see player, but we should continue patrolling/attacking.
+                
+                // Simple Logic from request: "Change direction to opposite and roll until hit wall/player"
                 int currentSign = (int)Mathf.Sign(transform.localScale.x);
                 int nextSign = -currentSign;
                 
-                // Set spin direction immediately
+                // If we actually see player right now, prioritize player direction
+                if (seesPlayer && _target != null)
+                {
+                     float dx = _target.position.x - transform.position.x;
+                     if (Mathf.Abs(dx) > 0.1f) nextSign = (int)Mathf.Sign(dx);
+                }
+                
                 _spinDirection = new Vector2(nextSign, 0f);
                 
+                // Enter Trigger (Windup)
                 EnterTrigger();
                 
                 _motor.Face(nextSign);
@@ -284,7 +295,8 @@ public class WormBrain : MonoBehaviour
         _anim?.ResetAllTriggers();
         _anim?.TriggerAttack();
         
-        // Face target if known
+        // Logic for initial facing usually happens before calling EnterTrigger or inside tick
+        // But here we set facing if target is known, otherwise keep current.
         if (_target)
         {
             float dx = _target.position.x - transform.position.x;
@@ -318,7 +330,6 @@ public class WormBrain : MonoBehaviour
     {
         _state = State.Stun;
         _stateTimer = 0;
-        // Important: Reset triggers so we don't accidentally exit Stun or have PatrolTrigger active
         _anim?.ResetAllTriggers();
         _anim?.TriggerStun();
         _motor.SetFrozen(false);
@@ -329,7 +340,7 @@ public class WormBrain : MonoBehaviour
         var prevState = _state;
         _state = State.Dead;
         _motor.SetFrozen(true);
-        _motor.StopAllCoroutines(); // just in case
+        _motor.StopAllCoroutines(); 
         
         if (prevState == State.Spinning)
             _anim?.TriggerSpinningDeath();
@@ -346,11 +357,6 @@ public class WormBrain : MonoBehaviour
         _isBouncing = true;
         
         // Calculate bounce velocity
-        // Simple arc away from normal
-        Vector2 bounceDir = (impactNormal + Vector2.up).normalized;
-        // Or strictly calculated like in old script
-        
-        // Calculate velocity for Arc
         float g = Mathf.Abs(Physics2D.gravity.y);
         float h = _config.bounceArcHeight;
         float dist = _config.bounceArcDistance;
@@ -359,7 +365,7 @@ public class WormBrain : MonoBehaviour
         float t = 2 * vy / g;
         float vx = dist / t;
         
-        float dirX = -Mathf.Sign(_spinDirection.x); // Bounce back
+        float dirX = -Mathf.Sign(_spinDirection.x); // Bounce back against spin direction
         
         _motor.SetVelocity(new Vector2(dirX * vx, vy));
     }
@@ -367,7 +373,6 @@ public class WormBrain : MonoBehaviour
     bool CheckPlayerHit(out Vector2 away)
     {
         away = Vector2.zero;
-        // Simple overlap check for player
         if (_config.playerLayer.value == 0) return false;
         
         Collider2D hit = Physics2D.OverlapCircle(transform.position, 1.0f, _config.playerLayer);
@@ -389,18 +394,12 @@ public class WormBrain : MonoBehaviour
         {
             if (_state == State.Patrol && _forgetTimer <= 0)
             {
-                 // Turn around
                  _patrolDir *= -1;
                  _motor.Face(_patrolDir);
                  
-                 // Trigger aggro
                  EnterTrigger();
                  
-                 // Update forget timer so we don't immediately lose interest
                  _forgetTimer = _config.aggroForgetSeconds;
-                 
-                 // Try to set direction to where damage came from if possible, 
-                 // but "turn around" is usually sufficient if hit from back.
             }
         }
         _lastHp = current;
@@ -412,7 +411,7 @@ public class WormBrain : MonoBehaviour
     {
         if (_path == null || _path.Count <= 1) return;
         _pathIndex++;
-        if (_pathIndex >= _path.Count) _pathIndex = 0; // Loop by default for now
+        if (_pathIndex >= _path.Count) _pathIndex = 0;
     }
 
     int FindNearestWaypointIndex(Vector2 pos)
