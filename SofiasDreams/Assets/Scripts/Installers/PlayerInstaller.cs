@@ -16,6 +16,7 @@ public class PlayerInstaller : MonoInstaller
     public HitReactionConfig hitReactionSO;
     public PlayerAnimatorConfig animatorSO;
     public PlayerWeaponConfig weaponSO;
+    public CameraShakeConfig shakeSO;
 
     public override void InstallBindings()
     {
@@ -41,6 +42,7 @@ public class PlayerInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<UpAttack>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<JumpAttack>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<GrappleHairTrailSprites>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<CameraShakeService>().FromComponentOnRoot().AsSingle();
 
         if (moveSO)     Container.BindInstance(moveSO);
         if (jumpSO)     Container.BindInstance(jumpSO);
@@ -54,5 +56,6 @@ public class PlayerInstaller : MonoInstaller
         if (hitReactionSO) Container.BindInstance(hitReactionSO);
         if (animatorSO) Container.BindInstance(animatorSO);
         if (weaponSO)   Container.BindInstance(weaponSO);
+        if (shakeSO)    Container.BindInstance(shakeSO);
     }
 }
