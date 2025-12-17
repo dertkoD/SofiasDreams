@@ -43,6 +43,8 @@ public class WormAnimatorAdapter : MonoBehaviour
     public void TriggerStun() => _animator?.SetTrigger(_stunTriggerHash);
     public void TriggerPatrol() => _animator?.SetTrigger(_patrolTriggerHash);
     public void TriggerPatrolDeath() => _animator?.SetTrigger(_patrolDeathHash);
+    public void TriggerSpinningDeath() => _animator?.SetTrigger(_spinningDeathHash);
+    
     public void ResetPatrolTrigger() => _animator?.ResetTrigger(_patrolTriggerHash);
     public void ResetAllTriggers()
     {
