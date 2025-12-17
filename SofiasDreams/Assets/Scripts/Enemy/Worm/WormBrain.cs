@@ -272,6 +272,7 @@ public class WormBrain : MonoBehaviour
     {
         _state = State.Patrol;
         _stateTimer = 0;
+        _anim?.ResetAllTriggers();
         _anim?.TriggerPatrol();
         _motor.SetFrozen(false);
     }
@@ -280,6 +281,7 @@ public class WormBrain : MonoBehaviour
     {
         _state = State.Trigger;
         _stateTimer = 0;
+        _anim?.ResetAllTriggers();
         _anim?.TriggerAttack();
         
         // Face target if known
@@ -307,6 +309,7 @@ public class WormBrain : MonoBehaviour
         _state = State.Spinning;
         _stateTimer = 0;
         _isBouncing = false;
+        _anim?.ResetAllTriggers();
         _anim?.TriggerSpinning();
         _motor.SetFrozen(false);
     }
@@ -315,6 +318,8 @@ public class WormBrain : MonoBehaviour
     {
         _state = State.Stun;
         _stateTimer = 0;
+        // Important: Reset triggers so we don't accidentally exit Stun or have PatrolTrigger active
+        _anim?.ResetAllTriggers();
         _anim?.TriggerStun();
         _motor.SetFrozen(false);
     }
