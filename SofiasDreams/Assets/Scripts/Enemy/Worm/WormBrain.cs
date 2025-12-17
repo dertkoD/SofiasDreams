@@ -162,15 +162,16 @@ public class WormBrain : MonoBehaviour
             _patrolDir = dx >= 0 ? 1 : -1;
         }
         
-        // Ledge Check
-        if (_motor.IsLedgeAhead(_patrolDir) || _motor.IsWallAhead(_patrolDir))
+        // Ledge/Wall Check ONLY if we don't have a valid path (or path logic failed)
+        // If we have a path, we trust the waypoints.
+        bool hasPath = _path != null && _path.Count > 0;
+        
+        if (!hasPath)
         {
-             // If we hit a wall or ledge in patrol
-             // If we have a path, we usually stick to it, but simple fallback:
-             _patrolDir *= -1;
-             
-             // If path exists, maybe we are stuck?
-             // Simple fallback: just reverse
+            if (_motor.IsLedgeAhead(_patrolDir) || _motor.IsWallAhead(_patrolDir))
+            {
+                 _patrolDir *= -1;
+            }
         }
         
         _motor.Move(_config.patrolSpeed, _config.patrolAcceleration, _patrolDir);
@@ -230,13 +231,13 @@ public class WormBrain : MonoBehaviour
     {
         _motor.ApplyDrag(_config.stunDrag);
         
-        // Wait for Animator to enter Stun state and finish clip
-        // Use a small delay to avoid frame 0 exit before transition happens
-        if (_stateTimer < 0.2f) return;
+        // Always wait for minimum config duration
+        if (_stateTimer < _config.stunDuration) return;
 
-        bool animFinished = _anim != null && _anim.IsStunFinished();
+        // Optionally wait for animation if it's longer than config duration
+        bool animFinished = _anim == null || _anim.IsStunFinished();
         
-        // Safety timeout in case animation fails or is missing
+        // Safety timeout
         bool timeout = _stateTimer > 5.0f;
 
         if (animFinished || timeout)
@@ -244,7 +245,6 @@ public class WormBrain : MonoBehaviour
             _motor.ResetDrag();
             
             // Re-eval aggression logic:
-            // "If timer not finished -> Spin other way"
             if (_forgetTimer > 0f)
             {
                 // Simple Ping-Pong: reverse direction from current facing
@@ -254,9 +254,6 @@ public class WormBrain : MonoBehaviour
                 // Set spin direction immediately
                 _spinDirection = new Vector2(nextSign, 0f);
                 
-                // Enter Trigger (Windup) to telegraph next roll
-                // Note: EnterTrigger usually calculates direction from Target.
-                // We override this by explicitly setting facing after enter.
                 EnterTrigger();
                 
                 _motor.Face(nextSign);
