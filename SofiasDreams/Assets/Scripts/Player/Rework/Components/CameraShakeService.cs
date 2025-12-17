@@ -31,28 +31,39 @@ public class CameraShakeService : MonoBehaviour
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         
-        // Find Global Volume
+        // Поиск Volume, который управляет Vignette
+        // 1. Сначала пробуем найти CinemachineVolumeSettings на камерах
+        var cams = FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None);
+        foreach (var cam in cams)
+        {
+             // Cinemachine 3.x может иметь VolumeSettings как компонент расширения
+             var volSettings = cam.GetComponent<CinemachineVolumeSettings>();
+             if (volSettings != null && volSettings.Profile != null)
+             {
+                 if (volSettings.Profile.TryGet(out _vignette))
+                 {
+                     Debug.Log($"[CameraShakeService] Found Vignette in CinemachineCamera: {cam.name}");
+                     return; // Нашли, выходим
+                 }
+             }
+        }
+
+        // 2. Если не нашли в Cinemachine, ищем обычный Global Volume на сцене (резервный вариант)
         var volumes = FindObjectsByType<Volume>(FindObjectsSortMode.None);
         foreach (var v in volumes)
         {
             if (v.isGlobal)
             {
                 _volume = v;
-                break;
+                if (_volume.profile.TryGet(out _vignette))
+                {
+                    Debug.Log($"[CameraShakeService] Found Vignette in Global Volume: {v.name}");
+                    return;
+                }
             }
         }
-
-        if (_volume != null)
-        {
-            if (!_volume.profile.TryGet(out _vignette))
-            {
-                Debug.LogWarning("[CameraShakeService] Vignette override not found in Global Volume profile.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[CameraShakeService] Global Volume not found.");
-        }
+        
+        Debug.LogWarning("[CameraShakeService] Vignette override not found anywhere (checked CinemachineVolumeSettings and Global Volumes).");
     }
 
     void OnEnable()
