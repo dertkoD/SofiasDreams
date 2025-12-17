@@ -283,6 +283,7 @@ MonoBehaviour:
   _stateMachine: {fileID: 6222623665920495925}
   _patrolController: {fileID: 394871941965451042}
   _health: {fileID: 6227272584779357697}
+  _jumpingBrain: {fileID: 0}
 --- !u!114 &2240562265475578678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,7 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c4a04e3dfb4c5841a84cb96f14dc33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rb: {fileID: 0}
+  _rb: {fileID: 144452895185385874}
 --- !u!114 &7273009063138791189
 MonoBehaviour:
   m_ObjectHideFlags: 0
