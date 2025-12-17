@@ -12,12 +12,9 @@ GameObject:
   - component: {fileID: 4330824214661127395}
   - component: {fileID: 6295553472205053760}
   - component: {fileID: 3134217212742597380}
-  - component: {fileID: 5470135879886321744}
-  - component: {fileID: 7090010629859699467}
-  - component: {fileID: 8356300849247633871}
+  - component: {fileID: 4755696345033124883}
+  - component: {fileID: 2816325931161875509}
   - component: {fileID: 1129000204393869049}
-  - component: {fileID: 675408158808808953}
-  - component: {fileID: 1139977953366896205}
   - component: {fileID: 581196364006425546}
   - component: {fileID: 2325367667037875845}
   - component: {fileID: 9073262138175589624}
@@ -84,195 +81,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 4, y: 1}
   m_Direction: 1
---- !u!114 &5470135879886321744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03ccd10307060894b95e174090beb4a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 30
-  currencyReward: 1
-  destroy: 1
-  rootToDestroy: {fileID: 1532011633854459779}
-  deferDespawnToAnimator: 1
-  deathBridge: {fileID: 675408158808808953}
---- !u!114 &7090010629859699467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a55c2e93c01c684fb070937965b9a46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  overrideRoute: {fileID: 0}
-  routeKey: wormPatrol1
-  searchRadius: 100
-  pickNearestIfKeyMissing: 1
-  createFallbackIfNone: 1
-  fallbackRadius: 3
-  fallbackPoints: 6
-  showFallbackGizmos: 1
-  showEvenWhenBound: 1
-  drawWhenNotSelected: 0
-  gizmoCircleSegments: 48
-  fallbackAreaColor: {r: 0, g: 1, b: 0, a: 0.06}
-  fallbackLineColor: {r: 0, g: 1, b: 0, a: 0.9}
-  fallbackPointRadius: 0.08
---- !u!114 &8356300849247633871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 755ad912588f8b14db0b7f2944058da5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 2
-  acceleration: 20
-  deceleration: 25
-  _brain: {fileID: 1129000204393869049}
-  hitFlipOnlyInPatrol: 1
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 128
-  useOvalGroundCheck: 1
-  groundCheckOvalOffset: {x: 0.04, y: -0.5}
-  groundCheckOvalSize: {x: 3.97, y: 0.26}
-  groundCheckOffset: {x: 0, y: -0.5}
-  groundCheckRadius: 0.15
-  binder: {fileID: 7090010629859699467}
-  abandonRouteOnFirstFail: 1
-  solidLayers:
-    serializedVersion: 2
-    m_Bits: 128
-  wallCastDistance: 0.2
-  stuckTimeThreshold: 0.5
-  flipCooldown: 0.35
-  flipByScaleX: 1
-  flipOnAttackInPatrol: 1
-  flipOnHitInPatrol: 1
-  flipOnHpDecreaseInPatrol: 1
-  playerHurtboxLayers:
-    serializedVersion: 2
-    m_Bits: 4096
-  playerHitboxLayers:
-    serializedVersion: 2
-    m_Bits: 1024
-  hitSources:
-  - {fileID: 5464545579631771159}
-  hurtboxReceivers: []
---- !u!114 &1129000204393869049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1497218504e5834883404fc096f887e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  patrol: {fileID: 8356300849247633871}
-  vision: {fileID: 7507275875965290131}
-  animator: {fileID: 3134217212742597380}
-  mirror: {fileID: 1139977953366896205}
-  rb: {fileID: 6295553472205053760}
-  bodyCollider: {fileID: 0}
-  facingTransform: {fileID: 0}
-  ledgeGuard: {fileID: 581196364006425546}
-  useLedgeGuard: 0
-  aggroTimeout: 2
-  playerHurtboxLayers:
-    serializedVersion: 2
-    m_Bits: 4096
-  solidLayers:
-    serializedVersion: 2
-    m_Bits: 128
-  windupTime: 1
-  windupDamp: 10
-  chargeSpeed: 10
-  chargeAcceleration: 100
-  spinMinDuration: 0
-  bounceArcDistance: 0
-  bounceArcHeight: 0
-  stunStandDuration: 1.42
-  stunHoldLinearDrag: 20
-  flipByScaleX: 1
-  hitSources:
-  - {fileID: 5464545579631771159}
-  externalHitStunActive: 0
---- !u!114 &675408158808808953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9cf4e6c9ea47c1449a1f453694de22e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 5470135879886321744}
-  animator: {fileID: 3134217212742597380}
-  disableOnDeath:
-  - {fileID: 8356300849247633871}
-  - {fileID: 1129000204393869049}
-  disableRigidAndColliders: 1
-  autoWatchHealth: 1
-  triggersToClear:
-  - TriggerAttack
-  - StunTrigger
-  - PatrolTrigger
-  - SpinningTrigger
-  defaultDeathTrigger: Death
-  rules:
-  - match: 0
-    tokenOrTag: Patrol
-    deathTrigger: PatrolDeath
-  - match: 0
-    tokenOrTag: Trigger
-    deathTrigger: PatrolDeath
-  - match: 0
-    tokenOrTag: Stun
-    deathTrigger: PatrolDeath
-  - match: 0
-    tokenOrTag: Spinning
-    deathTrigger: SpinningDeath
-  autoFinalizeIfNoEvent: 1
-  deathAutoFinalizeDelay: 2
-  onDeathStart:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeathEnd:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1139977953366896205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf172cb9807a4d74789964baa5a0d6e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!50 &6295553472205053760
 Rigidbody2D:
   serializedVersion: 5
@@ -300,6 +108,82 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!95 &3134217212742597380
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3de1bd4258dc4244a8d7198d2d322d74, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4755696345033124883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scriptableObjectInstallers: []
+  _monoInstallers:
+  - {fileID: 2816325931161875509}
+  _installerPrefabs: []
+  _autoRun: 1
+  _kernel: {fileID: 0}
+--- !u!114 &2816325931161875509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9454397ea66903d42998aa15935043a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyConfig: {fileID: 0}
+  _healthConfig: {fileID: 0}
+  _health: {fileID: 0}
+  _brain: {fileID: 0}
+  _motor: {fileID: 0}
+  _animator: {fileID: 0}
+  _vision: {fileID: 0}
+--- !u!114 &1129000204393869049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1497218504e5834883404fc096f887e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _motor: {fileID: 0}
+  _anim: {fileID: 0}
+  _vision: {fileID: 0}
+  _health: {fileID: 0}
+  _patrolPath: {fileID: 0}
 --- !u!114 &581196364006425546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,28 +239,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _facade: {fileID: 0}
   _hitConfig: {fileID: 0}
---- !u!95 &3134217212742597380
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532011633854459779}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 3de1bd4258dc4244a8d7198d2d322d74, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2745463514634361623
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,6 +565,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fda885b17375ee4c9d18e5d4665a994, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  owner: {fileID: 8356300849247633871}
+  owner: {fileID: 0}
   reactOnAttack: 0
   reactOnGotHit: 1
