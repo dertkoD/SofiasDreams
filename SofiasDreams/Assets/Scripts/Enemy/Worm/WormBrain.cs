@@ -191,8 +191,9 @@ public class WormBrain : MonoBehaviour
         
         if (_isBouncing)
         {
-            // Wait for ground logic
-            if (_motor.Rigidbody.linearVelocity.y <= 0 && Physics2D.Raycast(transform.position, Vector2.down, 0.1f, _config.solidLayers))
+            // Wait for ground logic - increased raycast distance
+            // Also check velocity to ensure we are falling or landed
+            if (_motor.Rigidbody.linearVelocity.y <= 0.1f && Physics2D.Raycast(transform.position, Vector2.down, 0.5f, _config.solidLayers))
             {
                 EnterStun();
             }
