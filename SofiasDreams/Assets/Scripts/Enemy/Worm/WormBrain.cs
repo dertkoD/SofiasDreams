@@ -163,7 +163,6 @@ public class WormBrain : MonoBehaviour
         }
         
         // Ledge/Wall Check ONLY if we don't have a valid path (or path logic failed)
-        // If we have a path, we trust the waypoints.
         bool hasPath = _path != null && _path.Count > 0;
         
         if (!hasPath)
@@ -179,7 +178,6 @@ public class WormBrain : MonoBehaviour
 
     void TickTrigger()
     {
-        // Wait for windup time
         _motor.SetFrozen(true);
         if (_stateTimer >= _config.windupTime)
         {
@@ -193,9 +191,8 @@ public class WormBrain : MonoBehaviour
         
         if (_isBouncing)
         {
-            // Arc movement is handled by physics (velocity set at start of bounce)
-            // Wait for ground
-            if (_motor.Rigidbody.linearVelocity.y <= 0 && Physics2D.Raycast(transform.position, Vector2.down, 0.1f, _config.solidLayers)) // grounded check
+            // Wait for ground logic
+            if (_motor.Rigidbody.linearVelocity.y <= 0 && Physics2D.Raycast(transform.position, Vector2.down, 0.1f, _config.solidLayers))
             {
                 EnterStun();
             }
@@ -208,54 +205,41 @@ public class WormBrain : MonoBehaviour
         // Check Hit (Wall or Player)
         if (_stateTimer > _config.spinMinDuration)
         {
-            // Wall Hit
             if (_motor.CheckWallHit(out Vector2 wallNormal))
             {
+                //Debug.Log($"[Worm] Hit Wall! Normal: {wallNormal}");
                 Bounce(wallNormal);
                 return;
             }
 
-            // Player Hit
             if (CheckPlayerHit(out Vector2 away))
             {
+                //Debug.Log($"[Worm] Hit Player! Away: {away}");
                 Bounce(away);
                 return;
             }
         }
-        
-        // Note: We DO NOT exit Spinning by timer. Only by impact.
     }
 
     void TickStun(bool seesPlayer)
     {
         _motor.ApplyDrag(_config.stunDrag);
         
-        // Always wait for minimum config duration
         if (_stateTimer < _config.stunDuration) return;
 
-        // Optionally wait for animation
         bool animFinished = _anim == null || _anim.IsStunFinished();
-        
-        // Safety timeout
         bool timeout = _stateTimer > 5.0f;
 
         if (animFinished || timeout)
         {
             _motor.ResetDrag();
             
-            // Re-eval aggression logic
             if (_forgetTimer > 0f)
             {
-                // Timer still active -> Attack again!
-                
-                // If we see player (or saw recently and hit player), try to face them.
-                // If we just hit a wall and reversed, we might not see player, but we should continue patrolling/attacking.
-                
-                // Simple Logic from request: "Change direction to opposite and roll until hit wall/player"
+                // Attack again Logic
                 int currentSign = (int)Mathf.Sign(transform.localScale.x);
                 int nextSign = -currentSign;
                 
-                // If we actually see player right now, prioritize player direction
                 if (seesPlayer && _target != null)
                 {
                      float dx = _target.position.x - transform.position.x;
@@ -263,15 +247,11 @@ public class WormBrain : MonoBehaviour
                 }
                 
                 _spinDirection = new Vector2(nextSign, 0f);
-                
-                // Enter Trigger (Windup)
                 EnterTrigger();
-                
                 _motor.Face(nextSign);
             }
             else
             {
-                // Timer expired -> Patrol
                 EnterPatrol();
             }
         }
@@ -281,6 +261,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterPatrol()
     {
+        //Debug.Log("[Worm] Enter Patrol");
         _state = State.Patrol;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
@@ -290,13 +271,12 @@ public class WormBrain : MonoBehaviour
 
     void EnterTrigger()
     {
+        //Debug.Log("[Worm] Enter Trigger (Windup)");
         _state = State.Trigger;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
         _anim?.TriggerAttack();
         
-        // Logic for initial facing usually happens before calling EnterTrigger or inside tick
-        // But here we set facing if target is known, otherwise keep current.
         if (_target)
         {
             float dx = _target.position.x - transform.position.x;
@@ -318,6 +298,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterSpinning()
     {
+        //Debug.Log("[Worm] Enter Spinning");
         _state = State.Spinning;
         _stateTimer = 0;
         _isBouncing = false;
@@ -328,6 +309,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterStun()
     {
+        //Debug.Log("[Worm] Enter Stun");
         _state = State.Stun;
         _stateTimer = 0;
         _anim?.ResetAllTriggers();
@@ -337,6 +319,7 @@ public class WormBrain : MonoBehaviour
 
     void EnterDead()
     {
+        //Debug.Log("[Worm] Dead");
         var prevState = _state;
         _state = State.Dead;
         _motor.SetFrozen(true);
@@ -356,7 +339,6 @@ public class WormBrain : MonoBehaviour
     {
         _isBouncing = true;
         
-        // Calculate bounce velocity
         float g = Mathf.Abs(Physics2D.gravity.y);
         float h = _config.bounceArcHeight;
         float dist = _config.bounceArcDistance;
@@ -365,7 +347,7 @@ public class WormBrain : MonoBehaviour
         float t = 2 * vy / g;
         float vx = dist / t;
         
-        float dirX = -Mathf.Sign(_spinDirection.x); // Bounce back against spin direction
+        float dirX = -Mathf.Sign(_spinDirection.x); 
         
         _motor.SetVelocity(new Vector2(dirX * vx, vy));
     }
@@ -375,7 +357,7 @@ public class WormBrain : MonoBehaviour
         away = Vector2.zero;
         if (_config.playerLayer.value == 0) return false;
         
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, 1.0f, _config.playerLayer);
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, 0.8f, _config.playerLayer);
         if (hit)
         {
             away = (transform.position - hit.transform.position).normalized;
@@ -389,16 +371,13 @@ public class WormBrain : MonoBehaviour
         if (_health == null) return;
         int current = _health.CurrentHP;
         
-        // If hit and in Patrol and didn't see player -> turn and aggro
         if (current < _lastHp)
         {
             if (_state == State.Patrol && _forgetTimer <= 0)
             {
                  _patrolDir *= -1;
                  _motor.Face(_patrolDir);
-                 
                  EnterTrigger();
-                 
                  _forgetTimer = _config.aggroForgetSeconds;
             }
         }

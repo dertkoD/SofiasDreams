@@ -11,7 +11,7 @@ public class WormAnimatorAdapter : MonoBehaviour
     [SerializeField] string _stunTrigger = "StunTrigger";
     [SerializeField] string _patrolTrigger = "PatrolTrigger";
     [SerializeField] string _patrolDeath = "PatrolDeath";
-    [SerializeField] string _spinningDeath = "SpinningDeath"; // Note: User wrote "SpinnigDeath" in one place, assumed "SpinningDeath" or consistent with user input. User wrote: "SpinningDeath в стейт SpinnigDeath". I will use SpinningDeath for trigger and handle state names if needed.
+    [SerializeField] string _spinningDeath = "SpinningDeath"; 
 
     [Header("State Names")]
     [SerializeField] string _patrolState = "Patrol";
@@ -64,7 +64,6 @@ public class WormAnimatorAdapter : MonoBehaviour
     {
         if (!_animator) return true;
         var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-        // Check if we are in Stun state and normalized time >= 1
         if (stateInfo.IsName(_stunState))
         {
             return stateInfo.normalizedTime >= 1.0f;
