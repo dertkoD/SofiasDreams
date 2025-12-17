@@ -159,8 +159,14 @@ public class CameraShakeService : MonoBehaviour
     
     void PlayVignette()
     {
-        if (_vignette == null) return;
-        
+        if (_vignette == null)
+        {
+             // Try to find it again, maybe it was added later or lost reference?
+             // Or just log error if we really expect it.
+             Debug.LogError("[CameraShakeService] Cannot play vignette: _vignette is null!");
+             return;
+        }
+
         if (_vignetteCo != null) StopCoroutine(_vignetteCo);
         _vignetteCo = StartCoroutine(VignetteRoutine());
     }
@@ -169,14 +175,11 @@ public class CameraShakeService : MonoBehaviour
     {
         _vignette.active = true;
         
-        // Save original? Assuming we control it fully or it starts at 0.
-        // Usually Vignette is used for style, so we might overlap.
-        // For now, I'll override the Color and Intensity.
+        // Force reset to ensure we start from clean state
+        float targetIntensity = _config.vignetteIntensity;
         
-        var originalColor = _vignette.color.value;
-        var originalIntensity = _vignette.intensity.value; // Usually 0 or low
-        
-        _vignette.color.value = _config.vignetteColor;
+        // Override color
+        _vignette.color.Override(_config.vignetteColor);
         
         float t = 0;
         float halfDuration = _config.vignetteDuration * 0.5f;
@@ -186,7 +189,8 @@ public class CameraShakeService : MonoBehaviour
         {
             t += Time.deltaTime;
             float progress = t / halfDuration;
-            _vignette.intensity.value = Mathf.Lerp(originalIntensity, _config.vignetteIntensity, progress);
+            // Use Override to set value
+            _vignette.intensity.Override(Mathf.Lerp(0f, targetIntensity, progress));
             yield return null;
         }
         
@@ -196,18 +200,11 @@ public class CameraShakeService : MonoBehaviour
         {
             t += Time.deltaTime;
             float progress = t / halfDuration;
-            _vignette.intensity.value = Mathf.Lerp(_config.vignetteIntensity, originalIntensity, progress);
+            _vignette.intensity.Override(Mathf.Lerp(targetIntensity, 0f, progress));
             yield return null;
         }
         
-        _vignette.intensity.value = originalIntensity;
-        _vignette.color.value = originalColor;
-        
-        // If it was inactive before, maybe disable it? 
-        // But if originalIntensity was > 0, we should keep it active.
-        if (originalIntensity <= 0.01f)
-        {
-            _vignette.active = false;
-        }
+        _vignette.intensity.Override(0f);
+        _vignette.active = false;
     }
 }
