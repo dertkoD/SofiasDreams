@@ -50,6 +50,18 @@ public class WormAnimatorAdapter : MonoBehaviour
     public bool IsInSpinning() => IsState(_spinningState);
     public bool IsInStun() => IsState(_stunState);
 
+    public bool IsStunFinished()
+    {
+        if (!_animator) return true;
+        var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+        // Check if we are in Stun state and normalized time >= 1
+        if (stateInfo.IsName(_stunState))
+        {
+            return stateInfo.normalizedTime >= 1.0f;
+        }
+        return false;
+    }
+
     bool IsState(string name)
     {
         if (!_animator) return false;

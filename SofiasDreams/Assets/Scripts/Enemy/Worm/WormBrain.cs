@@ -232,7 +232,16 @@ public class WormBrain : MonoBehaviour
     {
         _motor.ApplyDrag(_config.stunDrag);
         
-        if (_stateTimer >= _config.stunDuration)
+        // Wait for Animator to enter Stun state and finish clip
+        // Use a small delay to avoid frame 0 exit before transition happens
+        if (_stateTimer < 0.2f) return;
+
+        bool animFinished = _anim != null && _anim.IsStunFinished();
+        
+        // Safety timeout in case animation fails or is missing
+        bool timeout = _stateTimer > 5.0f;
+
+        if (animFinished || timeout)
         {
             _motor.ResetDrag();
             // Decide next state
