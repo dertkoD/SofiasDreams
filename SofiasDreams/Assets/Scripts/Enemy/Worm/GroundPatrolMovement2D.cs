@@ -399,7 +399,7 @@ public class GroundPatrolMovement2D : MonoBehaviour
         if (hitFlipOnlyInPatrol)
         {
             _brain ??= GetComponentInParent<WormBrain>();
-            if (_brain && !_brain.IsInPatrol) return; // агро/атака/стан — выходим
+            //if (_brain && !_brain.IsInPatrol) return; // агро/атака/стан — выходим
         }
 
         int curDir = Mathf.Abs(_desiredVX) >= 0.01f

@@ -8,6 +8,7 @@ public class EnemyFacade : MonoBehaviour
     [SerializeField] EnemyPatrolController _patrolController;
     [SerializeField] Health _health;
     [SerializeField] JumpingEnemyBrain _jumpingBrain;
+    [SerializeField] WormBrain _wormBrain;
 
     EnemyConfigSO _config;
 
@@ -36,6 +37,7 @@ public class EnemyFacade : MonoBehaviour
     {
         _patrolController?.SetPath(path);
         _jumpingBrain?.SetPatrolPath(path);
+        _wormBrain?.SetPatrolPath(path);
     }
     
     public void ApplyDamage(DamageInfo info)
