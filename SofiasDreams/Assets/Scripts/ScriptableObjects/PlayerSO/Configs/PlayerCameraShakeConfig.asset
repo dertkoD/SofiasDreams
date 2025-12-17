@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27c3a01974bcbcd408bd6251ad4bd69b, type: 3}
   m_Name: PlayerCameraShakeConfig
   m_EditorClassIdentifier: 
-  airAttackForce: 0.15
+  commonAttackForce: 0.5
+  attackWhitoutHit: 0
   enemyHitForce: 0.5
   damageTakenForce: 1
   healShakeForce: 0.1
   dashShakeForce: 0.1
   continuousShakeFrequency: 0.05
-  vignetteIntensity: 1.01
-  vignetteDuration: 1.16
-  vignetteColor: {r: 1, g: 0.033018887, b: 0.09156888, a: 1}
+  vignetteIntensity: 0.55
+  vignetteDuration: 0.75
+  vignetteSmoothness: 0.75
+  vignetteColor: {r: 0, g: 0, b: 0, a: 1}

@@ -31,24 +31,20 @@ public class CameraShakeService : MonoBehaviour
     {
         _impulseSource = GetComponent<CinemachineImpulseSource>();
         
-        // Поиск Volume, который управляет Vignette
-        // 1. Сначала пробуем найти CinemachineVolumeSettings на камерах
         var cams = FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None);
         foreach (var cam in cams)
         {
-             // Cinemachine 3.x может иметь VolumeSettings как компонент расширения
              var volSettings = cam.GetComponent<CinemachineVolumeSettings>();
              if (volSettings != null && volSettings.Profile != null)
              {
                  if (volSettings.Profile.TryGet(out _vignette))
                  {
                      Debug.Log($"[CameraShakeService] Found Vignette in CinemachineCamera: {cam.name}");
-                     return; // Нашли, выходим
+                     return; 
                  }
              }
         }
 
-        // 2. Если не нашли в Cinemachine, ищем обычный Global Volume на сцене (резервный вариант)
         var volumes = FindObjectsByType<Volume>(FindObjectsSortMode.None);
         foreach (var v in volumes)
         {
@@ -96,7 +92,8 @@ public class CameraShakeService : MonoBehaviour
 
     void OnAttackStarted()
     {
-        Shake(_config.airAttackForce);
+        if (_config.attackWhitoutHit)
+            Shake(_config.commonAttackForce);
     }
 
     void OnEnemyHit()
@@ -191,6 +188,9 @@ public class CameraShakeService : MonoBehaviour
         
         // Override color
         _vignette.color.Override(_config.vignetteColor);
+        
+        // Override smoothness
+        _vignette.smoothness.Override(_config.vignetteSmoothness);
         
         float t = 0;
         float halfDuration = _config.vignetteDuration * 0.5f;

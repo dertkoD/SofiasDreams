@@ -3,8 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CameraShakeConfig", menuName = "Configs/Camera Shake Config")]
 public class CameraShakeConfig : ScriptableObject
 {
-    [Header("Air Attack (Small Shake)")]
-    public float airAttackForce = 0.5f;
+    [Header("Common Attack (Small Shake)")]
+    public float commonAttackForce = 0.5f;
+    public bool attackWhitoutHit = true;
 
     [Header("Enemy Hit (Medium Shake)")]
     public float enemyHitForce = 1.0f;
@@ -20,5 +21,6 @@ public class CameraShakeConfig : ScriptableObject
     [Header("Damage Vignette")]
     public float vignetteIntensity = 0.5f;
     public float vignetteDuration = 0.5f;
+    public float vignetteSmoothness = 0.5f;
     public Color vignetteColor = Color.red;
 }
