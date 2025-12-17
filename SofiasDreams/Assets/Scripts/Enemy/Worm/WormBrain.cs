@@ -191,9 +191,8 @@ public class WormBrain : MonoBehaviour
         
         if (_isBouncing)
         {
-            // Wait for ground logic - increased raycast distance
-            // Also check velocity to ensure we are falling or landed
-            if (_motor.Rigidbody.linearVelocity.y <= 0.1f && Physics2D.Raycast(transform.position, Vector2.down, 0.5f, _config.solidLayers))
+            // Wait for ground logic using robust ground checker
+            if (_motor.Velocity.y <= 0.1f && _motor.IsGrounded)
             {
                 EnterStun();
             }
@@ -339,6 +338,7 @@ public class WormBrain : MonoBehaviour
     void Bounce(Vector2 impactNormal)
     {
         _isBouncing = true;
+        _motor.NotifyBounceStarted();
         
         float g = Mathf.Abs(Physics2D.gravity.y);
         float h = _config.bounceArcHeight;

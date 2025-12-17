@@ -9,6 +9,7 @@ public class WormMotor2D : MonoBehaviour
     [SerializeField] Rigidbody2D _rb;
     [SerializeField] Transform _facingTransform;
     [SerializeField] LedgeGuard2D _ledgeGuard;
+    [SerializeField] WormGroundChecker2D _groundChecker;
 
     WormConfigSO _config;
     IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
@@ -19,6 +20,7 @@ public class WormMotor2D : MonoBehaviour
 
     public Rigidbody2D Rigidbody => _rb;
     public bool IsFrozen => _frozen;
+    public bool IsGrounded => _groundChecker && _groundChecker.IsGrounded;
     public Vector2 Velocity => _rb ? _rb.linearVelocity : Vector2.zero;
 
     [Inject]
@@ -34,6 +36,7 @@ public class WormMotor2D : MonoBehaviour
         if (!_rb) _rb = GetComponent<Rigidbody2D>();
         if (!_facingTransform) _facingTransform = transform;
         if (!_ledgeGuard) _ledgeGuard = GetComponentInChildren<LedgeGuard2D>(true);
+        if (!_groundChecker) _groundChecker = GetComponentInChildren<WormGroundChecker2D>(true);
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
@@ -108,8 +111,10 @@ public class WormMotor2D : MonoBehaviour
         }
     }
 
-    public bool IsLedgeAhead(int dir)
+    public void NotifyBounceStarted()
     {
+        if (_groundChecker) _groundChecker.NotifyBounceStarted();
+    }
         if (!_ledgeGuard) return false;
         return _ledgeGuard.IsLedgeAhead(transform.position, dir, _config != null ? _config.solidLayers : default);
     }
