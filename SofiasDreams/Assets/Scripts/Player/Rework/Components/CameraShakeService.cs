@@ -55,7 +55,13 @@ public class CameraShakeService : MonoBehaviour
     {
         if (_impulseSource != null)
         {
-            _impulseSource.GenerateImpulse(force);
+            // Генерируем случайный вектор направления для тряски (X, Y)
+            // Это создаст более живое ощущение "тряски", чем просто удар в одну сторону
+            Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f).normalized;
+            
+            // Передаем вектор скорости. Это переопределит Default Velocity в инспекторе,
+            // но сохранит форму кривой (Impulse Shape) и длительность.
+            _impulseSource.GenerateImpulse(randomDirection * force);
         }
     }
 }
