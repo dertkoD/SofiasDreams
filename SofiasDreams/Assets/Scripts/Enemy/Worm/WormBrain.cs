@@ -106,7 +106,8 @@ public class WormBrain : MonoBehaviour
         _stateTimer += Time.deltaTime;
 
         // Vision Check
-        bool seesPlayer = _vision && _vision.TryGetClosestTarget(out Transform t);
+        Transform t = null;
+        bool seesPlayer = _vision && _vision.TryGetClosestTarget(out t);
         if (seesPlayer)
         {
             _target = t;
