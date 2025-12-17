@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c8cbeca93c41ee4089e68277421468d, type: 3}
-  m_Name: PlayerJumpAttackConfig
+  m_Script: {fileID: 11500000, guid: 27c3a01974bcbcd408bd6251ad4bd69b, type: 3}
+  m_Name: PlayerCameraShakeConfig
   m_EditorClassIdentifier: 
-  damage: 10
-  cooldown: 0.2
+  airAttackForce: 0.15
+  enemyHitForce: 0.5
+  damageTakenForce: 1
