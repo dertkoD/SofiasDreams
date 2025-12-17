@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 8136951883763552695}
   - component: {fileID: 2558406007754955381}
   - component: {fileID: 5405793950238714744}
+  - component: {fileID: -8336346839882354902}
   - component: {fileID: 2210461091705559010}
   - component: {fileID: 7495473321665206775}
   - component: {fileID: 2390830618896636519}
@@ -239,6 +240,7 @@ GameObject:
   - component: {fileID: 2927966826410712086}
   - component: {fileID: 2648787401972596842}
   - component: {fileID: -4872943389680325650}
+  - component: {fileID: 4954444520845149196}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -404,6 +406,19 @@ MonoBehaviour:
   hitReactionSO: {fileID: 11400000, guid: 090a314edf72f964b86c8157b7e15900, type: 2}
   animatorSO: {fileID: 11400000, guid: 8719c19fb2c9994438161a6a8cf07b47, type: 2}
   weaponSO: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
+  shakeSO: {fileID: 11400000, guid: 4c88ee441b819ae4b9d23b35bd03288f, type: 2}
+--- !u!114 &-8336346839882354902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e1eacaef7dcf5e47968aa141ed64311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2210461091705559010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,7 +613,7 @@ MonoBehaviour:
   - {fileID: 6338143681887195673}
   - {fileID: 7568044809424727222}
   - {fileID: 9044232001047251501}
-  minGhostDistance: 0.05
+  minGhostDistance: 0.09
 --- !u!114 &2927966826410712086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,6 +656,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f9c56933a1ba9e4e97af9f8b59c7bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4954444520845149196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ImpulseDefinition:
+    ImpulseChannel: 1
+    ImpulseShape: 2
+    CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ImpulseDuration: 0.2
+    ImpulseType: 0
+    DissipationRate: 0.25
+    RawSignal: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    RepeatMode: 0
+    Randomize: 1
+    TimeEnvelope:
+      AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      AttackTime: 0
+      SustainTime: 0.2
+      DecayTime: 0.7
+      ScaleWithImpact: 1
+      HoldForever: 0
+    ImpactRadius: 100
+    DirectionMode: 0
+    DissipationMode: 2
+    DissipationDistance: 100
+    PropagationSpeed: 343
+  DefaultVelocity: {x: 0, y: -1, z: 0}
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
