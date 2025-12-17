@@ -165,14 +165,12 @@ public class WormBrain : MonoBehaviour
         // Ledge Check
         if (_motor.IsLedgeAhead(_patrolDir) || _motor.IsWallAhead(_patrolDir))
         {
-             // If we hit a wall or ledge in patrol (and no path or stuck), turn around?
-             // If we have a path, we should probably stick to it, but if blocked, maybe wait.
-             // For simple behavior: just stop or wait.
-             // But usually Worm patrol turns at edges.
-             if (_path == null)
-             {
-                 _patrolDir *= -1;
-             }
+             // If we hit a wall or ledge in patrol
+             // If we have a path, we usually stick to it, but simple fallback:
+             _patrolDir *= -1;
+             
+             // If path exists, maybe we are stuck?
+             // Simple fallback: just reverse
         }
         
         _motor.Move(_config.patrolSpeed, _config.patrolAcceleration, _patrolDir);
@@ -244,21 +242,28 @@ public class WormBrain : MonoBehaviour
         if (animFinished || timeout)
         {
             _motor.ResetDrag();
-            // Decide next state
-            if (_forgetTimer > 0)
+            
+            // Re-eval aggression logic:
+            // "If timer not finished -> Spin other way"
+            if (_forgetTimer > 0f)
             {
-                // Attack again
-                if (_target != null)
-                {
-                    // Face target
-                    float dx = _target.position.x - transform.position.x;
-                    _patrolDir = dx >= 0 ? 1 : -1;
-                    _motor.Face(_patrolDir);
-                }
+                // Simple Ping-Pong: reverse direction from current facing
+                int currentSign = (int)Mathf.Sign(transform.localScale.x);
+                int nextSign = -currentSign;
+                
+                // Set spin direction immediately
+                _spinDirection = new Vector2(nextSign, 0f);
+                
+                // Enter Trigger (Windup) to telegraph next roll
+                // Note: EnterTrigger usually calculates direction from Target.
+                // We override this by explicitly setting facing after enter.
                 EnterTrigger();
+                
+                _motor.Face(nextSign);
             }
             else
             {
+                // Timer expired -> Patrol
                 EnterPatrol();
             }
         }
