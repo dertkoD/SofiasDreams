@@ -64,11 +64,16 @@ public class WormAnimatorAdapter : MonoBehaviour
     {
         if (!_animator) return true;
         var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+        
+        // Если мы в стейте Stun -> проверяем время
         if (stateInfo.IsName(_stunState))
         {
             return stateInfo.normalizedTime >= 1.0f;
         }
-        return false;
+        
+        // Если мы НЕ в стейте Stun (а логика думает что должна быть), значит аниматор уже перешел дальше.
+        // Считаем это как "Stun Finished".
+        return true; 
     }
 
     bool IsState(string name)
