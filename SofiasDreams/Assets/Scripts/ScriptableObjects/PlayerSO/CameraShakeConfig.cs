@@ -11,4 +11,14 @@ public class CameraShakeConfig : ScriptableObject
 
     [Header("Damage Taken (Large Shake)")]
     public float damageTakenForce = 2.0f;
+
+    [Header("Continuous Shakes")]
+    public float healShakeForce = 0.1f;
+    public float dashShakeForce = 0.1f;
+    public float continuousShakeFrequency = 0.05f;
+
+    [Header("Damage Vignette")]
+    public float vignetteIntensity = 0.5f;
+    public float vignetteDuration = 0.5f;
+    public Color vignetteColor = Color.red;
 }
