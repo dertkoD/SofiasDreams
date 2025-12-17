@@ -6,8 +6,8 @@ public class WormBrain : MonoBehaviour
     public enum State
     {
         Patrol,
-        Trigger,  // Windup
-        Spinning, // Attack
+        Trigger,  // Windup logic state (waiting for anim)
+        Spinning, // Active attack state
         Stun,
         Dead
     }
@@ -75,9 +75,8 @@ public class WormBrain : MonoBehaviour
             _health.OnHealthChanged += OnHealthChanged;
         }
         
-        _state = State.Patrol;
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerPatrol();
+        // Start in Patrol
+        EnterPatrol();
         
         if (_patrolPath == null)
             _patrolPath = FindNearestPatrolPath();
@@ -161,10 +160,9 @@ public class WormBrain : MonoBehaviour
 
             _patrolDir = dx >= 0 ? 1 : -1;
             
-            // Check if blocked (Wall or Ledge) while trying to follow path
+            // Check if blocked (Wall or Ledge)
             if (_motor.IsWallAhead(_patrolDir) || _motor.IsLedgeAhead(_patrolDir))
             {
-                // Abandon path, switch to wall patrol
                 _path = null;
                 _patrolDir *= -1;
             }
@@ -183,10 +181,20 @@ public class WormBrain : MonoBehaviour
 
     void TickTrigger()
     {
+        // Waiting for Animator to finish "Trigger" anim and enter "Spinning" state
         _motor.SetFrozen(true);
-        if (_stateTimer >= _config.windupTime)
+        
+        // Safety timeout in case animator gets stuck (e.g. no transition)
+        if (_stateTimer > 3.0f)
         {
-            EnterSpinning();
+            Debug.LogWarning("[Worm] Trigger state timed out. Forcing Spin.");
+            EnterSpinningLogic(); 
+            return;
+        }
+
+        if (_anim && _anim.IsInSpinning())
+        {
+            EnterSpinningLogic();
         }
     }
 
@@ -194,11 +202,12 @@ public class WormBrain : MonoBehaviour
     {
         _motor.SetFrozen(false);
         
-        // Remove Bounce Logic. Just Charge.
+        // Movement
         _motor.Move(_config.chargeSpeed, _config.chargeAcceleration, (int)Mathf.Sign(_spinDirection.x));
 
         // Check Hit (Wall or Player)
-        if (_stateTimer > _config.spinMinDuration)
+        // Add small delay to avoid hitting self/floor immediately if weird collision
+        if (_stateTimer > 0.05f) 
         {
             if (_motor.CheckWallHit(out Vector2 wallNormal))
             {
@@ -222,35 +231,32 @@ public class WormBrain : MonoBehaviour
     {
         _motor.ApplyDrag(_config.stunDrag);
         
-        // Wait for stun duration (anim clip length)
         bool animFinished = _anim == null || _anim.IsStunFinished();
-        
-        // Safety timeout
         bool timeout = _stateTimer > 5.0f;
 
         if (animFinished || timeout)
         {
             _motor.ResetDrag();
             
+            // Decision: Attack again or Patrol?
             if (_forgetTimer > 0f)
             {
-                // Aggro timer still active
+                // Attack Again
                 if (_lastHitWasWall)
                 {
-                    // "Change direction to opposite and roll"
+                    // Bounce/Roll back: invert direction
                     _spinDirection = new Vector2(-Mathf.Sign(_spinDirection.x), 0f);
                     EnterTrigger(true); 
                 }
                 else
                 {
-                    // Last hit was Player
-                    // "Trigger -> Spinning (towards player)"
+                    // Hit player: chase player
                     EnterTrigger(false); 
                 }
             }
             else
             {
-                // Timer finished
+                // Back to patrol
                 EnterPatrol();
             }
         }
@@ -263,11 +269,13 @@ public class WormBrain : MonoBehaviour
         Debug.Log("[Worm] Enter Patrol");
         _state = State.Patrol;
         _stateTimer = 0;
+        
         _anim?.ResetAllTriggers();
         _anim?.TriggerPatrol();
+        
         _motor.SetFrozen(false);
         
-        // Try to recover path?
+        // Resume path?
         if (_patrolPath != null) _path = _patrolPath;
     }
 
@@ -276,40 +284,44 @@ public class WormBrain : MonoBehaviour
         Debug.Log("[Worm] Enter Trigger (Windup)");
         _state = State.Trigger;
         _stateTimer = 0;
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerAttack();
         
+        // 1. Setup direction
         if (!preserveDirection)
         {
             if (_target)
             {
                 float dx = _target.position.x - transform.position.x;
                 if (Mathf.Abs(dx) > 0.1f)
-                {
                     _spinDirection = new Vector2(Mathf.Sign(dx), 0);
-                }
                 else
-                {
-                     _spinDirection = new Vector2(transform.localScale.x, 0);
-                }
+                    _spinDirection = new Vector2(transform.localScale.x, 0);
             }
             else
             {
                 _spinDirection = new Vector2(transform.localScale.x, 0);
             }
         }
-        
         _motor.Face((int)_spinDirection.x);
-    }
 
-    void EnterSpinning()
+        // 2. Setup Animator Triggers
+        // We set BOTH TriggerAttack (to enter Trigger state) 
+        // AND SpinningTrigger (to automatically exit Trigger -> Spinning after ExitTime)
+        _anim?.ResetAllTriggers();
+        _anim?.TriggerAttack();
+        _anim?.TriggerSpinning();
+        
+        // 3. Freeze until animation finishes
+        _motor.SetFrozen(true);
+    }
+    
+    // Called ONLY when we detect Animator has actually entered Spinning state
+    void EnterSpinningLogic()
     {
-        Debug.Log("[Worm] Enter Spinning");
+        Debug.Log("[Worm] Enter Spinning (Logic)");
         _state = State.Spinning;
         _stateTimer = 0;
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerSpinning();
         _motor.SetFrozen(false);
+        // Note: No need to set triggers here, we are already in the state
     }
 
     void EnterStun()
@@ -317,8 +329,10 @@ public class WormBrain : MonoBehaviour
         Debug.Log("[Worm] Enter Stun");
         _state = State.Stun;
         _stateTimer = 0;
+        
         _anim?.ResetAllTriggers();
         _anim?.TriggerStun();
+        
         _motor.SetFrozen(false);
     }
 
@@ -361,9 +375,7 @@ public class WormBrain : MonoBehaviour
         
         if (current < _lastHp)
         {
-            // If taken damage, get aggro
-             _forgetTimer = _config.aggroForgetSeconds;
-
+            _forgetTimer = _config.aggroForgetSeconds;
             if (_state == State.Patrol)
             {
                  _patrolDir *= -1;
@@ -373,8 +385,6 @@ public class WormBrain : MonoBehaviour
         }
         _lastHp = current;
     }
-    
-    // --- Patrol Utils ---
     
     void AdvancePathIndex()
     {
