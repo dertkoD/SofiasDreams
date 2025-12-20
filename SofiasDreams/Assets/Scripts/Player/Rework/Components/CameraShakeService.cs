@@ -68,12 +68,12 @@ public class CameraShakeService : MonoBehaviour
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
         _bus.Subscribe<TookDamage>(OnTookDamage);
         
-        _bus.Subscribe<HealStarted>(OnHealStarted);
-        _bus.Subscribe<HealFinished>(OnHealFinished);
-        _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
-        
-        _bus.Subscribe<DashStarted>(OnDashStarted);
-        _bus.Subscribe<DashFinished>(OnDashFinished);
+        // _bus.Subscribe<HealStarted>(OnHealStarted);
+        // _bus.Subscribe<HealFinished>(OnHealFinished);
+        // _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
+        //
+        // _bus.Subscribe<DashStarted>(OnDashStarted);
+        // _bus.Subscribe<DashFinished>(OnDashFinished);
     }
 
     void OnDisable()
@@ -82,12 +82,12 @@ public class CameraShakeService : MonoBehaviour
         _bus.Unsubscribe<EnemyHit>(OnEnemyHit);
         _bus.Unsubscribe<TookDamage>(OnTookDamage);
         
-        _bus.Unsubscribe<HealStarted>(OnHealStarted);
-        _bus.Unsubscribe<HealFinished>(OnHealFinished);
-        _bus.Unsubscribe<HealInterrupted>(OnHealInterrupted);
-        
-        _bus.Unsubscribe<DashStarted>(OnDashStarted);
-        _bus.Unsubscribe<DashFinished>(OnDashFinished);
+        // _bus.Unsubscribe<HealStarted>(OnHealStarted);
+        // _bus.Unsubscribe<HealFinished>(OnHealFinished);
+        // _bus.Unsubscribe<HealInterrupted>(OnHealInterrupted);
+        //
+        // _bus.Unsubscribe<DashStarted>(OnDashStarted);
+        // _bus.Unsubscribe<DashFinished>(OnDashFinished);
     }
 
     void OnAttackStarted()
@@ -107,7 +107,7 @@ public class CameraShakeService : MonoBehaviour
          PlayVignette();
     }
     
-    void OnHealStarted()
+    /*void OnHealStarted()
     {
         StopHealShake();
         _healShakeCo = StartCoroutine(ContinuousShakeRoutine(_config.healShakeForce));
@@ -149,7 +149,7 @@ public class CameraShakeService : MonoBehaviour
             Shake(force);
             yield return new WaitForSeconds(_config.continuousShakeFrequency > 0 ? _config.continuousShakeFrequency : 0.05f);
         }
-    }
+    }*/
 
     void Shake(float force)
     {

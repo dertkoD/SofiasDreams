@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45158cc0bb10fe842b5c793a338a7050, type: 3}
   m_Name: PlayerJumpConfig
   m_EditorClassIdentifier: 
-  jumpForce: 15
+  jumpForce: 16
   coyoteTime: 0.1
   jumpBufferTime: 0.15
   groundCheckRadius: 0.1

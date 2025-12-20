@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db11eedfaa94f234b9e8c1c6ecc2162e, type: 3}
   m_Name: FlyingEnemyHealthConfig
   m_EditorClassIdentifier: 
-  maxHP: 5
+  maxHP: 3
   invulnTime: 0.3

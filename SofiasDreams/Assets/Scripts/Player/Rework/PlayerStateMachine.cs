@@ -128,7 +128,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _state == PlayerState.Hurt ||
             _state == PlayerState.Heal ||
             _state == PlayerState.Dash ||
-            _state == PlayerState.Attack)
+            _state == PlayerState.Attack ||
+            _state == PlayerState.Grapple)
             return;
         
         if (_gate.IsJumpBlocked) return;
@@ -293,7 +294,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void Dash()
     {
         if (_state == PlayerState.Dead) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Attack or PlayerState.Dash)
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Attack or PlayerState.Dash or PlayerState.Grapple)
             return;
 
         float dir = Mathf.Abs(_moveX) > 0.01f
