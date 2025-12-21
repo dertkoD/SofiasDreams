@@ -284,6 +284,7 @@ MonoBehaviour:
   _patrolController: {fileID: 394871941965451042}
   _health: {fileID: 6227272584779357697}
   _jumpingBrain: {fileID: 0}
+  _wormBrain: {fileID: 0}
 --- !u!114 &2240562265475578678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,8 +480,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.17}
-  m_Size: {x: 1.74, y: 2.96}
+  m_Offset: {x: -0.035377502, y: 1.322123}
+  m_Size: {x: 1.4003754, y: 2.5991507}
   m_Direction: 0
 --- !u!114 &6058861881810890545
 MonoBehaviour:
@@ -562,8 +563,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.17}
-  m_Size: {x: 1.74, y: 2.96}
+  m_Offset: {x: 0.024763107, y: 1.0461788}
+  m_Size: {x: 1.223484, y: 1.8916035}
   m_Direction: 0
 --- !u!114 &6828326011456730797
 MonoBehaviour:

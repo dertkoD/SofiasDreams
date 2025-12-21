@@ -154,8 +154,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.24, y: 0.86}
-  m_Radius: 1.31
+  m_Offset: {x: -0.35762465, y: 0.73475087}
+  m_Radius: 1.2756773
 --- !u!114 &123608623488109820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,8 +239,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.24, y: 0.86}
-  m_Radius: 1.31
+  m_Offset: {x: -0.35762465, y: 0.73475087}
+  m_Radius: 1.2756773
 --- !u!114 &4180206917627938028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,6 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aabe1a1cafe67e44991cce016afa4f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ownerComponent: {fileID: 0}
 --- !u!1 &8288131572571801195
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,6 +449,8 @@ MonoBehaviour:
   _stateMachine: {fileID: 6051644237315353362}
   _patrolController: {fileID: 6177437442468836438}
   _health: {fileID: 5959875013899935517}
+  _jumpingBrain: {fileID: 0}
+  _wormBrain: {fileID: 0}
 --- !u!114 &3486534548289669652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -461,8 +464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rb: {fileID: 8451830297677357593}
-  _knockback: {fileID: 8145587937332117411}
-  _damageFeedback: {fileID: 1413346990785986338}
+  _movementMode: 0
 --- !u!114 &6051644237315353362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,8 +522,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _facade: {fileID: 4831771523523908512}
-  _knockback: {fileID: 8145587937332117411}
-  _feedback: {fileID: 1413346990785986338}
   _hitConfig: {fileID: 11400000, guid: 7559f10ff4f0e4b4fb6717bc9fcc5e9b, type: 2}
 --- !u!114 &8791749440236852469
 MonoBehaviour:

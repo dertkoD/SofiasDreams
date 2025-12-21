@@ -24,11 +24,11 @@ public class ShortcutDamageable : MonoBehaviour, IDamageable
         }
 
         float shortcutX = transform.position.x;
-        float sourceX   = source.transform.position.x;
+        float attackerX   = source.transform.root.position.x;
 
-        bool hitFromLeft = sourceX < shortcutX;
+        bool attackerFromLeft = attackerX < shortcutX;
 
-        if (hitFromLeft == requireHitFromLeft)
+        if (attackerFromLeft == requireHitFromLeft)
         {
             // Correct side → destroy shortcut
             _isDestroyed = true;
