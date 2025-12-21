@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 9073262138175589624}
   - component: {fileID: 4511526649807701908}
   - component: {fileID: 6446686646846548365}
+  - component: {fileID: 4382349868164211847}
   m_Layer: 9
   m_Name: Worm
   m_TagString: Enemy
@@ -302,6 +303,7 @@ MonoBehaviour:
   _rb: {fileID: 6295553472205053760}
   _facingTransform: {fileID: 0}
   _ledgeGuard: {fileID: 581196364006425546}
+  _groundChecker: {fileID: 4382349868164211847}
 --- !u!114 &6446686646846548365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -325,6 +327,22 @@ MonoBehaviour:
   _triggerState: Trigger
   _spinningState: Spinning
   _stunState: Stun
+--- !u!114 &4382349868164211847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03a51391efc20d743b11c2a022beee26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rb: {fileID: 6295553472205053760}
+  _fallbackGroundMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &2745463514634361623
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,7 +584,6 @@ GameObject:
   - component: {fileID: 5209923783015218117}
   - component: {fileID: 6423076779408467216}
   - component: {fileID: 7722767311745674304}
-  - component: {fileID: 643653951392893987}
   m_Layer: 13
   m_Name: Hurtbox
   m_TagString: Enemy
@@ -639,18 +656,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerComponent: {fileID: 0}
---- !u!114 &643653951392893987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8380214388709164060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fda885b17375ee4c9d18e5d4665a994, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  owner: {fileID: 0}
-  reactOnAttack: 0
-  reactOnGotHit: 1
