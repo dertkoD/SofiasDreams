@@ -17,6 +17,7 @@ public class WormBrain : MonoBehaviour
     [SerializeField] WormAnimatorAdapter _anim;
     [SerializeField] VisionCone2D _vision;
     [SerializeField] Health _health;
+    [SerializeField] Knockback2D _knockback;
     [SerializeField] EnemyPatrolPath _patrolPath;
 
     [Inject]
@@ -24,6 +25,11 @@ public class WormBrain : MonoBehaviour
     {
         _config = config;
         _iHealth = health;
+        
+        if (_knockback)
+        {
+            _knockback.Configure(new KnockbackSettings { defaultHitStop = _config.defaultHitStop });
+        }
     }
 
     WormConfigSO _config;
@@ -63,6 +69,7 @@ public class WormBrain : MonoBehaviour
         if (!_anim) _anim = GetComponentInChildren<WormAnimatorAdapter>(true);
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>(true);
         if (!_health) _health = GetComponent<Health>();
+        if (!_knockback) _knockback = GetComponent<Knockback2D>();
         
         if (_iHealth == null && _health) _iHealth = _health;
     }
