@@ -6,10 +6,6 @@ public class WormConfigSO : ScriptableObject
     [Header("Knockback")]
     public float defaultHitStop = 0.1f;
 
-    [Header("Health")]
-    public int maxHP = 3;
-    public float invulnTime = 0.2f;
-
     [Header("Patrol")]
     [Min(0f)] public float patrolSpeed = 2f;
     [Min(0f)] public float patrolAcceleration = 20f;
