@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 4511526649807701908}
   - component: {fileID: 6446686646846548365}
   - component: {fileID: 4382349868164211847}
+  - component: {fileID: -6128683343587007184}
   m_Layer: 9
   m_Name: Worm
   m_TagString: Enemy
@@ -343,6 +344,27 @@ MonoBehaviour:
   _fallbackGroundMask:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &-6128683343587007184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1df15f150767a694783821acffca915e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _health: {fileID: 3891489234604132372}
+  _movement: {fileID: 0}
+  _facade: {fileID: 6210117844752786583}
+  _rb: {fileID: 6295553472205053760}
+  _colliders:
+  - {fileID: 4330824214661127395}
+  - {fileID: 6423076779408467216}
+  - {fileID: 5464545579631771159}
+  _destroyDelay: 1
 --- !u!1 &2745463514634361623
 GameObject:
   m_ObjectHideFlags: 0
