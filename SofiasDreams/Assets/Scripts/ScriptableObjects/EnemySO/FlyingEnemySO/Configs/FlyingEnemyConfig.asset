@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: FlyingEnemyConfig
   m_EditorClassIdentifier: 
   movementMode: 1
-  moveSpeed: 3
+  moveSpeed: 4
   destinationTolerance: 0.1
-  minPauseAtPoint: 0.5
-  maxPauseAtPoint: 2
-  newPointSearchRadius: 2
+  minPauseAtPoint: 0
+  maxPauseAtPoint: 0
+  newPointSearchRadius: 0.1

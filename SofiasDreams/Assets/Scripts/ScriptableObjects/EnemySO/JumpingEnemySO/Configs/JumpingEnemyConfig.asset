@@ -24,11 +24,11 @@ MonoBehaviour:
   patrolPathSearchRadius: 100
   loopPath: 1
   waypointArriveDistance: 0.2
-  patrolJumpCooldown: 0.3
-  patrolJumpHeight: 1.5
+  patrolJumpCooldown: 0.2
+  patrolJumpHeight: 3
   patrolJumpHorizontalSpeed: 3.5
   landingStunSeconds: 0.1
   aggroForgetSeconds: 0.05
-  aggroJumpCooldown: 0.25
-  aggroJumpHeight: 2
-  aggroJumpHorizontalSpeed: 4
+  aggroJumpCooldown: 0.1
+  aggroJumpHeight: 3
+  aggroJumpHorizontalSpeed: 5

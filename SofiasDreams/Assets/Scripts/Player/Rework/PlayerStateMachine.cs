@@ -190,10 +190,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        if (_jumpAttack.Request(AttackMode.AirFwd))
-        {
-            Block(MobilityBlockReason.Attack);
-        }
+        _jumpAttack.Request(AttackMode.AirFwd);
     }
 
     public void UpJumpAttack()
@@ -201,10 +198,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        if (_jumpAttack.Request(AttackMode.AirUp))
-        {
-            Block(MobilityBlockReason.Attack);
-        }
+        _jumpAttack.Request(AttackMode.AirUp);
     }
 
     public void DownJumpAttack()
@@ -212,10 +206,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt) return;
 
-        if (_jumpAttack.Request(AttackMode.AirDown))
-        {
-            Block(MobilityBlockReason.Attack);
-        }
+        _jumpAttack.Request(AttackMode.AirDown);
     }
 
     public void HealBegin()

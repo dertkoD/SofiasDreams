@@ -24,10 +24,10 @@ MonoBehaviour:
   arrivalClearance: 0
   zeroGravityWhileGrappling: 1
   startupDelay: 0.1
-  exitStrength: 16
+  exitStrength: 17
   carryOverEntrySpeedFactor: 0
   maxExitSpeedX: 11
-  maxExitSpeedY: 16
+  maxExitSpeedY: 17
   exitBlendTime: 0.05
   blendByVelocityLerp: 1
   hardLockDuration: 0.12

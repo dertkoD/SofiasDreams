@@ -1,26 +1,107 @@
+using System.Collections;
 using UnityEngine;
 
 public class RespawnManager : MonoBehaviour
 {
-    [SerializeField] private GameObject spawnPoint;
+    [Header("Refs")]
+    [SerializeField] private Transform spawnPoint;
+
+    [Header("Damage")]
+    [SerializeField] private bool applyDamageOnRespawn = true;
+
+    [Tooltip("If true, deals enough damage to drop HP to 0 (bypasses invuln if configured).")]
+    [SerializeField] private bool lethalDamage = false;
+
+    [Tooltip("Used only when Lethal Damage is false.")]
+    [SerializeField] private int damageAmount = 1;
+
+    [SerializeField] private bool bypassInvuln = true;
+
+    [SerializeField] private DamageType damageType = DamageType.Melee;
+
+    [Header("Respawn Feel")]
+    [Tooltip("Optional tiny delay before teleport (useful for hit FX).")]
+    [SerializeField] private float respawnDelay = 0f;
+
+    [Tooltip("Prevents retriggering immediately after teleport.")]
+    [SerializeField] private float triggerCooldown = 0.25f;
+
+    bool _cooldown;
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // ���������, ��� ������ �����
-        if (other.CompareTag("Player"))
+        if (_cooldown) return;
+        if (!other.CompareTag("Player")) return;
+
+        if (spawnPoint == null)
         {
-            PlayerHealth.Instance.TakeDamage(1);
-            other.transform.position = spawnPoint.transform.position;
+            Debug.LogWarning("[RespawnManager] No spawnPoint assigned.");
+            return;
         }
+
+        // Find player systems on the thing that entered the trigger (or its parents)
+        var playerHealth = other.GetComponentInParent<Health>();
+        var playerRb     = other.attachedRigidbody
+                        ? other.attachedRigidbody
+                        : other.GetComponentInParent<Rigidbody2D>();
+
+        // Apply damage using DamageInfo pipeline
+        if (applyDamageOnRespawn && playerHealth != null)
+        {
+            int dmg = lethalDamage ? Mathf.Max(1, playerHealth.CurrentHP) : Mathf.Max(0, damageAmount);
+
+            // Direction/normal aren’t super important here
+            var info = DamageInfo.FromHit(
+                src: transform,
+                dmg: dmg,
+                point: other.bounds.ClosestPoint(transform.position),
+                normal: Vector2.up,
+                impulse: Vector2.zero,
+                t: damageType,
+                bypass: bypassInvuln,
+                crit: false,
+                stun: 0f
+            );
+
+            playerHealth.ApplyDamage(info);
+        }
+
+        // Teleport + cleanup (optionally delayed)
+        StartCoroutine(RespawnRoutine(other.transform, playerRb));
     }
 
-    // ������������ ����� ������ � ���������
+    IEnumerator RespawnRoutine(Transform playerTransform, Rigidbody2D playerRb)
+    {
+        _cooldown = true;
+
+        if (respawnDelay > 0f)
+            yield return new WaitForSeconds(respawnDelay);
+
+        // Reset physics so no retained horizontal velocity / momentum after teleport
+        if (playerRb != null)
+        {
+            playerRb.linearVelocity = Vector2.zero;
+            playerRb.angularVelocity = 0f;
+
+            // Prefer rb.position to avoid weirdness with interpolation
+            playerRb.position = spawnPoint.position;
+        }
+        else
+        {
+            playerTransform.position = spawnPoint.position;
+        }
+
+        if (triggerCooldown > 0f)
+            yield return new WaitForSeconds(triggerCooldown);
+
+        _cooldown = false;
+    }
+
     void OnDrawGizmos()
     {
-        if (Camera.current != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(spawnPoint.transform.position, 0.5f);
-        }
+        if (spawnPoint == null) return;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(spawnPoint.position, 0.5f);
     }
 }

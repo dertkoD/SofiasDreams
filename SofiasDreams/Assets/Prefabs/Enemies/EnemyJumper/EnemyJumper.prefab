@@ -47,8 +47,8 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4096
-  radius: 6.54
-  fov: 45
+  radius: 12
+  fov: 61
   requireLineOfSight: 0
   obstacleLayers:
     serializedVersion: 2
@@ -598,6 +598,7 @@ MonoBehaviour:
   _patrolController: {fileID: 0}
   _health: {fileID: 6149265313361646971}
   _jumpingBrain: {fileID: 8677910553421361380}
+  _wormBrain: {fileID: 0}
 --- !u!1 &9163621309807500896
 GameObject:
   m_ObjectHideFlags: 0
