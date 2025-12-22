@@ -205,13 +205,6 @@ public class JumpingEnemyBrain : MonoBehaviour
                 TickReturnToPatrol();
                 break;
         }
-
-        // Continuous pursuit in air during aggro (player can move after takeoff)
-        if (_state == State.Aggro && _motor != null && !_motor.IsGrounded && !_motor.IsFrozen)
-        {
-            int dir = GetAggroDirectionSign();
-            _motor.SetAirDesiredVX(dir * Mathf.Max(0f, _config.aggroJumpHorizontalSpeed));
-        }
     }
 
     void TickAnimatorParams()
