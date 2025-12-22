@@ -33,7 +33,7 @@ public class EnemyDeathHandler : MonoBehaviour
         if (_colliders == null || _colliders.Length == 0)
             _colliders = GetComponentsInChildren<Collider2D>(true);
             
-        _groundChecker = GetComponent<IEnemyGroundChecker>();
+        _groundChecker = GetComponentInChildren<IEnemyGroundChecker>();
     }
 
     void OnEnable()
