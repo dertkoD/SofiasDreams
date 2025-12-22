@@ -827,7 +827,22 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             int hp = _health.CurrentHP;
             if (_lastHp != int.MinValue && hp < _lastHp)
+            {
+                if (_health.LastHit != null && _health.LastHit.source != null)
+                {
+                    _lastSeenPos = _health.LastHit.source.position;
+                    _hasLastSeen = true;
+                    _hasChaseDir = true;
+                    
+                    float dx = _lastSeenPos.x - transform.position.x;
+                    if (Mathf.Abs(dx) > 0.01f)
+                    {
+                        _lastChaseDirSign = dx >= 0f ? +1 : -1;
+                    }
+                }
+
                 RequestAggroTrigger();
+            }
             _lastHp = hp;
         }
     }
