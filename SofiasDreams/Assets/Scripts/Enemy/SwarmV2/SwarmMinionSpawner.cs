@@ -1,19 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class SwarmMinionSpawner : MonoBehaviour
 {
-    [Header("Detect")] public VisionCone2D swarmVision;
+    [Header("Refs")]
+    // Vision is now handled by Brain
+    // Config comes from Zenject now
 
-    [Header("Pooling")]
-    public MinionOrbitBrain2D minionPrefab;
-    [Min(1)] public int poolSize = 3;
-
-    [Header("Spawn")]
-    [Min(1)] public int minionsPerSwarm = 3;
+    [Header("Internal Pool")]
+    // We use the config for pool size now
     public Transform spawnParent;
     public int sortingOrderOffset = 5;
-    [Min(0.05f)] public float spawnInterval = 0.6f;
 
     [Header("Chaos")]
     public bool randomizeDirection = false;
@@ -25,31 +23,24 @@ public class SwarmMinionSpawner : MonoBehaviour
     readonly Queue<MinionOrbitBrain2D> _pool = new();
     readonly List<MinionOrbitBrain2D>  _active = new();
 
-    bool  _seeing;
+    SwarmConfig _config;
+    bool _isSpawningEnabled;
     float _nextSpawnAt;
-    int   _spawnIdxPhase;
-
+    int _spawnIdxPhase;
+    Transform _currentTarget;
     SpriteRenderer _swarmSR;
-
     MinionOrbitBrain2D _aggressor;
-    Transform _lastSeenPlayer;                       // NEW
 
     public bool HasAggressor => _aggressor && _aggressor.gameObject.activeInHierarchy;
-    public Transform AggressorTarget => HasAggressor ? _aggressor.CurrentAttackTarget : null;
-    public Transform FallbackTarget => _lastSeenPlayer; // для саппортов/назначения NEW
 
-    void OnValidate()
+    [Inject]
+    public void Construct(SwarmConfig config)
     {
-        if (!spawnParent)
-        {
-            var child = transform.Find("spawn");
-            if (child) spawnParent = child;
-        }
+        _config = config;
     }
 
     void Awake()
     {
-        if (!swarmVision) swarmVision = GetComponent<VisionCone2D>();
         _swarmSR = GetComponentInChildren<SpriteRenderer>();
 
         if (!spawnParent)
@@ -58,52 +49,84 @@ public class SwarmMinionSpawner : MonoBehaviour
             go.transform.SetParent(transform, false);
             spawnParent = go.transform;
         }
+    }
 
-        var existing = spawnParent.GetComponentsInChildren<MinionOrbitBrain2D>(true);
-        foreach (var m in existing) if (m && !m.gameObject.activeSelf) _pool.Enqueue(m);
+    void Start()
+    {
+        if (_config == null) return;
 
-        int toCreate = Mathf.Max(0, poolSize - _pool.Count);
+        // Pre-warm pool
+        int toCreate = Mathf.Max(0, _config.poolInitialSize);
         for (int i = 0; i < toCreate; i++)
         {
-            var m = Instantiate(minionPrefab, spawnParent);
-            m.gameObject.SetActive(false);
-            _pool.Enqueue(m);
+            CreateMinionInPool();
         }
     }
 
     void Update()
     {
-        if (swarmVision && swarmVision.TryGetClosestTarget(out var p))
-        {
-            _lastSeenPlayer = p;                     // NEW: обновляем цель всегда
-            if (!_seeing) _nextSpawnAt = Time.time;
-            _seeing = true;
-        }
-        else _seeing = false;
-
         AggressorHousekeeping();
 
-        if (_seeing) TryTopUpWithInterval();
+        if (_isSpawningEnabled && _config != null)
+        {
+            TryTopUpWithInterval();
+        }
+    }
+
+    void CreateMinionInPool()
+    {
+        if (_config.minionPrefab == null) return;
+        var go = Instantiate(_config.minionPrefab, spawnParent);
+        var m = go.GetComponent<MinionOrbitBrain2D>();
+        if (m)
+        {
+            go.SetActive(false);
+            _pool.Enqueue(m);
+        }
+    }
+
+    public void EnableSpawning(bool enable)
+    {
+        _isSpawningEnabled = enable;
+        if (enable)
+        {
+            // Reset timer so it can spawn immediately if cooldown passed
+            if (Time.time > _nextSpawnAt)
+                _nextSpawnAt = Time.time; 
+        }
+    }
+
+    public void SetAggroTarget(Transform target)
+    {
+        _currentTarget = target;
+        if (_currentTarget && !HasAggressor)
+        {
+             AssignSpecificAggressor(_currentTarget);
+        }
     }
 
     void TryTopUpWithInterval()
     {
         CleanActive();
-        if (_active.Count >= minionsPerSwarm) return;
+        if (_active.Count >= _config.maxMinions) return;
         if (Time.time < _nextSpawnAt) return;
 
         var m = GetFromPool();
-        SetupMinion(m, _spawnIdxPhase++);
-        _active.Add(m);
-
-        if (_lastSeenPlayer && !HasAggressor) AssignSpecificAggressor(_lastSeenPlayer); // NEW
-
-        _nextSpawnAt = Time.time + spawnInterval;
+        if (m != null)
+        {
+            SetupMinion(m, _spawnIdxPhase++);
+            _active.Add(m);
+            if (_currentTarget && !HasAggressor) AssignSpecificAggressor(_currentTarget);
+            _nextSpawnAt = Time.time + _config.spawnInterval;
+        }
     }
 
     MinionOrbitBrain2D GetFromPool()
     {
-        var m = _pool.Count > 0 ? _pool.Dequeue() : Instantiate(minionPrefab, spawnParent);
+        if (_pool.Count == 0) CreateMinionInPool();
+        if (_pool.Count == 0) return null;
+
+        var m = _pool.Dequeue();
         if (m.transform.parent != spawnParent) m.transform.SetParent(spawnParent, false);
         m.gameObject.SetActive(true);
 
@@ -121,9 +144,9 @@ public class SwarmMinionSpawner : MonoBehaviour
         m.transform.position = transform.position;
 
         var obit = m.GetComponent<OrbitPatrol2D>();
-        if (obit)
+        if (obit && _config.minionPrefab)
         {
-            var baseObit = minionPrefab ? minionPrefab.GetComponent<OrbitPatrol2D>() : null;
+            var baseObit = _config.minionPrefab.GetComponent<OrbitPatrol2D>();
             if (baseObit)
             {
                 obit.radius = baseObit.radius;
@@ -135,7 +158,7 @@ public class SwarmMinionSpawner : MonoBehaviour
             if (randomizeDirection) obit.clockwise = (Random.value < 0.5f);
         }
 
-        int n = Mathf.Max(1, minionsPerSwarm);
+        int n = Mathf.Max(1, _config.maxMinions);
         float baseDeg = (index % n) * (360f / n);
         float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
         Vector2 kickDir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
@@ -158,14 +181,6 @@ public class SwarmMinionSpawner : MonoBehaviour
         }
     }
 
-    public void DespawnAll()
-    {
-        for (int i = _active.Count - 1; i >= 0; i--) Release(_active[i]);
-        _active.Clear();
-        _spawnIdxPhase = 0;
-        _nextSpawnAt = Time.time;
-    }
-
     public void KillAllMinionsAnimated()
     {
         CleanActive();
@@ -178,6 +193,7 @@ public class SwarmMinionSpawner : MonoBehaviour
             if (ec != null) ec.ForceDeathByOwner();
             else Release(m);
         }
+        _active.Clear();
     }
 
     public void Release(MinionOrbitBrain2D m)
@@ -190,33 +206,10 @@ public class SwarmMinionSpawner : MonoBehaviour
         bool wasAggressor = (m == _aggressor);
         if (wasAggressor) _aggressor = null;
 
-        if (m.transform.parent != spawnParent) m.transform.SetParent(spawnParent, false);
-        m.transform.localPosition = Vector3.zero;
-
-        var rb = m.GetComponent<Rigidbody2D>();
-        if (rb) rb.linearVelocity = Vector2.zero;
-
         m.gameObject.SetActive(false);
         _pool.Enqueue(m);
 
-        if (wasAggressor) PromoteSupportToAggressor(); // NEW
-
-        if (_seeing)
-        {
-            if (!HasAggressor && _lastSeenPlayer) AssignSpecificAggressor(_lastSeenPlayer);
-            if (_active.Count < minionsPerSwarm) _nextSpawnAt = Mathf.Min(_nextSpawnAt, Time.time);
-        }
-    }
-
-    public bool TryClaimAggressor(MinionOrbitBrain2D m, Transform player)
-    {
-        CleanActive();
-        if (HasAggressor) return false;
-        if (m == null || !_active.Contains(m) || !m.gameObject.activeInHierarchy) return false;
-        _aggressor = m;
-        _lastSeenPlayer = player;                    // NEW
-        m.EnterAttackMode(player);
-        return true;
+        if (wasAggressor) PromoteSupportToAggressor();
     }
 
     void AggressorHousekeeping()
@@ -225,9 +218,8 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_aggressor != null && !_aggressor.gameObject.activeInHierarchy)
         {
             _aggressor = null;
-            PromoteSupportToAggressor();            // NEW
+            PromoteSupportToAggressor();
         }
-        if (_seeing && !HasAggressor && _lastSeenPlayer) AssignSpecificAggressor(_lastSeenPlayer);
     }
 
     void AssignSpecificAggressor(Transform player)
@@ -249,18 +241,10 @@ public class SwarmMinionSpawner : MonoBehaviour
         }
     }
 
-    void PromoteSupportToAggressor()                 // NEW
+    void PromoteSupportToAggressor()
     {
         if (_active.Count == 0) return;
-        // если знаем игрока — назначаем ближайшего к нему
-        if (_lastSeenPlayer) { AssignSpecificAggressor(_lastSeenPlayer); return; }
-
-        // иначе попробуем спросить визор сейчас
-        if (swarmVision && swarmVision.TryGetClosestTarget(out var p))
-        {
-            _lastSeenPlayer = p;
-            AssignSpecificAggressor(_lastSeenPlayer);
-        }
+        if (_currentTarget) AssignSpecificAggressor(_currentTarget);
     }
 
     void CleanActive()
@@ -270,6 +254,5 @@ public class SwarmMinionSpawner : MonoBehaviour
             var m = _active[i];
             if (m == null || !m.gameObject.activeInHierarchy) _active.RemoveAt(i);
         }
-        if (_aggressor != null && !_aggressor.gameObject.activeInHierarchy) _aggressor = null;
     }
 }
