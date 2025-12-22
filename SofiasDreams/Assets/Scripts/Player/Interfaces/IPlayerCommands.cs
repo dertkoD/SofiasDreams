@@ -20,5 +20,7 @@ public interface  IPlayerCommands
 
     void DropPlatform();
 
+    void Interact();
+
     void ApplyDamage(DamageInfo info);
 }

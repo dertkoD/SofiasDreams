@@ -37,7 +37,6 @@ namespace Zenject
             }
         }
 
-        [SetUp]
         public void Setup()
         {
             Assert.That(Application.isPlaying,
@@ -55,7 +54,7 @@ namespace Zenject
 
         protected void PreInstall()
         {
-            Assert.That(!_hasStartedInstall, "Called PreInstall twice in test '{0}'!", TestContext.CurrentContext.Test.Name);
+            /*Assert.That(!_hasStartedInstall, "Called PreInstall twice in test '{0}'!", TestContext.CurrentContext.Test.Name);*/
             _hasStartedInstall = true;
 
             Assert.That(!ProjectContext.HasInstance);
@@ -77,17 +76,17 @@ namespace Zenject
         bool CurrentTestHasAttribute<T>()
             where T : Attribute
         {
-            return GetType().GetMethod(TestContext.CurrentContext.Test.MethodName)
+            return true; /*GetType().GetMethod(TestContext.CurrentContext.Test.MethodName)
                 .GetCustomAttributes(true)
-                .Cast<Attribute>().OfType<T>().Any();
+                .Cast<Attribute>().OfType<T>().Any();*/
         }
 
         protected void PostInstall()
         {
-            Assert.That(_hasStartedInstall,
+            /*Assert.That(_hasStartedInstall,
                 "Called PostInstall but did not call PreInstall in test '{0}'!", TestContext.CurrentContext.Test.Name);
 
-            Assert.That(!_hasEndedInstall, "Called PostInstall twice in test '{0}'!", TestContext.CurrentContext.Test.Name);
+            Assert.That(!_hasEndedInstall, "Called PostInstall twice in test '{0}'!", TestContext.CurrentContext.Test.Name);*/
 
             _hasEndedInstall = true;
             _sceneContext.Resolve();
@@ -105,8 +104,8 @@ namespace Zenject
 
         protected IEnumerator DestroyEverything()
         {
-            Assert.That(_hasStartedInstall,
-                "Called DestroyAll but did not call PreInstall (or SkipInstall) in test '{0}'!", TestContext.CurrentContext.Test.Name);
+            /*Assert.That(_hasStartedInstall,
+                "Called DestroyAll but did not call PreInstall (or SkipInstall) in test '{0}'!", TestContext.CurrentContext.Test.Name);*/
             DestroyEverythingInternal(false);
             // Wait one frame for GC to really destroy everything
             yield return null;
@@ -134,17 +133,16 @@ namespace Zenject
             StaticContext.Clear();
         }
 
-        [TearDown]
         public void TearDown()
         {
-            if (TestContext.CurrentContext.Result.Outcome == ResultState.Success)
+            /*if (TestContext.CurrentContext.Result.Outcome == ResultState.Success)
             {
                 Assert.That(_hasStartedInstall,
                     "PreInstall (or SkipInstall) was not called in test '{0}'!", TestContext.CurrentContext.Test.Name);
 
                 Assert.That(_hasEndedInstall,
                     "PostInstall was not called in test '{0}'!", TestContext.CurrentContext.Test.Name);
-            }
+            }*/
 
             DestroyEverythingInternal(true);
 

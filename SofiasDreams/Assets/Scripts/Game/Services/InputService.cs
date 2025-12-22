@@ -16,4 +16,6 @@ public class InputService : IInputService
     public bool  DashPressed()    => Input.GetKeyDown(KeyCode.LeftShift);
 
     public bool GrapplePressed() => Input.GetKeyDown(KeyCode.E);
+
+    public bool InteractPressed() => Input.GetKeyDown(KeyCode.F);
 }

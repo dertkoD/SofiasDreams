@@ -43,6 +43,7 @@ public class PlayerInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<JumpAttack>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<GrappleHairTrailSprites>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<CameraShakeService>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<PlayerInteractor>().FromComponentOnRoot().AsSingle();
 
         if (moveSO)     Container.BindInstance(moveSO);
         if (jumpSO)     Container.BindInstance(jumpSO);

@@ -101,6 +101,9 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         foreach (var h in hits)
         {
+            var lockComp = h.GetComponentInParent<GrapplePointLock>();
+            if (lockComp != null && lockComp.IsLocked)
+                continue;
             Vector2 p   = h.transform.position;
             Vector2 toP = p - origin;
             float distSq = toP.sqrMagnitude;

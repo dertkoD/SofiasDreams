@@ -21,6 +21,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly Dasher2D       _dasher;
     readonly Grappler2D   _grappler;
     readonly IJumpAttack    _jumpAttack;
+    readonly PlayerInteractor _interactor;
 
     readonly IPlayerAbilityConfigurator _abilityConfigurator;
     readonly HitReactionConfig _hitSO;
@@ -33,7 +34,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         Mover2D mover, Jumper2D jumper,
         ICombat combo,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
-        Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack,
+        Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor,
         IPlayerAbilityConfigurator abilityConfigurator,
         [Inject(Optional = true)] HitReactionConfig hitSO)
     {
@@ -49,6 +50,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _dasher   = dasher;
         _grappler = grappler;
         _jumpAttack = jumpAttack;
+        _interactor = interactor;
         _abilityConfigurator = abilityConfigurator;
         _hitSO     = hitSO;
     }
@@ -69,6 +71,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.Subscribe<DashFinished>(OnDashFinished);
         _bus.Subscribe<PlayerGrappleRequested>(OnGrappleRequested);
         _bus.Subscribe<GrappleFinished>(OnGrappleFinished);
+        _bus.Subscribe<InteractPressed>(OnInteractPressed);
     }
 
     public void Dispose()
@@ -85,6 +88,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.TryUnsubscribe<DashFinished>(OnDashFinished);
         _bus.TryUnsubscribe<PlayerGrappleRequested>(OnGrappleRequested);
         _bus.TryUnsubscribe<GrappleFinished>(OnGrappleFinished);
+        _bus.TryUnsubscribe<InteractPressed>(OnInteractPressed);
+
     }
 
     // ───────────────────── Commands ─────────────────────
@@ -239,6 +244,26 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         // Treat as airborne for logic until grounded signal fires
         _state = PlayerState.Jump;
+    }
+
+    void OnInteractPressed(InteractPressed _)
+    {
+        // Optional: block interacting during states you don't want
+        if (_state == PlayerState.Dead || _state == PlayerState.Hurt || _state == PlayerState.Dash || 
+            _state == PlayerState.Attack || _state == PlayerState.Grapple || _state == PlayerState.Jump ||
+           _state == PlayerState.Heal)
+            return;
+
+        var current = _interactor != null ? _interactor.Current : null;
+        if (current == null) return;
+        if (!current.CanInteract) return;
+
+        current.Interact(_mover != null ? _mover.transform : null);
+    }
+    
+    public void Interact()
+    {
+        _bus.Fire(new InteractPressed());
     }
 
     public void ApplyDamage(DamageInfo info)

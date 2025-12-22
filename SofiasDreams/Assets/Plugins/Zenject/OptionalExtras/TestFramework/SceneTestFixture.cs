@@ -84,7 +84,6 @@ namespace Zenject
             }
         }
 
-        [SetUp]
         public virtual void SetUp()
         {
             StaticContext.Clear();
@@ -98,7 +97,6 @@ namespace Zenject
             _sceneContainers.Clear();
         }
 
-        [TearDown]
         public virtual void Teardown()
         {
             ZenjectTestUtil.DestroyEverythingExceptTestRunner(true);

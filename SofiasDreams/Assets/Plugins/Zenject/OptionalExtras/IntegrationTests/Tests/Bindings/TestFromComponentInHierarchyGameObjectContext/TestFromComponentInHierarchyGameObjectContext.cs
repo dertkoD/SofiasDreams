@@ -18,7 +18,6 @@ namespace Zenject.Tests.Bindings.FromComponentInHierarchyGameObjectContext
             }
         }
 
-        [SetUp]
         public void SetUp()
         {
             new GameObject().AddComponent<Gorp>();

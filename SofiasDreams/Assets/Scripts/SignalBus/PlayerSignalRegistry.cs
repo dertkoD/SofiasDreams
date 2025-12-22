@@ -22,6 +22,7 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<GrappleFinished>();
         container.DeclareSignal<EnemyDiedSignal>();
         container.DeclareSignal<EnemyHit>();
+        container.DeclareSignal<InteractPressed>();
     }
 
     public static void DeclarePlayerSignals(DiContainer container)

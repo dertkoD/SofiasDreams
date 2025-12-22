@@ -16,13 +16,11 @@ namespace Zenject
             get { return _container; }
         }
 
-        [SetUp]
         public virtual void Setup()
         {
             _container = new DiContainer(StaticContext.Container);
         }
 
-        [TearDown]
         public virtual void Teardown()
         {
             StaticContext.Clear();

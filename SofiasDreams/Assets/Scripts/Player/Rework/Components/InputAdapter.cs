@@ -66,6 +66,9 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
         
         if (_input.DashPressed())
             _commands.Dash();
+        
+        if (_input.InteractPressed())
+            _commands.Interact();
     }
 
     void HandleAttack(bool jumpPressedThisFrame)

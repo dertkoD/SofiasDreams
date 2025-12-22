@@ -11,4 +11,6 @@ public interface  IInputService
     bool HealReleased();
     bool DashPressed();
     bool GrapplePressed();
+
+    bool InteractPressed();
 }
