@@ -18,6 +18,7 @@ public class WormBrain : MonoBehaviour
     [SerializeField] VisionCone2D _vision;
     [SerializeField] Health _health;
     [SerializeField] EnemyPatrolPath _patrolPath;
+    [SerializeField] EnemyContactDamage _contactDamage;
 
     [Inject]
     public void Construct(WormConfigSO config, IHealth health)
@@ -64,6 +65,7 @@ public class WormBrain : MonoBehaviour
         if (!_anim) _anim = GetComponentInChildren<WormAnimatorAdapter>(true);
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>(true);
         if (!_health) _health = GetComponent<Health>();
+        if (!_contactDamage) _contactDamage = GetComponent<EnemyContactDamage>();
         
         if (_iHealth == null && _health) _iHealth = _health;
     }
@@ -75,6 +77,8 @@ public class WormBrain : MonoBehaviour
             _lastHp = _health.CurrentHP;
             _health.OnHealthChanged += OnHealthChanged;
         }
+
+        if (_contactDamage) _contactDamage.OnPlayerContact += OnPlayerContact;
         
         // Start in Patrol
         EnterPatrol();
@@ -89,6 +93,7 @@ public class WormBrain : MonoBehaviour
     void OnDisable()
     {
         if (_health) _health.OnHealthChanged -= OnHealthChanged;
+        if (_contactDamage) _contactDamage.OnPlayerContact -= OnPlayerContact;
     }
 
     void Update()
@@ -133,6 +138,27 @@ public class WormBrain : MonoBehaviour
             case State.Stun:
                 TickStun(seesPlayer);
                 break;
+        }
+    }
+
+    void OnPlayerContact()
+    {
+        if (_state == State.Patrol)
+        {
+            // If on a fixed path, we might need to detach or handle it, 
+            // but simply reversing direction is a good start.
+            // If path is active, this flip might be overridden next frame in TickPatrol 
+            // unless we clear the path or handle logic there.
+            // For now, let's assume "Wall Patrol" behavior (null path) or force it.
+            
+            if (_path != null)
+            {
+                // Abort path following to allow free movement/turn
+                _path = null; 
+            }
+
+            _patrolDir *= -1;
+            _motor.Face(_patrolDir);
         }
     }
 
