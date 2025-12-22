@@ -1,7 +1,7 @@
 using UnityEngine;
 using Zenject;
 
-public class WormGroundChecker2D : MonoBehaviour
+public class WormGroundChecker2D : MonoBehaviour, IEnemyGroundChecker
 {
     [Header("Refs")]
     [SerializeField] Rigidbody2D _rb;

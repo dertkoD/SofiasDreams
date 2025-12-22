@@ -6,7 +6,7 @@ using Zenject;
 /// Rigidbody2D.IsTouching(ContactFilter2D) with normal-angle filter,
 /// plus "leaveGroundVelocity" to avoid 1-frame stale grounded after jump starts.
 /// </summary>
-public class JumpingEnemyGroundChecker2D : MonoBehaviour
+public class JumpingEnemyGroundChecker2D : MonoBehaviour, IEnemyGroundChecker
 {
     [Header("Refs")]
     [SerializeField] Rigidbody2D _rb;
