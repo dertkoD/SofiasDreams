@@ -17,6 +17,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     [SerializeField] JumpingEnemyAnimatorAdapter _anim;
     [SerializeField] VisionCone2D _vision;
     [SerializeField] Health _health;
+    [SerializeField] EnemyContactDamage _contactDamage;
     [SerializeField] EnemyPatrolPath _patrolPath;
 
     public void SetPatrolPath(EnemyPatrolPath path)
@@ -87,6 +88,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         _health = GetComponent<Health>();
         _vision = GetComponentInChildren<VisionCone2D>(true);
         _anim = GetComponentInChildren<JumpingEnemyAnimatorAdapter>(true);
+        _contactDamage = GetComponentInChildren<EnemyContactDamage>(true);
         _patrolPath = GetComponentInChildren<EnemyPatrolPath>(true);
     }
 
@@ -96,6 +98,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (!_health) _health = GetComponent<Health>();
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>(true);
         if (!_anim) _anim = GetComponentInChildren<JumpingEnemyAnimatorAdapter>(true);
+        if (!_contactDamage) _contactDamage = GetComponentInChildren<EnemyContactDamage>(true);
         if (!_patrolPath) _patrolPath = GetComponentInChildren<EnemyPatrolPath>(true);
         if (_iHealth == null) _iHealth = _health as IHealth;
 
@@ -118,6 +121,9 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (_health != null)
             _health.OnHealthChanged += OnHealthChanged;
 
+        if (_contactDamage != null)
+            _contactDamage.OnPlayerContact += OnPlayerContact;
+
         if (_bus != null)
             _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
 
@@ -128,6 +134,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_health != null)
             _health.OnHealthChanged -= OnHealthChanged;
+
+        if (_contactDamage != null)
+            _contactDamage.OnPlayerContact -= OnPlayerContact;
 
         if (_bus != null)
             _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
@@ -512,6 +521,14 @@ public class JumpingEnemyBrain : MonoBehaviour
         _lostSightTimerRunning = false;
 
         _motor?.StopAll();
+
+        if (_hasLastSeen && _motor != null)
+        {
+             float dx = _lastSeenPos.x - transform.position.x;
+             if (Mathf.Abs(dx) > 0.01f)
+                 _motor.Face(dx >= 0 ? 1 : -1);
+        }
+
         _jumpBool = false;
         _anim?.SetJump(false);
         _anim?.TriggerAgro();
@@ -643,6 +660,32 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
 
         return _hasChaseDir ? _lastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
+    }
+
+    void OnPlayerContact()
+    {
+        if (_state == State.Dead) return;
+
+        if (_player == null)
+        {
+            var pf = FindObjectOfType<PlayerFacade>();
+            if (pf != null) _player = pf.transform;
+        }
+
+        if (_player != null)
+        {
+            _lastSeenPos = _player.position;
+            _hasLastSeen = true;
+            _hasChaseDir = true;
+            
+            float dx = _lastSeenPos.x - transform.position.x;
+            if (Mathf.Abs(dx) > 0.01f)
+            {
+                _lastChaseDirSign = dx >= 0f ? +1 : -1;
+            }
+        }
+        
+        RequestAggroTrigger();
     }
 
     void OnPlayerSpawned(PlayerSpawned s)
@@ -784,7 +827,22 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             int hp = _health.CurrentHP;
             if (_lastHp != int.MinValue && hp < _lastHp)
+            {
+                if (_health.LastHit != null && _health.LastHit.source != null)
+                {
+                    _lastSeenPos = _health.LastHit.source.position;
+                    _hasLastSeen = true;
+                    _hasChaseDir = true;
+                    
+                    float dx = _lastSeenPos.x - transform.position.x;
+                    if (Mathf.Abs(dx) > 0.01f)
+                    {
+                        _lastChaseDirSign = dx >= 0f ? +1 : -1;
+                    }
+                }
+
                 RequestAggroTrigger();
+            }
             _lastHp = hp;
         }
     }
