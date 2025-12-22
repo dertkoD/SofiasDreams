@@ -35,4 +35,8 @@ public class WormConfigSO : ScriptableObject
     [Range(0f, 180f)] public float minGroundNormalAngle = 80f;
     [Range(0f, 180f)] public float maxGroundNormalAngle = 100f;
     [Min(0f)] public float leaveGroundVelocity = 0.1f;
+
+    [Header("Jump Over Reaction")]
+    [Min(0f)] public float jumpOverRayHeight = 5f;
+    [Min(1f)] public float jumpOverSpeedMultiplier = 2f;
 }

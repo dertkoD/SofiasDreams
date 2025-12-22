@@ -18,8 +18,8 @@ MonoBehaviour:
   patrolTurnWaitTime: 0.5
   windupTime: 0.12
   aggroForgetSeconds: 2
-  chargeSpeed: 5
-  chargeAcceleration: 100
+  chargeSpeed: 10
+  chargeAcceleration: 40
   spinMinDuration: 0.1
   bounceArcDistance: 1.5
   bounceArcHeight: 0.8
@@ -37,3 +37,5 @@ MonoBehaviour:
   minGroundNormalAngle: 80
   maxGroundNormalAngle: 100
   leaveGroundVelocity: 0.1
+  jumpOverRayHeight: 5
+  jumpOverSpeedMultiplier: 2

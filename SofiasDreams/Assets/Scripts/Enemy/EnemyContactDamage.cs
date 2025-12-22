@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class EnemyContactDamage : MonoBehaviour
 {
+    public event System.Action OnPlayerContact;
+
     [SerializeField] private int contactDamage = 1;
     [SerializeField] private LayerMask playerHurtboxLayers;
 
@@ -17,5 +19,6 @@ public class EnemyContactDamage : MonoBehaviour
 
         Vector2 point = other.ClosestPoint(transform.position);
         target.ApplyDamage(contactDamage, point, Vector2.zero, gameObject);
+        OnPlayerContact?.Invoke();
     }
 }
