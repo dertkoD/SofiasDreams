@@ -126,6 +126,16 @@ public class WormMotor2D : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.right * dir, checkDist, _config.solidLayers);
         return hit.collider != null;
     }
+
+    public bool CheckPlayerAbove(float height)
+    {
+        if (_config == null) return false;
+        
+        Vector2 origin = transform.position;
+        // Cast upwards to detect player
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up, height, _config.playerLayer);
+        return hit.collider != null;
+    }
     
     public bool CheckWallHit(out Vector2 normal)
     {
