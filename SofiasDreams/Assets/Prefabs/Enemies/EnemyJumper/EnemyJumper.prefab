@@ -464,7 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baa4fd50ce4af3e458da228b5c23e9df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _facade: {fileID: 0}
+  _facade: {fileID: 2835801810131246883}
   _hitConfig: {fileID: 11400000, guid: 28bf0df47bd434644a5e4a828c4cc7dd, type: 2}
 --- !u!114 &8367457903033415282
 MonoBehaviour:
@@ -480,7 +480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _health: {fileID: 6149265313361646971}
   _movement: {fileID: 0}
-  _facade: {fileID: 0}
+  _facade: {fileID: 2835801810131246883}
   _rb: {fileID: 1128110938766937019}
   _colliders:
   - {fileID: 2865545936965834147}
@@ -633,6 +633,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7425912216409085134
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -651,6 +652,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -672,9 +675,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: -8361217530746402731, guid: 4f2489af4ecdff843b642e599cb2a0f2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
@@ -684,5 +689,4 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
