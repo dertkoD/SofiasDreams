@@ -150,6 +150,20 @@ public class JumpingEnemyBrain : MonoBehaviour
 
         if (!_iHealth.IsAlive)
         {
+            // If dead but in air, keep updating logic until grounded so we can play death animation on ground.
+            // EnemyDeathHandler keeps physics simulated until then.
+            if (_motor != null && !_motor.IsGrounded)
+            {
+                // Disable horizontal self-propulsion
+                _motor.StopHorizontal();
+                _jumpBool = false; 
+                _anim.SetJump(false); // Can trigger falling anim if any
+                
+                // Allow Animator Params to update (so falling anim plays)
+                TickAnimatorParams();
+                return;
+            }
+
             EnterDead();
             return;
         }
@@ -782,4 +796,3 @@ public class JumpingEnemyBrain : MonoBehaviour
         _armedHpWatch = true;
     }
 }
-

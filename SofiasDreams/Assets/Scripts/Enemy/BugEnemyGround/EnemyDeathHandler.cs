@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Zenject;
 
@@ -15,6 +16,7 @@ public class EnemyDeathHandler : MonoBehaviour
 
     SignalBus _bus;
     bool _handled;
+    IEnemyGroundChecker _groundChecker;
 
     [Inject]
     public void Construct(SignalBus bus)
@@ -30,6 +32,8 @@ public class EnemyDeathHandler : MonoBehaviour
         if (_rb == null)          _rb        = GetComponent<Rigidbody2D>();
         if (_colliders == null || _colliders.Length == 0)
             _colliders = GetComponentsInChildren<Collider2D>(true);
+            
+        _groundChecker = GetComponentInChildren<IEnemyGroundChecker>();
     }
 
     void OnEnable()
@@ -63,21 +67,7 @@ public class EnemyDeathHandler : MonoBehaviour
     {
         _handled = true;
 
-        if (_movement != null)
-            _movement.Stop();
-
-        if (_rb != null)
-        {
-            _rb.linearVelocity   = Vector2.zero;
-            _rb.simulated  = false;
-        }
-
-        if (_colliders != null)
-        {
-            foreach (var c in _colliders)
-                if (c) c.enabled = false;
-        }
-
+        // 1. Fire Logic Signal
         if (_facade != null && _bus != null)
         {
             bool killedByPlayer = false;
@@ -99,6 +89,72 @@ public class EnemyDeathHandler : MonoBehaviour
             }
 
             _bus.Fire(new EnemyDiedSignal(_facade, killedByPlayer));
+        }
+        
+        // 2. Stop active movement logic
+        if (_movement != null)
+            _movement.Stop();
+
+        // 3. Determine fall behavior
+        var mode = _movement != null ? _movement.MovementMode : EnemyMovementMode.GroundOnly;
+        
+        if (mode == EnemyMovementMode.Planar2D)
+        {
+            // Flying enemies die in place (or per existing logic)
+            FinalizeDeath();
+        }
+        else
+        {
+            // Ground/Jumping/Worm enemies should fall to ground
+            StartCoroutine(FallAndDieRoutine());
+        }
+    }
+    
+    IEnumerator FallAndDieRoutine()
+    {
+        // Ensure physics is active so it falls
+        if (_rb != null)
+        {
+            _rb.simulated = true;
+            // Note: _movement.Stop() might have zeroed velocity. Gravity should take over.
+        }
+
+        // Wait until grounded
+        if (_groundChecker != null)
+        {
+            // Wait at least one frame to let physics run
+            yield return new WaitForFixedUpdate();
+            
+            float timeout = 5f; // Prevent hanging forever if off-map
+            float timer = 0f;
+            
+            while (!_groundChecker.IsGrounded && timer < timeout)
+            {
+                timer += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
+            }
+        }
+        else
+        {
+            // Fallback: wait a bit for gravity to act if we can't check ground
+             yield return new WaitForSeconds(0.5f);
+        }
+
+        FinalizeDeath();
+    }
+
+    void FinalizeDeath()
+    {
+        if (_rb != null)
+        {
+            _rb.linearVelocity   = Vector2.zero;
+            _rb.simulated  = false;
+        }
+
+        if (_colliders != null)
+        {
+            foreach (var c in _colliders)
+                if (c) c.enabled = false;
         }
 
         Destroy(gameObject, _destroyDelay);
