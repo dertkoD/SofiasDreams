@@ -171,13 +171,6 @@ public class SwarmEnemyBrain : MonoBehaviour
         // Ensure we stop and spawn minions
         _motor.Stop();
         
-        // Face player while spawning
-        if (_hasSeenPlayer && _player != null)
-        {
-             float dx = _player.position.x - transform.position.x;
-             if (Mathf.Abs(dx) > 0.1f) _motor.Face(dx > 0 ? 1 : -1);
-        }
-
         // Check distance for Evasion
         float dist = Vector2.Distance(transform.position, _player.position);
         if (dist < _config.fleeDistance)
