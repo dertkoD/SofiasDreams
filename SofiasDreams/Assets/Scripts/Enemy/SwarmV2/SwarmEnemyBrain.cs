@@ -298,8 +298,23 @@ public class SwarmEnemyBrain : MonoBehaviour
         // Add any parameter updates if needed (e.g. Speed)
     }
     
-    public void SetPatrolPath(EnemyPatrolPath path)
+    void OnDrawGizmosSelected()
     {
-        _patrolPath = path;
+        if (_config != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, _config.visionRadius);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, _config.fleeDistance);
+        }
+        
+        if (_state == State.Evasion)
+        {
+            // Visualize flee destination
+            if (_motor != null && _motor.Velocity.sqrMagnitude > 0.1f)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(transform.position, transform.position + (Vector3)_motor.Velocity);
+            }
+        }
     }
-}
