@@ -231,6 +231,9 @@ public class SwarmEnemyBrain : MonoBehaviour
     {
         _state = State.Evasion;
         // Keep Angry animation
+        
+        // Ensure move starts immediately
+        TickEvasion();
     }
 
     void EnterReturnToPatrol()
