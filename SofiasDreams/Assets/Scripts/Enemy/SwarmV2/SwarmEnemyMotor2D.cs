@@ -74,7 +74,18 @@ public class SwarmEnemyMotor2D : MonoBehaviour
 
     public void Face(int sign)
     {
+        // User requested NOT to flip the main transform scale.
+        // We only flip the _facingTransform IF it is NOT the root transform,
+        // OR we just don't flip at all if that's what is asked.
+        
+        // Assuming the visual sprite is a child object assigned to _facingTransform.
+        // If _facingTransform == transform, then we are flipping the whole object which is bad for children (minions).
+        
         if (!_facingTransform) return;
+        
+        // Safety check: if facing transform IS the root, do nothing to avoid flipping children.
+        if (_facingTransform == transform) return;
+
         sign = sign >= 0 ? 1 : -1;
         var s = _facingTransform.localScale;
         s.x = _baseScaleX * sign;
