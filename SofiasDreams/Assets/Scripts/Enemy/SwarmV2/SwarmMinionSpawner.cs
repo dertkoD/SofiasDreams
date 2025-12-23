@@ -238,6 +238,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         }
 
         // ... (rest of function)
+        int n = Mathf.Max(1, _config.maxMinions);
         float baseDeg = (index % n) * (360f / n);
         float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
         
