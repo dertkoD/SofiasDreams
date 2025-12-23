@@ -128,10 +128,10 @@ public class SwarmEnemyBrain : MonoBehaviour
                 TickPatrol();
                 break;
             case State.Aggro:
-                TickAggro(seesPlayer);
+                TickAggroBehavior(); 
                 break;
             case State.Evasion:
-                TickEvasion();
+                TickAggroBehavior();
                 break;
             case State.ReturnToPatrol:
                 TickReturnToPatrol();
@@ -154,54 +154,7 @@ public class SwarmEnemyBrain : MonoBehaviour
         }
     }
 
-    void TickAggro(bool seesPlayer)
-    {
-        if (!seesPlayer)
-        {
-            _forgetTimer -= Time.deltaTime;
-            if (_forgetTimer <= 0)
-            {
-                EnterReturnToPatrol();
-                return;
-            }
-        }
-
-        if (_player == null) return;
-
-        // Ensure we stop and spawn minions
-        _motor.Stop();
-        
-        // Check distance for Evasion
-        float dist = Vector2.Distance(transform.position, _player.position);
-        if (dist < _config.fleeDistance)
-        {
-            EnterEvasion();
-            return;
-        }
-
-        // Spawner logic is handled by Spawner itself monitoring Aggro state or we call it
-        if (_spawner) _spawner.SetAggroTarget(_player);
-    }
-
-    void TickEvasion()
-    {
-        if (_player == null)
-        {
-            EnterReturnToPatrol();
-            return;
-        }
-
-        // Flee away from player
-        Vector2 dir = (transform.position - _player.position).normalized;
-        Vector2 fleePos = (Vector2)transform.position + dir * 5.0f; // Look ahead 5 units
-        
-        _motor.MoveTo(fleePos, _config.fleeSpeed);
-
-        if (Vector2.Distance(transform.position, _player.position) > _config.fleeDistance * 1.5f)
-        {
-            EnterAggro();
-        }
-    }
+    // Old separate ticks removed in favor of combined TickAggroBehavior
 
     void TickReturnToPatrol()
     {
@@ -226,14 +179,33 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (_animator) _animator.SetTrigger("Angry");
         if (_spawner) _spawner.EnableSpawning(true);
     }
-
-    void EnterEvasion()
+    
+    // Combined Aggro/Evasion behavior
+    void TickAggroBehavior()
     {
-        _state = State.Evasion;
-        // Keep Angry animation
+        if (_player == null) return;
         
-        // Ensure move starts immediately
-        TickEvasion();
+        float dist = Vector2.Distance(transform.position, _player.position);
+
+        // Flee Logic
+        if (dist < _config.fleeDistance)
+        {
+             _state = State.Evasion; // Just for debug/animator state tracking
+             
+             // Flee away
+             Vector2 dir = (transform.position - _player.position).normalized;
+             Vector2 fleePos = (Vector2)transform.position + dir * 5.0f;
+             _motor.MoveTo(fleePos, _config.fleeSpeed);
+        }
+        else
+        {
+            _state = State.Aggro;
+            // Stop and chill, let minions work
+            _motor.Stop();
+        }
+
+        // Spawning Logic (Always active in Aggro/Evasion)
+        if (_spawner) _spawner.SetAggroTarget(_player);
     }
 
     void EnterReturnToPatrol()
@@ -251,8 +223,10 @@ public class SwarmEnemyBrain : MonoBehaviour
     {
         if (_state != State.Dead)
         {
-            // If attacked, flee!
-            EnterEvasion();
+            // If attacked, we are likely close or hit by ranged. 
+            // We ensure we are in Aggro mode so TickAggroBehavior runs and decides to flee if close.
+            if (_state == State.Patrol || _state == State.ReturnToPatrol)
+                EnterAggro();
         }
     }
 
