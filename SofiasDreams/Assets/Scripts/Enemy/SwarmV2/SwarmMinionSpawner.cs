@@ -206,7 +206,10 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_pool.Count == 0) return null;
 
         var m = _pool.Dequeue();
-        if (m.transform.parent != spawnParent) m.transform.SetParent(spawnParent, false);
+        
+        // Detach from parent so Swarm scale (-1) doesn't flip minions
+        m.transform.SetParent(null, false);
+        
         m.gameObject.SetActive(true);
         m.OnSpawn();
 
@@ -263,6 +266,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (m == _currentAggressor) _currentAggressor = null;
 
         m.gameObject.SetActive(false);
+        m.transform.SetParent(spawnParent, false); // Return to parent for tidiness
         _pool.Enqueue(m);
     }
 
