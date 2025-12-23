@@ -12,9 +12,9 @@ public class SwarmConfig : ScriptableObject
     public float stoppingDistance = 0.5f;
 
     [Header("Behavior")]
-    public float visionRadius = 8f;       // «вижу игрока»
-    public float fleeDistance = 3.0f;     // Если игрок ближе, чем это, то убегать (меньше чем vision)
-    public float maintainDistance = 6.0f; // DEPRECATED: теперь мы просто стоим
+    public float visionRadius = 10f;       // «вижу игрока»
+    public float fleeDistance = 3.0f;     // DEPRECATED logic-wise, replaced by maintainDistance
+    public float maintainDistance = 8.0f; // Дистанция, которую пытаемся держать (убегаем, если ближе)
     public float aggroForgetSeconds = 3.0f;
     public float patrolPathSearchRadius = 50f;
     public float waypointArriveDistance = 1.0f;

@@ -187,13 +187,16 @@ public class SwarmEnemyBrain : MonoBehaviour
         
         float dist = Vector2.Distance(transform.position, _player.position);
 
-        // Flee Logic
-        if (dist < _config.fleeDistance)
+        // Flee/Maintain Distance Logic
+        // User wants enemy to move away if it sees the player.
+        // We use maintainDistance as the threshold.
+        if (dist < _config.maintainDistance)
         {
-             _state = State.Evasion; // Just for debug/animator state tracking
+             _state = State.Evasion; 
              
              // Flee away
              Vector2 dir = (transform.position - _player.position).normalized;
+             // Calculate a point further away
              Vector2 fleePos = (Vector2)transform.position + dir * 5.0f;
              _motor.MoveTo(fleePos, _config.fleeSpeed);
         }
