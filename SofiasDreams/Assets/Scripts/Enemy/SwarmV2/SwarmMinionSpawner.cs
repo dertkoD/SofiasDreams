@@ -218,9 +218,26 @@ public class SwarmMinionSpawner : MonoBehaviour
 
     void SetupMinion(MinionBrain m, int index)
     {
-        m.transform.position = transform.position;
+        // Force spawn position to be exact transform position, ensuring no weird offset.
+        // If NavMeshAgent is present, we must Warp it.
+        
+        Vector3 spawnPos = transform.position;
+        
+        m.transform.position = spawnPos;
+        m.transform.rotation = Quaternion.identity;
+        
+        // If minion has a NavMeshAgent, we must warp it to ensure it acknowledges the position change
+        var agent = m.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent)
+        {
+            agent.Warp(spawnPos);
+        }
+        else
+        {
+            m.transform.position = spawnPos;
+        }
 
-        int n = Mathf.Max(1, _config.maxMinions);
+        // ... (rest of function)
         float baseDeg = (index % n) * (360f / n);
         float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
         
