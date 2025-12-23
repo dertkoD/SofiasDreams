@@ -16,6 +16,7 @@ public class SwarmMinionSpawner : MonoBehaviour
     readonly List<MinionBrain>  _active = new();
 
     SwarmConfig _config;
+    DiContainer _container;
     bool _isSpawningEnabled;
     float _nextSpawnAt;
     int _spawnIdxPhase;
@@ -32,9 +33,10 @@ public class SwarmMinionSpawner : MonoBehaviour
     public Transform SquadTarget => _squadTarget;
 
     [Inject]
-    public void Construct(SwarmConfig config)
+    public void Construct(SwarmConfig config, DiContainer container)
     {
         _config = config;
+        _container = container;
     }
 
     void Awake()
@@ -159,7 +161,10 @@ public class SwarmMinionSpawner : MonoBehaviour
     void CreateMinionInPool()
     {
         if (_config.minionPrefab == null) return;
-        var go = Instantiate(_config.minionPrefab, spawnParent);
+        
+        // Use Zenject to instantiate so dependencies (Config, Motor, Brain) are injected
+        GameObject go = _container.InstantiatePrefab(_config.minionPrefab, spawnParent);
+        
         var m = go.GetComponent<MinionBrain>();
         if (m)
         {
