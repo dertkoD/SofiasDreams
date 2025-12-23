@@ -168,6 +168,16 @@ public class SwarmEnemyBrain : MonoBehaviour
 
         if (_player == null) return;
 
+        // Ensure we stop and spawn minions
+        _motor.Stop();
+        
+        // Face player while spawning
+        if (_hasSeenPlayer && _player != null)
+        {
+             float dx = _player.position.x - transform.position.x;
+             if (Mathf.Abs(dx) > 0.1f) _motor.Face(dx > 0 ? 1 : -1);
+        }
+
         // Check distance for Evasion
         float dist = Vector2.Distance(transform.position, _player.position);
         if (dist < _config.fleeDistance)
@@ -176,19 +186,7 @@ public class SwarmEnemyBrain : MonoBehaviour
             return;
         }
 
-        // Maintain distance
-        if (dist > _config.maintainDistance)
-        {
-            _motor.MoveTo(_player.position, _config.aggroSpeed);
-        }
-        else
-        {
-             // Drift/Hover logic could be here, or just stop
-             _motor.Stop();
-        }
-
         // Spawner logic is handled by Spawner itself monitoring Aggro state or we call it
-        // Ideally Spawner has a method UpdateSpawning(target)
         if (_spawner) _spawner.SetAggroTarget(_player);
     }
 
