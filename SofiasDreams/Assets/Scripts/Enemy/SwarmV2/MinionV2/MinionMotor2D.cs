@@ -10,6 +10,7 @@ public class MinionMotor2D : MonoBehaviour
     MinionConfig _config;
     bool _frozen;
     float _baseScaleX;
+    float _baseScaleY;
 
     public bool IsMoving => _agent && !_agent.isStopped && _agent.hasPath;
 
@@ -27,7 +28,9 @@ public class MinionMotor2D : MonoBehaviour
         if (!_facingTransform) _facingTransform = transform;
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
+        _baseScaleY = Mathf.Abs(_facingTransform.localScale.y);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
+        if (_baseScaleY < 0.0001f) _baseScaleY = 1f;
 
         if (_agent)
         {
@@ -46,7 +49,7 @@ public class MinionMotor2D : MonoBehaviour
 
         if (_agent && _agent.velocity.sqrMagnitude > 0.1f)
         {
-            Face(_agent.velocity.x >= 0 ? 1 : -1);
+            RotateTowards(_agent.velocity);
         }
     }
 
@@ -72,20 +75,34 @@ public class MinionMotor2D : MonoBehaviour
         if (frozen) Stop();
     }
 
-    public void Face(int sign)
+    public void RotateTowards(Vector2 dir)
     {
         if (!_facingTransform) return;
-        sign = sign >= 0 ? 1 : -1;
-        var s = _facingTransform.localScale;
-        s.x = _baseScaleX * sign;
+        
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        _facingTransform.rotation = Quaternion.Euler(0, 0, angle);
+
+        // Prevent "upside down" look by flipping Y scale if facing left-ish
+        Vector3 s = _facingTransform.localScale;
+        
+        // Always reset X to positive base since we use rotation now
+        s.x = _baseScaleX;
+        
+        if (Mathf.Abs(angle) > 90f)
+        {
+            s.y = -_baseScaleY;
+        }
+        else
+        {
+            s.y = _baseScaleY;
+        }
+        
         _facingTransform.localScale = s;
     }
 
     public void FaceTowards(Vector2 target)
     {
-        float dx = target.x - transform.position.x;
-        if (Mathf.Abs(dx) > 0.1f)
-            Face(dx > 0 ? 1 : -1);
+        RotateTowards(target - (Vector2)transform.position);
     }
 
     public void Warp(Vector2 position)
