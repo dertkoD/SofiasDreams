@@ -154,10 +154,13 @@ public class MinionBrain : MonoBehaviour
         {
             _stuckFlipCooldown -= Time.deltaTime;
         }
-        else if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
+        else if (_motor.IsStuck(0.1f)) // Threshold squared (0.1^2 is very small, use 0.1 directly if using sqrMagnitude < 0.1)
         {
+             // Wait, IsStuck takes sqr threshold. 0.1 is 0.31 speed.
+             // Let's use 0.1f directly as passed value.
+             
              _orbitDirection *= -1f;
-             _stuckFlipCooldown = 1.0f; // Wait 1s before flipping again
+             _stuckFlipCooldown = 1.0f; 
         }
 
         // 2. Project target ahead on the circle
@@ -171,6 +174,11 @@ public class MinionBrain : MonoBehaviour
         Vector2 target = (Vector2)_owner.transform.position + offset;
 
         // 4. Move there
+        // If stuck, maybe move slightly away from wall first?
+        // But NavMesh should handle it. 
+        // The issue is likely 'IsMoving' check logic:
+        // MinionMotor2D.IsMoving => hasPath and velocity check.
+        // If stuck against wall, velocity is low.
         _motor.MoveTo(target, _config.patrolSpeed);
     }
 

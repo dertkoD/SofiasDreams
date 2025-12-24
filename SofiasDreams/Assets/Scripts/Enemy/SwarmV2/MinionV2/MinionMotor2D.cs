@@ -12,7 +12,14 @@ public class MinionMotor2D : MonoBehaviour
     float _baseScaleX;
     float _baseScaleY;
 
+    // Check if agent is trying to move but not moving fast enough
     public bool IsMoving => _agent && !_agent.isStopped && _agent.hasPath;
+    
+    // Stricter check for stuck logic
+    public bool IsStuck(float thresholdSq = 0.01f)
+    {
+        return IsMoving && _agent.velocity.sqrMagnitude < thresholdSq;
+    }
 
     public Vector2 Velocity => _agent ? (Vector2)_agent.velocity : Vector2.zero;
 
