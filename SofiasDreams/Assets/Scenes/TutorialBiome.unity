@@ -53023,9 +53023,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4194008124286725297, guid: 523bd3e438ad4a84196f3e5dd14fa54f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1125345735}
-    - targetCorrespondingSourceObject: {fileID: 5549637911500226893, guid: 523bd3e438ad4a84196f3e5dd14fa54f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 477008166}
   m_SourcePrefab: {fileID: -5765183769023986340, guid: 523bd3e438ad4a84196f3e5dd14fa54f, type: 3}
 --- !u!19719996 &114340487 stripped
 TilemapCollider2D:
@@ -54271,27 +54268,6 @@ PrefabInstance:
       addedObject: {fileID: 1838316394}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e25cd069c74f6ef49870c52b4f27fc5e, type: 3}
---- !u!1 &477008165 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5549637911500226893, guid: 523bd3e438ad4a84196f3e5dd14fa54f, type: 3}
-  m_PrefabInstance: {fileID: 114340486}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &477008166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 477008165}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fa0352a4d56abd42ad2fc69deb72448, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NavMeshPlus::NavMeshPlus.Components.NavMeshModifierVolume
-  m_Size: {x: 0.98, y: 0.8372817, z: 4}
-  m_Center: {x: 0, y: 0.03855358, z: 0}
-  m_Area: 0
-  m_AffectedAgents: ffffffff
 --- !u!1 &504787512
 GameObject:
   m_ObjectHideFlags: 0
