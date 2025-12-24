@@ -18,6 +18,9 @@ public class SwarmConfig : ScriptableObject
     public float aggroForgetSeconds = 3.0f;
     public float patrolPathSearchRadius = 50f;
     public float waypointArriveDistance = 1.0f;
+    
+    // Moved from MinionConfig
+    public float minionOrbitRadius = 9.0f;
 
     [Header("Spawning (minions)")]
     public int maxMinions = 3;

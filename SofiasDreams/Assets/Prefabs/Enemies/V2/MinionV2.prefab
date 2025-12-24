@@ -165,8 +165,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8836222299079716266, guid: fafb9dc65f75c6c4082c3c9422e11b84,
-    type: 3}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: -8836222299079716266, guid: fafb9dc65f75c6c4082c3c9422e11b84, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -175,7 +175,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &5123599858426812987
 GameObject:
@@ -188,7 +187,10 @@ GameObject:
   - component: {fileID: 2214602140703396017}
   - component: {fileID: 6020281236700647580}
   - component: {fileID: 4891658040325734019}
+  - component: {fileID: 8439520641707823608}
   - component: {fileID: 974530763928110597}
+  - component: {fileID: 3824219234029252913}
+  - component: {fileID: 3768249928059029545}
   - component: {fileID: 1587342956999047592}
   - component: {fileID: 6739814335552437063}
   - component: {fileID: 441412287351680462}
@@ -197,9 +199,6 @@ GameObject:
   - component: {fileID: 3600793028637448167}
   - component: {fileID: 3834917864326008281}
   - component: {fileID: 4241457840446402968}
-  - component: {fileID: 8439520641707823608}
-  - component: {fileID: 3824219234029252913}
-  - component: {fileID: 3768249928059029545}
   - component: {fileID: 5544273943376506240}
   - component: {fileID: 84165035687718964}
   m_Layer: 9
@@ -219,7 +218,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6421789148335544916}
@@ -291,6 +290,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!95 &8439520641707823608
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a197a7094323ffb4a892f6ef5e453d1f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!195 &974530763928110597
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -300,7 +321,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5123599858426812987}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 2
+  m_Radius: 1
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -313,6 +334,43 @@ NavMeshAgent:
   m_BaseOffset: 2
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3824219234029252913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Zenject::Zenject.GameObjectContext
+  _scriptableObjectInstallers: []
+  _monoInstallers:
+  - {fileID: 3768249928059029545}
+  _installerPrefabs: []
+  _autoRun: 1
+  _kernel: {fileID: 0}
+--- !u!114 &3768249928059029545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e27dc3d51482ad44b9f56bed1a6a8ec7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinionInstaller
+  _config: {fileID: 11400000, guid: 23394192b8a39a449b8cea5b9466c2ab, type: 2}
+  _healthConfig: {fileID: 11400000, guid: b288372820536a740853b32f69e16a06, type: 2}
+  _health: {fileID: 441412287351680462}
+  _brain: {fileID: 5544273943376506240}
+  _motor: {fileID: 84165035687718964}
+  _shooter: {fileID: 3600793028637448167}
+  _vision: {fileID: 1587342956999047592}
 --- !u!114 &1587342956999047592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,6 +393,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   faceByScaleX: 1
+  useTransformRotation: 1
   fixedFacingSign: 1
   showGizmos: 1
   gizmoColor: {r: 1, g: 0.9, b: 0, a: 0.35}
@@ -450,64 +509,6 @@ MonoBehaviour:
   - {fileID: 520089046049550604}
   - {fileID: 2337141343044969826}
   _destroyDelay: 1
---- !u!95 &8439520641707823608
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5123599858426812987}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: a197a7094323ffb4a892f6ef5e453d1f, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3824219234029252913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5123599858426812987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Zenject::Zenject.GameObjectContext
-  _scriptableObjectInstallers: []
-  _monoInstallers:
-  - {fileID: 3768249928059029545}
-  _installerPrefabs: []
-  _autoRun: 1
-  _kernel: {fileID: 0}
---- !u!114 &3768249928059029545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5123599858426812987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e27dc3d51482ad44b9f56bed1a6a8ec7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MinionInstaller
-  _config: {fileID: 11400000, guid: 23394192b8a39a449b8cea5b9466c2ab, type: 2}
-  _health: {fileID: 441412287351680462}
-  _brain: {fileID: 5544273943376506240}
-  _motor: {fileID: 84165035687718964}
-  _shooter: {fileID: 3600793028637448167}
-  _vision: {fileID: 1587342956999047592}
 --- !u!114 &5544273943376506240
 MonoBehaviour:
   m_ObjectHideFlags: 0

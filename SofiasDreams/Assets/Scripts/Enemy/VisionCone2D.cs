@@ -13,6 +13,7 @@ public class VisionCone2D : MonoBehaviour
 
     [Header("Facing")]
     public bool faceByScaleX = true;
+    public bool useTransformRotation = false; // New flag to support top-down rotation
     public int fixedFacingSign = 1;
 
     [Header("Debug")]
@@ -89,6 +90,10 @@ public class VisionCone2D : MonoBehaviour
 
     Vector2 GetForward()
     {
+        if (useTransformRotation)
+        {
+            return transform.right;
+        }
         if (faceByScaleX)
         {
             float sign = Mathf.Sign(transform.lossyScale.x);

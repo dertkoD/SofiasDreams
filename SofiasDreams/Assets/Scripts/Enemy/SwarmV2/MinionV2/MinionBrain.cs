@@ -15,9 +15,17 @@ public class MinionBrain : MonoBehaviour
     MinionConfig _config;
     SwarmMinionSpawner _owner;
     Role _currentRole;
+    Collider2D _collider;
     
+    // Aggro/Forget
+    // float _localForgetTimer; // Removed: reliance on squad state
+    bool _canSeeTarget; // Cached vision state
+
     // Patrol
     float _orbitAngle;
+    float _orbitDirection = 1f; // 1 for clockwise, -1 for counter-clockwise
+    float _spawnExitTimer; // Time to just fly away from center before orbiting
+    float _stuckFlipCooldown; // Cooldown for flipping direction when stuck
 
     // Support
     float _supportLateralSide; // 1 or -1
@@ -36,23 +44,43 @@ public class MinionBrain : MonoBehaviour
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>();
         if (!_animator) _animator = GetComponentInChildren<Animator>();
         if (!_health) _health = GetComponent<Health>();
+        
+        _collider = GetComponent<Collider2D>();
+        
+        if (_vision) _vision.useTransformRotation = true;
     }
 
     public void Initialize(SwarmMinionSpawner owner)
     {
         _owner = owner;
+        
+        // Ignore collisions with owner
+        if (_owner && _collider)
+        {
+            var ownerColliders = _owner.GetComponentsInChildren<Collider2D>();
+            foreach (var c in ownerColliders)
+            {
+                if (c && c != _collider)
+                    Physics2D.IgnoreCollision(_collider, c, true);
+            }
+        }
     }
 
     public void OnSpawn()
     {
         _orbitAngle = Random.Range(0f, 360f);
+        _orbitDirection = Random.Range(0, 2) == 0 ? 1f : -1f;
         _supportLateralSide = Random.Range(0, 2) == 0 ? 1f : -1f;
         _currentRole = Role.Patrol;
-        
-        // Revive Logic if needed? Health component usually needs reset if pooled manually without Zenject MemoryPool
-        // Assuming Health handles itself on Enable or we might need to reset it.
-        // If Health is Monobehaviour and not destroyed, we should check if it needs reset.
-        // For now assume standard usage.
+        // _localForgetTimer = 0f; // Removed
+        _spawnExitTimer = 0.5f; // Give 0.5s to exit spawn area
+
+        // Ensure health is full when spawned from pool
+        if (_health)
+        {
+            if (_health.CanHeal())
+                _health.Heal(_health.MaxHP);
+        }
     }
 
     void OnEnable()
@@ -71,11 +99,14 @@ public class MinionBrain : MonoBehaviour
         if (!_health.IsAlive) return;
 
         // Vision Check
-        if (_vision && _vision.TryGetClosestTarget(out var seenTarget))
+        Transform seenTarget = null;
+        _canSeeTarget = _vision && _vision.TryGetClosestTarget(out seenTarget);
+        if (_canSeeTarget)
         {
             _owner.ReportEnemySeen(seenTarget);
         }
 
+        // Behavior: Always follow role assigned by Squad Leader
         switch (_currentRole)
         {
             case Role.Patrol:
@@ -88,26 +119,66 @@ public class MinionBrain : MonoBehaviour
                 TickSupport();
                 break;
         }
-
-        // Animator logic (simple)
-        if (_animator)
-        {
-            // _animator.SetBool("Aggro", _currentRole != Role.Patrol); // Removed as parameter does not exist
-        }
     }
 
     void TickPatrol()
     {
         if (_config == null) return;
 
-        // Orbit around owner
-        _orbitAngle += _config.orbitSpeed * Time.deltaTime * Mathf.Rad2Deg; // config speed in rad/s, we use degrees for trig if needed or just mult
-        // actually Mathf.Cos takes radians.
-        
-        float rads = _orbitAngle * Mathf.Deg2Rad;
-        Vector2 offset = new Vector2(Mathf.Cos(rads), Mathf.Sin(rads)) * _config.orbitRadius;
+        // Spawn Exit Logic
+        if (_spawnExitTimer > 0f)
+        {
+            _spawnExitTimer -= Time.deltaTime;
+            if (_owner != null)
+            {
+                Vector2 dir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
+                if (dir == Vector2.zero) dir = Random.insideUnitCircle.normalized;
+                
+                float initialOrbitRadius = _owner.MinionOrbitRadius;
+                Vector2 targetPos = (Vector2)_owner.transform.position + dir * initialOrbitRadius;
+                _motor.MoveTo(targetPos, _config.patrolSpeed);
+            }
+            return;
+        }
+
+        if (_owner == null) return;
+
+        // Reactive Orbit Logic:
+        // 1. Calculate current angle from owner
+        Vector2 toMinion = (Vector2)transform.position - (Vector2)_owner.transform.position;
+        float currentAngleRad = Mathf.Atan2(toMinion.y, toMinion.x);
+        float orbitRadius = _owner.MinionOrbitRadius;
+
+        // Check if stuck
+        if (_stuckFlipCooldown > 0f)
+        {
+            _stuckFlipCooldown -= Time.deltaTime;
+        }
+        else if (_motor.IsStuck(0.1f)) // Threshold squared (0.1^2 is very small, use 0.1 directly if using sqrMagnitude < 0.1)
+        {
+             // Wait, IsStuck takes sqr threshold. 0.1 is 0.31 speed.
+             // Let's use 0.1f directly as passed value.
+             
+             _orbitDirection *= -1f;
+             _stuckFlipCooldown = 1.0f; 
+        }
+
+        // 2. Project target ahead on the circle
+        // Tangential speed = patrolSpeed. Angular speed = v / r
+        float angularSpeed = _config.patrolSpeed / Mathf.Max(0.1f, orbitRadius);
+        float lookAheadTime = 0.5f; // Look ahead 0.5s
+        float nextAngleRad = currentAngleRad + (angularSpeed * _orbitDirection * lookAheadTime);
+
+        // 3. Calculate target position
+        Vector2 offset = new Vector2(Mathf.Cos(nextAngleRad), Mathf.Sin(nextAngleRad)) * orbitRadius;
         Vector2 target = (Vector2)_owner.transform.position + offset;
 
+        // 4. Move there
+        // If stuck, maybe move slightly away from wall first?
+        // But NavMesh should handle it. 
+        // The issue is likely 'IsMoving' check logic:
+        // MinionMotor2D.IsMoving => hasPath and velocity check.
+        // If stuck against wall, velocity is low.
         _motor.MoveTo(target, _config.patrolSpeed);
     }
 
@@ -118,29 +189,28 @@ public class MinionBrain : MonoBehaviour
 
         float dist = Vector2.Distance(transform.position, target.position);
         
-        // Movement
-        if (dist > _config.attackDistance)
+        // Strict distance maintenance
+        if (dist > _config.attackDistance + 0.5f)
         {
+            // Move Closer
             _motor.MoveTo(target.position, _config.aggroSpeed);
         }
-        else if (dist < _config.attackBackoffDistance)
+        else if (dist < _config.attackDistance - 0.5f)
         {
-            // Back off
+            // Back off (move away from target)
             Vector2 dir = (transform.position - target.position).normalized;
-            Vector2 dest = (Vector2)target.position + dir * _config.attackDistance;
+            // Target specific point away
+            Vector2 dest = (Vector2)target.position + dir * (_config.attackDistance + 1.0f);
             _motor.MoveTo(dest, _config.aggroSpeed);
         }
         else
         {
-            // In range
+            // In optimal range
             _motor.Stop();
         }
         
         _motor.FaceTowards(target.position);
 
-        // Shoot
-        // Uses shootRange or detectRange if shootRange missing (config update needed)
-        // But we added shootRange to config.
         if (dist < _config.shootRange)
         {
             _shooter.TryFireAt(target.position);
@@ -152,39 +222,39 @@ public class MinionBrain : MonoBehaviour
         Transform target = _owner.SquadTarget;
         if (target == null) return;
 
-        Vector2 toTarget = (Vector2)target.position - (Vector2)transform.position;
-        Vector2 dirToTarget = toTarget.normalized;
+        // Halfway between Swarm and Aggressor
+        Vector2 p1 = _owner.transform.position;
+        Vector2 p2 = p1;
         
-        // Perpendicular vector for lateral offset
-        Vector2 perp = new Vector2(-dirToTarget.y, dirToTarget.x) * _supportLateralSide;
+        if (_owner.CurrentAggressor != null)
+        {
+            p2 = _owner.CurrentAggressor.transform.position;
+        }
+        else
+        {
+            // Fallback if no aggressor (unlikely in Aggro state, but possible)
+            // Use target position as proxy
+            p2 = target.position;
+        }
 
-        // Desired position: Target position - direction * supportDistance + perp * spread
-        // Actually we want to stay AT supportDistance FROM target.
-        // So target.position - dirToTarget * supportDistance...
-        // But dirToTarget changes as we move.
-        // Let's use the vector from Target TO Us to determine the "Sector".
+        Vector2 midPoint = (p1 + p2) * 0.5f;
+
+        // Add some jitter/spread so they don't stack perfectly
+        // We can use the _supportLateralSide and orbit logic here too, or just simple offset
+        // Let's use the offset from center relative to target direction
+        Vector2 dirToTarget = ((Vector2)target.position - midPoint).normalized;
+        Vector2 perp = new Vector2(-dirToTarget.y, dirToTarget.x) * _supportLateralSide * _config.supportLateralSpread;
+
+        Vector2 desiredPos = midPoint + perp;
         
-        // Simply: Stay at supportDistance, offset by lateral spread relative to line of sight
-        // Target - (DirectionFromTarget * Distance) + Lateral
-        
-        // Direction from Target to Minion
-        Vector2 dirFromTarget = ((Vector2)transform.position - (Vector2)target.position).normalized;
-        if (dirFromTarget == Vector2.zero) dirFromTarget = Vector2.right;
-        
-        Vector2 desiredPos = (Vector2)target.position + dirFromTarget * _config.supportDistance;
-        
-        // Add some lateral movement (orbiting slowly?)
-        // Let's just hold position relative to player
-        
-        _motor.MoveTo(desiredPos, _config.patrolSpeed); // Use patrol speed for support movement
+        _motor.MoveTo(desiredPos, _config.patrolSpeed);
         _motor.FaceTowards(target.position);
 
-        // Shoot occasionally
+        // Shoot occasionally if in range and line of sight
+        float distToTarget = Vector2.Distance(transform.position, target.position);
         if (Time.time > _nextSupportFireTime)
         {
-             // Check if we have line of sight or distance is reasonable
-             // Using visionRadius as generic "detect" range if VisionCone not available directly for target check
-             if (toTarget.magnitude < _config.visionRadius) 
+             if (_canSeeTarget && distToTarget < _config.shootRange) 
              {
                  _shooter.TryFireAt(target.position);
              }
@@ -200,6 +270,12 @@ public class MinionBrain : MonoBehaviour
             if (role == Role.Support)
             {
                 _nextSupportFireTime = Time.time + Random.Range(0.5f, 1.5f);
+            }
+            // Reset orbit angle when switching back to Patrol so we don't fly across map
+            if (role == Role.Patrol && _owner != null)
+            {
+                // No state reset needed for new reactive logic
+                _spawnExitTimer = 0f; 
             }
         }
     }

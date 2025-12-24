@@ -24,6 +24,7 @@ MonoBehaviour:
   aggroForgetSeconds: 3
   patrolPathSearchRadius: 50
   waypointArriveDistance: 1
+  minionOrbitRadius: 6.5
   maxMinions: 3
   spawnInterval: 1.5
   poolInitialSize: 5

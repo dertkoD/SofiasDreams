@@ -11,7 +11,6 @@ public class MinionConfig : ScriptableObject
     public float stoppingDistance = 0.5f;
 
     [Header("Patrol (Orbit)")]
-    public float orbitRadius = 3.0f;
     public float orbitSpeed = 2.0f; // radians/sec
 
     [Header("Roles - Aggressor")]

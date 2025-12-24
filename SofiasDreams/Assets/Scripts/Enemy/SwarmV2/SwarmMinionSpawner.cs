@@ -31,6 +31,9 @@ public class SwarmMinionSpawner : MonoBehaviour
     public bool HasAggressor => _currentAggressor && _currentAggressor.gameObject.activeInHierarchy;
     public bool IsSquadAggro => _squadInAggro;
     public Transform SquadTarget => _squadTarget;
+    public MinionBrain CurrentAggressor => _currentAggressor;
+
+    public float MinionOrbitRadius => _config != null ? _config.minionOrbitRadius : 3.0f;
 
     [Inject]
     public void Construct(SwarmConfig config, DiContainer container)
@@ -187,6 +190,8 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (m != null)
         {
             SetupMinion(m, _spawnIdxPhase++);
+            m.gameObject.SetActive(true);
+            m.OnSpawn();
             _active.Add(m);
             _nextSpawnAt = Time.time + _config.spawnInterval;
         }
@@ -198,33 +203,32 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_pool.Count == 0) return null;
 
         var m = _pool.Dequeue();
-        m.transform.SetParent(null, false);
-        m.gameObject.SetActive(true);
-        m.OnSpawn();
-
+        m.transform.SetParent(null); // Detach parent but keep pos/rot/scale
         return m;
     }
 
     void SetupMinion(MinionBrain m, int index)
     {
-        Vector3 spawnPos = transform.position;
+        // Distribute spawn points around the Swarm to prevent stacking
+        float spawnRadius = 5.0f; // Spawn outside Swarm body (radius ~3.8)
+        float angle = index * (360f / 3f) * Mathf.Deg2Rad; // 3 directions: 0, 120, 240
+        Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * spawnRadius;
+        
+        Vector3 spawnPos = transform.position + offset;
+        
+        // Since minion is inactive, we can just set transform position.
+        // If it has NavMeshAgent, it will pick up this position when enabled.
         m.transform.position = spawnPos;
         m.transform.rotation = Quaternion.identity;
         
+        // No need to Warp if inactive
         var agent = m.GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent)
         {
-            agent.Warp(spawnPos);
-        }
-        else
-        {
-            m.transform.position = spawnPos;
+            // Reset velocity just in case
+            agent.velocity = Vector3.zero;
         }
 
-        int n = Mathf.Max(1, _config.maxMinions);
-        float baseDeg = (index % n) * (360f / n);
-        float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
-        
         RaiseSortingAboveSwarm(m.gameObject, sortingOrderOffset);
     }
 

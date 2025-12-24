@@ -97,6 +97,8 @@ public class SwarmEnemyBrain : MonoBehaviour
             {
                 _player = _health.LastHit.source;
             }
+            
+            _forgetTimer = _config.aggroForgetSeconds;
             // Trigger Evasion immediately
         }
 
@@ -118,6 +120,14 @@ public class SwarmEnemyBrain : MonoBehaviour
             if (_state != State.Aggro && _state != State.Evasion)
             {
                 EnterAggro();
+            }
+        }
+        else if (_state == State.Aggro || _state == State.Evasion)
+        {
+            _forgetTimer -= Time.deltaTime;
+            if (_forgetTimer <= 0f)
+            {
+                EnterReturnToPatrol();
             }
         }
 
@@ -310,6 +320,10 @@ public class SwarmEnemyBrain : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, _config.visionRadius);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, _config.fleeDistance);
+            
+            // Draw Minion Orbit Radius
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, _config.minionOrbitRadius);
         }
 
         if (_state == State.Evasion)
