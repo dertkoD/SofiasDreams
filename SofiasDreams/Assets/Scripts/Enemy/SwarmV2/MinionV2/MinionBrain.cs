@@ -70,7 +70,8 @@ public class MinionBrain : MonoBehaviour
         if (!_health.IsAlive) return;
 
         // Vision Check
-        bool seesTarget = _vision && _vision.TryGetClosestTarget(out var seenTarget);
+        Transform seenTarget = null;
+        bool seesTarget = _vision && _vision.TryGetClosestTarget(out seenTarget);
         if (seesTarget)
         {
             _owner.ReportEnemySeen(seenTarget);
