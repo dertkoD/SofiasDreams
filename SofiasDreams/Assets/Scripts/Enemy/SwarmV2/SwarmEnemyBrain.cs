@@ -12,8 +12,7 @@ public class SwarmEnemyBrain : MonoBehaviour
         Dead
     }
 
-    [Header("Refs")]
-    [SerializeField] SwarmEnemyMotor2D _motor;
+    [Header("Refs")] [SerializeField] SwarmEnemyMotor2D _motor;
     [SerializeField] SwarmMinionSpawner _spawner;
     [SerializeField] VisionCone2D _vision;
     [SerializeField] EnemyPatrolPath _patrolPath;
@@ -23,7 +22,7 @@ public class SwarmEnemyBrain : MonoBehaviour
     SwarmConfig _config;
     Transform _player;
     State _state;
-    
+
     // Patrol
     int _pathIndex;
     int _pathDir = 1;
@@ -87,8 +86,8 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (_health == null) return;
         if (!_health.IsAlive)
         {
-             OnDeath();
-             return;
+            OnDeath();
+            return;
         }
 
         if (_health.LastHit != null && _health.LastHit.source != null)
@@ -128,7 +127,7 @@ public class SwarmEnemyBrain : MonoBehaviour
                 TickPatrol();
                 break;
             case State.Aggro:
-                TickAggroBehavior(); 
+                TickAggroBehavior();
                 break;
             case State.Evasion:
                 TickAggroBehavior();
@@ -179,12 +178,12 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (_animator) _animator.SetTrigger("Angry");
         if (_spawner) _spawner.EnableSpawning(true);
     }
-    
+
     // Combined Aggro/Evasion behavior
     void TickAggroBehavior()
     {
         if (_player == null) return;
-        
+
         float dist = Vector2.Distance(transform.position, _player.position);
 
         // Flee/Maintain Distance Logic
@@ -192,13 +191,13 @@ public class SwarmEnemyBrain : MonoBehaviour
         // We use maintainDistance as the threshold.
         if (dist < _config.maintainDistance)
         {
-             _state = State.Evasion; 
-             
-             // Flee away
-             Vector2 dir = (transform.position - _player.position).normalized;
-             // Calculate a point further away
-             Vector2 fleePos = (Vector2)transform.position + dir * 5.0f;
-             _motor.MoveTo(fleePos, _config.fleeSpeed);
+            _state = State.Evasion;
+
+            // Flee away
+            Vector2 dir = (transform.position - _player.position).normalized;
+            // Calculate a point further away
+            Vector2 fleePos = (Vector2)transform.position + dir * 5.0f;
+            _motor.MoveTo(fleePos, _config.fleeSpeed);
         }
         else
         {
@@ -216,7 +215,7 @@ public class SwarmEnemyBrain : MonoBehaviour
         _state = State.ReturnToPatrol;
         if (_animator) _animator.SetTrigger("Idle");
         if (_spawner) _spawner.EnableSpawning(false);
-        
+
         // Find nearest waypoint to resume
         if (_patrolPath != null)
             _pathIndex = FindNearestWaypointIndex(transform.position);
@@ -240,7 +239,7 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (_animator) _animator.SetTrigger("Death");
         if (_spawner) _spawner.EnableSpawning(false);
         if (_spawner) _spawner.KillAllMinionsAnimated();
-        
+
         enabled = false;
     }
 
@@ -255,8 +254,8 @@ public class SwarmEnemyBrain : MonoBehaviour
         var all = FindObjectsOfType<EnemyPatrolPath>();
         EnemyPatrolPath best = null;
         float minDist = float.MaxValue;
-        
-        foreach(var p in all)
+
+        foreach (var p in all)
         {
             float d = Vector2.Distance(transform.position, p.transform.position);
             if (d < minDist && d < _config.patrolPathSearchRadius)
@@ -265,6 +264,7 @@ public class SwarmEnemyBrain : MonoBehaviour
                 best = p;
             }
         }
+
         return best;
     }
 
@@ -273,7 +273,7 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (_patrolPath == null) return 0;
         int best = 0;
         float minDist = float.MaxValue;
-        for(int i=0; i<_patrolPath.Count; i++)
+        for (int i = 0; i < _patrolPath.Count; i++)
         {
             float d = Vector2.Distance(pos, _patrolPath.GetPoint(i));
             if (d < minDist)
@@ -282,6 +282,7 @@ public class SwarmEnemyBrain : MonoBehaviour
                 best = i;
             }
         }
+
         return best;
     }
 
@@ -300,7 +301,7 @@ public class SwarmEnemyBrain : MonoBehaviour
     {
         // Add any parameter updates if needed (e.g. Speed)
     }
-    
+
     void OnDrawGizmosSelected()
     {
         if (_config != null)
@@ -310,7 +311,7 @@ public class SwarmEnemyBrain : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, _config.fleeDistance);
         }
-        
+
         if (_state == State.Evasion)
         {
             // Visualize flee destination
@@ -321,3 +322,4 @@ public class SwarmEnemyBrain : MonoBehaviour
             }
         }
     }
+}

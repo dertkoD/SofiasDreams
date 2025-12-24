@@ -19,6 +19,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
     readonly Knockback2D _knockback;
     readonly Dasher2D _dasher;
     readonly Grappler2D _grappler;
+    readonly IPlayerAbilities _abilities;
 
     readonly PlayerMovementConfig _movementConfig;
     readonly PlayerJumpConfig _jumpConfig;
@@ -40,6 +41,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         Knockback2D knockback,
         Dasher2D dasher,
         Grappler2D grappler,
+        IPlayerAbilities abilities,
         [Inject(Optional = true)] PlayerMovementConfig movementConfig,
         [Inject(Optional = true)] PlayerJumpConfig jumpConfig,
         [Inject(Optional = true)] PlayerAttackConfig attackConfig,
@@ -59,6 +61,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         _knockback = knockback;
         _dasher = dasher;
         _grappler = grappler;
+        _abilities = abilities;
         _movementConfig = movementConfig;
         _jumpConfig = jumpConfig;
         _attackConfig = attackConfig;
@@ -151,6 +154,9 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
             accel = _dashConfig.accel,
             decel = _dashConfig.decel
         });
+        
+        if (_dashConfig.startUnlocked)
+            _abilities?.GrantDash();
     }
 
     void ConfigureGrapple()

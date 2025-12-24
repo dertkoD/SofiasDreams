@@ -47,6 +47,9 @@ public class EnemyStateMachine : MonoBehaviour
 
     void Update()
     {
+        if (EnemyCombatGate.IsBonfireSafe)
+            return;
+        
         _current?.Tick();
     }
 

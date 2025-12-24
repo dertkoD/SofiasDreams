@@ -22,7 +22,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly Grappler2D   _grappler;
     readonly IJumpAttack    _jumpAttack;
     readonly PlayerInteractor _interactor;
-
+    
+    readonly IPlayerAbilities _abilities;
     readonly IPlayerAbilityConfigurator _abilityConfigurator;
     readonly HitReactionConfig _hitSO;
 
@@ -34,25 +35,26 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         Mover2D mover, Jumper2D jumper,
         ICombat combo,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
-        Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor,
-        IPlayerAbilityConfigurator abilityConfigurator,
+        Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor, 
+        IPlayerAbilities abilities, IPlayerAbilityConfigurator abilityConfigurator,
         [Inject(Optional = true)] HitReactionConfig hitSO)
     {
-        _bus      = bus;
-        _gate     = gate;
-        _mover    = mover;
-        _jumper   = jumper;
-        _combo    = combo;
-        _healer   = healer;
-        _health   = health;
-        _knock    = knock;
-        _anim     = anim;
-        _dasher   = dasher;
-        _grappler = grappler;
-        _jumpAttack = jumpAttack;
-        _interactor = interactor;
+        _bus                 = bus;
+        _gate                = gate;
+        _mover               = mover;
+        _jumper              = jumper;
+        _combo               = combo;
+        _healer              = healer;
+        _health              = health;
+        _knock               = knock;
+        _anim                = anim;
+        _dasher              = dasher;
+        _grappler            = grappler;
+        _jumpAttack          = jumpAttack;
+        _interactor          = interactor;
+        _abilities           = abilities;
         _abilityConfigurator = abilityConfigurator;
-        _hitSO     = hitSO;
+        _hitSO               = hitSO;
     }
 
     public void Initialize()
@@ -72,6 +74,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.Subscribe<PlayerGrappleRequested>(OnGrappleRequested);
         _bus.Subscribe<GrappleFinished>(OnGrappleFinished);
         _bus.Subscribe<InteractPressed>(OnInteractPressed);
+        _bus.Subscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
     }
 
     public void Dispose()
@@ -89,6 +92,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.TryUnsubscribe<PlayerGrappleRequested>(OnGrappleRequested);
         _bus.TryUnsubscribe<GrappleFinished>(OnGrappleFinished);
         _bus.TryUnsubscribe<InteractPressed>(OnInteractPressed);
+        _bus.TryUnsubscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
 
     }
 
@@ -96,7 +100,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void Move(float x)
     {
-        if (_state == PlayerState.Dead || _state == PlayerState.Dash) 
+        if (_state == PlayerState.Dead || _state == PlayerState.Dash || _state == PlayerState.BonfireRest) 
             return;
         
         _moveX = x;
@@ -134,7 +138,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _state == PlayerState.Heal ||
             _state == PlayerState.Dash ||
             _state == PlayerState.Attack ||
-            _state == PlayerState.Grapple)
+            _state == PlayerState.Grapple ||
+            _state == PlayerState.BonfireRest)
             return;
         
         if (_gate.IsJumpBlocked) return;
@@ -145,7 +150,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     
     public void JumpRelease()
     {
-        if (_state == PlayerState.Dead)
+        if (_state == PlayerState.Dead || _state == PlayerState.BonfireRest)
             return;
 
         if (_gate.IsJumpBlocked)
@@ -157,7 +162,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void Attack()
     {
         if (_state == PlayerState.Dead) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest) return;
         
         if (_jumper.IsGrounded)
         {
@@ -172,7 +177,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void UpAttack()
     {
         if (_state == PlayerState.Dead) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest) return;
 
         if (_jumper.IsGrounded)
         {
@@ -193,7 +198,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void ForwardJumpAttack()
     {
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest) return;
 
         _jumpAttack.Request(AttackMode.AirFwd);
     }
@@ -201,7 +206,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void UpJumpAttack()
     {
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest) return;
 
         _jumpAttack.Request(AttackMode.AirUp);
     }
@@ -209,14 +214,14 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void DownJumpAttack()
     {
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest) return;
 
         _jumpAttack.Request(AttackMode.AirDown);
     }
 
     public void HealBegin()
     {
-        if (_state == PlayerState.Dead || _state == PlayerState.Hurt)
+        if (_state == PlayerState.Dead || _state == PlayerState.Hurt || _state == PlayerState.BonfireRest)
             return;
 
         _healer.StartHeal();
@@ -234,7 +239,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _state == PlayerState.Heal ||
             _state == PlayerState.Attack ||
             _state == PlayerState.Dash ||
-            _state == PlayerState.Grapple)
+            _state == PlayerState.Grapple ||
+            _state == PlayerState.BonfireRest)
             return;
 
         if (!_jumper.IsGrounded)
@@ -248,17 +254,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     void OnInteractPressed(InteractPressed _)
     {
-        // Optional: block interacting during states you don't want
-        if (_state == PlayerState.Dead || _state == PlayerState.Hurt || _state == PlayerState.Dash || 
-            _state == PlayerState.Attack || _state == PlayerState.Grapple || _state == PlayerState.Jump ||
-           _state == PlayerState.Heal)
+        
+        if (_state == PlayerState.Dead || _state == PlayerState.Hurt || _state == PlayerState.Dash ||
+            _state == PlayerState.Attack || _state == PlayerState.Grapple || _state == PlayerState.Heal)
             return;
 
-        var current = _interactor != null ? _interactor.Current : null;
-        if (current == null) return;
-        if (!current.CanInteract) return;
-
-        current.Interact(_mover != null ? _mover.transform : null);
+        bool ok = _interactor != null && _interactor.TryInteract(_mover.transform);
+        Debug.Log("[Interact] TryInteract => " + ok);
     }
     
     public void Interact()
@@ -268,7 +270,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void ApplyDamage(DamageInfo info)
     {
-        if (_state == PlayerState.Dead)
+        if (EnemyCombatGate.IsBonfireSafe)
+            return;
+        
+        if (_state == PlayerState.Dead || _state == PlayerState.BonfireRest)
             return;
 
         if (_health.IsInvincible && !info.bypassInvuln)
@@ -309,10 +314,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void Dash()
     {
-        if (_state == PlayerState.Dead) return;
-        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Attack or PlayerState.Dash or PlayerState.Grapple)
-            return;
-
+        if (_state is PlayerState.Heal or PlayerState.Dead or PlayerState.BonfireRest 
+            or PlayerState.Hurt or PlayerState.Attack 
+            or PlayerState.Dash or PlayerState.Grapple) return;
+        
+        if (_abilities != null && !_abilities.HasDash)  return;
+        
         float dir = Mathf.Abs(_moveX) > 0.01f
             ? Mathf.Sign(_moveX)
             : 0f;                       
@@ -451,7 +458,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _state == PlayerState.Hurt ||
             _state == PlayerState.Heal ||
             _state == PlayerState.Dash ||
-            _state == PlayerState.Attack)
+            _state == PlayerState.Attack ||
+            _state == PlayerState.BonfireRest)
             return;
 
         if (_grappler.IsGrappling)
@@ -476,6 +484,39 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
         else
             _state = PlayerState.Jump;
+    }
+    
+    void OnBonfireRestStateChanged(BonfireRestStateChanged s)
+    {
+        if (s.IsResting)
+        {
+            // lock player completely
+            _state = PlayerState.BonfireRest;
+
+            _mover.SetInput(0f);
+            _mover.StopHorizontal();
+
+            if (_healer != null && _healer.IsHealing)
+                _healer.CancelHealing();
+
+            _combo?.Interrupt();
+
+            _gate.BlockMovement(MobilityBlockReason.Bonfire);
+            _gate.BlockJump(MobilityBlockReason.Bonfire);
+
+            // restore resources on ENTER
+            _health.Heal(999);                 // full heal (safe)
+            _healer.RestoreChargesToMax();     // you already have this method
+        }
+        else
+        {
+            // unlock
+            _gate.UnblockMovement(MobilityBlockReason.Bonfire);
+            _gate.UnblockJump(MobilityBlockReason.Bonfire);
+
+            if (_state == PlayerState.BonfireRest)
+                _state = PlayerState.Idle;
+        }
     }
 
     // ───────────────────── Local ─────────────────────
