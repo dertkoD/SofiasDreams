@@ -137,46 +137,49 @@ public class MinionBrain : MonoBehaviour
         if (_spawnExitTimer > 0f)
         {
             _spawnExitTimer -= Time.deltaTime;
-            // Simply move away from owner's center to get to orbit radius
             if (_owner != null)
             {
                 Vector2 dir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
                 if (dir == Vector2.zero) dir = Random.insideUnitCircle.normalized;
                 
-                // Move towards orbit radius
                 float initialOrbitRadius = _owner.MinionOrbitRadius;
                 Vector2 targetPos = (Vector2)_owner.transform.position + dir * initialOrbitRadius;
                 _motor.MoveTo(targetPos, _config.patrolSpeed);
                 
-                // Recalculate orbit angle so we transition smoothly
                 if (_spawnExitTimer <= 0f)
                 {
-                    Vector2 currentDir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
-                    _orbitAngle = Mathf.Atan2(currentDir.y, currentDir.x) * Mathf.Rad2Deg;
+                    // No need for orbit angle state, we calculate dynamically
                 }
             }
             return;
         }
 
-        // Logic for reversing orbit on obstacle:
-        // We can check if we are stuck.
+        if (_owner == null) return;
+
+        // Reactive Orbit Logic:
+        // 1. Calculate current angle from owner
+        Vector2 toMinion = (Vector2)transform.position - (Vector2)_owner.transform.position;
+        float currentAngleRad = Mathf.Atan2(toMinion.y, toMinion.x);
+        float currentDist = toMinion.magnitude;
+        float orbitRadius = _owner.MinionOrbitRadius;
+
+        // Check if stuck
         if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
         {
-             // Maybe stuck?
-             // Flip orbit direction
              _orbitDirection *= -1f;
         }
 
-        // Orbit around owner
-        _orbitAngle += _config.orbitSpeed * _orbitDirection * Time.deltaTime * Mathf.Rad2Deg;
-        
-        float rads = _orbitAngle * Mathf.Deg2Rad;
-        // Access orbit radius from Swarm Spawner
-        float orbitRadius = _owner != null ? _owner.MinionOrbitRadius : 3.0f;
-        
-        Vector2 offset = new Vector2(Mathf.Cos(rads), Mathf.Sin(rads)) * orbitRadius;
+        // 2. Project target ahead on the circle
+        // Tangential speed = patrolSpeed. Angular speed = v / r
+        float angularSpeed = _config.patrolSpeed / Mathf.Max(0.1f, orbitRadius);
+        float lookAheadTime = 0.5f; // Look ahead 0.5s
+        float nextAngleRad = currentAngleRad + (angularSpeed * _orbitDirection * lookAheadTime);
+
+        // 3. Calculate target position
+        Vector2 offset = new Vector2(Mathf.Cos(nextAngleRad), Mathf.Sin(nextAngleRad)) * orbitRadius;
         Vector2 target = (Vector2)_owner.transform.position + offset;
 
+        // 4. Move there
         _motor.MoveTo(target, _config.patrolSpeed);
     }
 
@@ -272,9 +275,8 @@ public class MinionBrain : MonoBehaviour
             // Reset orbit angle when switching back to Patrol so we don't fly across map
             if (role == Role.Patrol && _owner != null)
             {
-                Vector2 currentDir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
-                _orbitAngle = Mathf.Atan2(currentDir.y, currentDir.x) * Mathf.Rad2Deg;
-                _spawnExitTimer = 0f; // No delay if we were already active
+                // No state reset needed for new reactive logic
+                _spawnExitTimer = 0f; 
             }
         }
     }
