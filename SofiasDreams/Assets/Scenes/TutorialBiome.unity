@@ -55567,6 +55567,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SwarmV2
       objectReference: {fileID: 0}
+    - target: {fileID: 7851447040320294286, guid: 23bbc0fee2dc8b741ae3fd97a9334a7e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
