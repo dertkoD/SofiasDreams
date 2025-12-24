@@ -19,6 +19,13 @@ public class MinionBrain : MonoBehaviour
     // Aggro/Forget
     float _localForgetTimer;
 
+    // Patrol
+    float _orbitAngle;
+
+    // Support
+    float _supportLateralSide; // 1 or -1
+    float _nextSupportFireTime;
+
     [Inject]
     public void Construct(MinionConfig config)
     {
