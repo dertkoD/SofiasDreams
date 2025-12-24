@@ -190,6 +190,8 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (m != null)
         {
             SetupMinion(m, _spawnIdxPhase++);
+            m.gameObject.SetActive(true);
+            m.OnSpawn();
             _active.Add(m);
             _nextSpawnAt = Time.time + _config.spawnInterval;
         }
@@ -201,10 +203,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_pool.Count == 0) return null;
 
         var m = _pool.Dequeue();
-        m.transform.SetParent(null, false);
-        m.gameObject.SetActive(true);
-        m.OnSpawn();
-
+        m.transform.SetParent(null); // Detach parent but keep pos/rot/scale
         return m;
     }
 
@@ -216,24 +215,20 @@ public class SwarmMinionSpawner : MonoBehaviour
         Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * spawnRadius;
         
         Vector3 spawnPos = transform.position + offset;
+        
+        // Since minion is inactive, we can just set transform position.
+        // If it has NavMeshAgent, it will pick up this position when enabled.
         m.transform.position = spawnPos;
         m.transform.rotation = Quaternion.identity;
         
+        // No need to Warp if inactive
         var agent = m.GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent)
         {
-            agent.Warp(spawnPos);
-        }
-        else
-        {
-            m.transform.position = spawnPos;
+            // Reset velocity just in case
+            agent.velocity = Vector3.zero;
         }
 
-        // Removed old jitter logic as we want specific directions
-        // int n = Mathf.Max(1, _config.maxMinions);
-        // float baseDeg = (index % n) * (360f / n);
-        // float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
-        
         RaiseSortingAboveSwarm(m.gameObject, sortingOrderOffset);
     }
 
