@@ -18,7 +18,8 @@ public class MinionBrain : MonoBehaviour
     Collider2D _collider;
     
     // Aggro/Forget
-    float _localForgetTimer;
+    // float _localForgetTimer; // Removed: reliance on squad state
+    bool _canSeeTarget; // Cached vision state
 
     // Patrol
     float _orbitAngle;
@@ -71,7 +72,7 @@ public class MinionBrain : MonoBehaviour
         _orbitDirection = Random.Range(0, 2) == 0 ? 1f : -1f;
         _supportLateralSide = Random.Range(0, 2) == 0 ? 1f : -1f;
         _currentRole = Role.Patrol;
-        _localForgetTimer = 0f;
+        // _localForgetTimer = 0f; // Removed
         _spawnExitTimer = 0.5f; // Give 0.5s to exit spawn area
 
         // Ensure health is full when spawned from pool
@@ -99,36 +100,24 @@ public class MinionBrain : MonoBehaviour
 
         // Vision Check
         Transform seenTarget = null;
-        bool seesTarget = _vision && _vision.TryGetClosestTarget(out seenTarget);
-        if (seesTarget)
+        _canSeeTarget = _vision && _vision.TryGetClosestTarget(out seenTarget);
+        if (_canSeeTarget)
         {
             _owner.ReportEnemySeen(seenTarget);
-            _localForgetTimer = _config.forgetTime;
-        }
-        else
-        {
-            _localForgetTimer -= Time.deltaTime;
         }
 
-        // If we personally forgot the target, ignore squad orders and patrol
-        if (_localForgetTimer <= 0f)
+        // Behavior: Always follow role assigned by Squad Leader
+        switch (_currentRole)
         {
-            TickPatrol();
-        }
-        else
-        {
-            switch (_currentRole)
-            {
-                case Role.Patrol:
-                    TickPatrol();
-                    break;
-                case Role.Aggressor:
-                    TickAggressor();
-                    break;
-                case Role.Support:
-                    TickSupport();
-                    break;
-            }
+            case Role.Patrol:
+                TickPatrol();
+                break;
+            case Role.Aggressor:
+                TickAggressor();
+                break;
+            case Role.Support:
+                TickSupport();
+                break;
         }
     }
 
@@ -253,11 +242,11 @@ public class MinionBrain : MonoBehaviour
         _motor.MoveTo(desiredPos, _config.patrolSpeed);
         _motor.FaceTowards(target.position);
 
-        // Shoot occasionally if in range
+        // Shoot occasionally if in range and line of sight
         float distToTarget = Vector2.Distance(transform.position, target.position);
         if (Time.time > _nextSupportFireTime)
         {
-             if (distToTarget < _config.shootRange) 
+             if (_canSeeTarget && distToTarget < _config.shootRange) 
              {
                  _shooter.TryFireAt(target.position);
              }
