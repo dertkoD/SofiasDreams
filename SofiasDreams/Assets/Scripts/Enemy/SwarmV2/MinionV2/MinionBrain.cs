@@ -55,10 +55,9 @@ public class MinionBrain : MonoBehaviour
         _currentRole = Role.Patrol;
         _localForgetTimer = 0f;
 
-        // Initialize Health from config if available
-        if (_health && _config && _config.healthConfig)
+        // Ensure health is full when spawned from pool
+        if (_health)
         {
-            _health.SetMaxHealth(_config.healthConfig.maxHealth);
             _health.HealFull();
         }
     }
