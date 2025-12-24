@@ -33,6 +33,8 @@ public class SwarmMinionSpawner : MonoBehaviour
     public Transform SquadTarget => _squadTarget;
     public MinionBrain CurrentAggressor => _currentAggressor;
 
+    public float MinionOrbitRadius => _config != null ? _config.minionOrbitRadius : 3.0f;
+
     [Inject]
     public void Construct(SwarmConfig config, DiContainer container)
     {

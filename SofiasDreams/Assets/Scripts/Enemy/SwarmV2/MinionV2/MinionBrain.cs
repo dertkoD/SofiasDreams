@@ -117,13 +117,6 @@ public class MinionBrain : MonoBehaviour
     {
         if (_config == null) return;
 
-        // Check if we are stuck or pushing something (using velocity or custom collision logic if needed)
-        // Simple heuristic: if velocity is very low but we are trying to move, maybe flip direction?
-        // But bumping into Swarm is physics layer issue or navmesh agent avoidance.
-        // Assuming NavMeshAgent handles movement. If they push Swarm, Swarm should be heavier or they should have avoidance.
-        // "Minions push Swarm" -> Swarm Rigidbody likely Dynamic and affected by collisions.
-        // Ideally Swarm RB is Kinematic or high mass, or layers set so they don't collide physically but use avoidance.
-        
         // Logic for reversing orbit on obstacle:
         // We can check if we are stuck.
         if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
@@ -137,7 +130,10 @@ public class MinionBrain : MonoBehaviour
         _orbitAngle += _config.orbitSpeed * _orbitDirection * Time.deltaTime * Mathf.Rad2Deg;
         
         float rads = _orbitAngle * Mathf.Deg2Rad;
-        Vector2 offset = new Vector2(Mathf.Cos(rads), Mathf.Sin(rads)) * _config.orbitRadius;
+        // Access orbit radius from Swarm Spawner
+        float orbitRadius = _owner != null ? _owner.MinionOrbitRadius : 3.0f;
+        
+        Vector2 offset = new Vector2(Mathf.Cos(rads), Mathf.Sin(rads)) * orbitRadius;
         Vector2 target = (Vector2)_owner.transform.position + offset;
 
         _motor.MoveTo(target, _config.patrolSpeed);

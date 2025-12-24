@@ -320,6 +320,10 @@ public class SwarmEnemyBrain : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, _config.visionRadius);
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, _config.fleeDistance);
+            
+            // Draw Minion Orbit Radius
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(transform.position, _config.minionOrbitRadius);
         }
 
         if (_state == State.Evasion)

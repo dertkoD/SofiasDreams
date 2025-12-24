@@ -4,6 +4,7 @@ using Zenject;
 public class MinionInstaller : MonoInstaller
 {
     [SerializeField] MinionConfig _config;
+    [SerializeField] PlayerHealthConfig _healthConfig;
     [SerializeField] Health _health;
     [SerializeField] MinionBrain _brain;
     [SerializeField] MinionMotor2D _motor;
@@ -15,6 +16,18 @@ public class MinionInstaller : MonoInstaller
         if (_config != null)
         {
             Container.BindInstance(_config).AsSingle();
+        }
+
+        if (_healthConfig != null)
+        {
+             HealthSettings healthSettings = new HealthSettings
+            {
+                maxHP = _healthConfig.maxHP,
+                invulnTime = _healthConfig.invulnTime
+            };
+            Container.BindInstance(healthSettings).AsSingle();
+             if (_health != null)
+                _health.Configure(healthSettings);
         }
 
         BindComponent(_health);

@@ -11,7 +11,6 @@ public class MinionConfig : ScriptableObject
     public float stoppingDistance = 0.5f;
 
     [Header("Patrol (Orbit)")]
-    public float orbitRadius = 3.0f;
     public float orbitSpeed = 2.0f; // radians/sec
 
     [Header("Roles - Aggressor")]
@@ -32,7 +31,6 @@ public class MinionConfig : ScriptableObject
     [Header("Behavior")]
     public float forgetTime = 3.0f; // Time to return to patrol after losing player
     public float visionRadius = 8.0f;
-    public PlayerHealthConfig healthConfig; // Added for HP initialization
 
     [Header("Refs")]
     public GameObject bulletPrefab;
