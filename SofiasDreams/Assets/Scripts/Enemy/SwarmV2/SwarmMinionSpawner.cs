@@ -31,6 +31,7 @@ public class SwarmMinionSpawner : MonoBehaviour
     public bool HasAggressor => _currentAggressor && _currentAggressor.gameObject.activeInHierarchy;
     public bool IsSquadAggro => _squadInAggro;
     public Transform SquadTarget => _squadTarget;
+    public MinionBrain CurrentAggressor => _currentAggressor;
 
     [Inject]
     public void Construct(SwarmConfig config, DiContainer container)
