@@ -182,7 +182,9 @@ public class MinionBrain : MonoBehaviour
         // Shoot occasionally
         if (Time.time > _nextSupportFireTime)
         {
-             if (toTarget.magnitude < _config.detectRange) // Check range
+             // Check if we have line of sight or distance is reasonable
+             // Using visionRadius as generic "detect" range if VisionCone not available directly for target check
+             if (toTarget.magnitude < _config.visionRadius) 
              {
                  _shooter.TryFireAt(target.position);
              }
