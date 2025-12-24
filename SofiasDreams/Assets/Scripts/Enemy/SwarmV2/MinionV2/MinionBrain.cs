@@ -15,6 +15,7 @@ public class MinionBrain : MonoBehaviour
     MinionConfig _config;
     SwarmMinionSpawner _owner;
     Role _currentRole;
+    Collider2D _collider;
     
     // Aggro/Forget
     float _localForgetTimer;
@@ -41,11 +42,24 @@ public class MinionBrain : MonoBehaviour
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>();
         if (!_animator) _animator = GetComponentInChildren<Animator>();
         if (!_health) _health = GetComponent<Health>();
+        
+        _collider = GetComponent<Collider2D>();
     }
 
     public void Initialize(SwarmMinionSpawner owner)
     {
         _owner = owner;
+        
+        // Ignore collisions with owner
+        if (_owner && _collider)
+        {
+            var ownerColliders = _owner.GetComponentsInChildren<Collider2D>();
+            foreach (var c in ownerColliders)
+            {
+                if (c && c != _collider)
+                    Physics2D.IgnoreCollision(_collider, c, true);
+            }
+        }
     }
 
     public void OnSpawn()
