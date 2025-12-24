@@ -13,7 +13,7 @@ public class SwarmMinionSpawner : MonoBehaviour
     public float startKickSpeed = 2.0f;
 
     readonly Queue<MinionBrain> _pool = new();
-    readonly List<MinionBrain>  _active = new();
+    readonly List<MinionBrain> _active = new();
 
     SwarmConfig _config;
     DiContainer _container;
@@ -77,14 +77,7 @@ public class SwarmMinionSpawner : MonoBehaviour
             }
             else
             {
-                // Note: Minions should call ReportEnemySeen to keep timer reset.
-                // If no one calls it, timer runs out.
-                // However, we need to know if minions see the player.
-                // MinionBrain will handle calling ReportEnemySeen logic.
-                // Here we just decrement if no report comes in.
-                
-                // NOTE: To avoid complexity, let's assume ReportEnemySeen sets timer to max.
-                // We just decrement here.
+                // Timer logic
                 _squadForgetTimer -= Time.deltaTime;
                 if (_squadForgetTimer <= 0)
                 {
@@ -107,10 +100,6 @@ public class SwarmMinionSpawner : MonoBehaviour
     {
         if (target == null) return;
         
-        // This is called by Minions OR Swarm.
-        // If called by Minions, it triggers squad aggro.
-        // It DOES NOT trigger Swarm spawning anymore. SwarmBrain handles that separately.
-        
         _squadTarget = target;
         _squadInAggro = true;
         _squadForgetTimer = _config.aggroForgetSeconds;
@@ -126,13 +115,66 @@ public class SwarmMinionSpawner : MonoBehaviour
         }
     }
 
-    // Called by SwarmBrain when Swarm itself sees player
     public void SetAggroTarget(Transform target)
     {
-        // When Swarm sees player, we want to enable spawning AND trigger squad aggro.
-        // SwarmBrain manages EnableSpawning(true/false).
-        // Here we just update the target for minions.
         ReportEnemySeen(target);
+    }
+
+    void UpdateSquadRoles()
+    {
+        if (_active.Count == 0) return;
+
+        if (!_squadInAggro)
+        {
+            foreach (var m in _active) m.SetRole(MinionBrain.Role.Patrol);
+            _currentAggressor = null;
+            return;
+        }
+
+        if (_currentAggressor == null || !_currentAggressor.gameObject.activeInHierarchy)
+        {
+            AssignNewAggressor();
+        }
+
+        foreach (var m in _active)
+        {
+            if (m == _currentAggressor)
+                m.SetRole(MinionBrain.Role.Aggressor);
+            else
+                m.SetRole(MinionBrain.Role.Support);
+        }
+    }
+
+    void AssignNewAggressor()
+    {
+        if (_squadTarget == null) return;
+
+        MinionBrain best = null;
+        float bestD = float.MaxValue;
+
+        foreach (var m in _active)
+        {
+            if (!m.gameObject.activeInHierarchy) continue;
+            float d = Vector2.Distance(m.transform.position, _squadTarget.position);
+            if (d < bestD) { bestD = d; best = m; }
+        }
+
+        _currentAggressor = best;
+    }
+
+    void CreateMinionInPool()
+    {
+        if (_config.minionPrefab == null) return;
+        
+        GameObject go = _container.InstantiatePrefab(_config.minionPrefab, spawnParent);
+        
+        var m = go.GetComponent<MinionBrain>();
+        if (m)
+        {
+            m.Initialize(this);
+            go.SetActive(false);
+            _pool.Enqueue(m);
+        }
     }
 
     void TryTopUpWithInterval()
@@ -156,10 +198,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_pool.Count == 0) return null;
 
         var m = _pool.Dequeue();
-        
-        // Detach from parent so Swarm scale (-1) doesn't flip minions
         m.transform.SetParent(null, false);
-        
         m.gameObject.SetActive(true);
         m.OnSpawn();
 
@@ -168,15 +207,10 @@ public class SwarmMinionSpawner : MonoBehaviour
 
     void SetupMinion(MinionBrain m, int index)
     {
-        // Force spawn position to be exact transform position, ensuring no weird offset.
-        // If NavMeshAgent is present, we must Warp it.
-        
         Vector3 spawnPos = transform.position;
-        
         m.transform.position = spawnPos;
         m.transform.rotation = Quaternion.identity;
         
-        // If minion has a NavMeshAgent, we must warp it to ensure it acknowledges the position change
         var agent = m.GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent)
         {
@@ -187,13 +221,9 @@ public class SwarmMinionSpawner : MonoBehaviour
             m.transform.position = spawnPos;
         }
 
-        // ... (rest of function)
         int n = Mathf.Max(1, _config.maxMinions);
         float baseDeg = (index % n) * (360f / n);
         float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
-        
-        // Initial kick if using physics, but with NavMesh we might warp or just set destination.
-        // MinionBrain Start will pick it up.
         
         RaiseSortingAboveSwarm(m.gameObject, sortingOrderOffset);
     }
@@ -218,7 +248,6 @@ public class SwarmMinionSpawner : MonoBehaviour
         {
             var m = list[i];
             if (!m) continue;
-            // Assuming MinionBrain has a Kill/Die method
             m.Kill();
         }
         _active.Clear();
@@ -234,7 +263,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (m == _currentAggressor) _currentAggressor = null;
 
         m.gameObject.SetActive(false);
-        m.transform.SetParent(spawnParent, false); // Return to parent for tidiness
+        m.transform.SetParent(spawnParent, false);
         _pool.Enqueue(m);
     }
 
