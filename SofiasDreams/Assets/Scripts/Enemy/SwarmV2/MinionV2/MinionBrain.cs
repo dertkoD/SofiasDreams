@@ -147,6 +147,13 @@ public class MinionBrain : MonoBehaviour
                 float initialOrbitRadius = _owner.MinionOrbitRadius;
                 Vector2 targetPos = (Vector2)_owner.transform.position + dir * initialOrbitRadius;
                 _motor.MoveTo(targetPos, _config.patrolSpeed);
+                
+                // Recalculate orbit angle so we transition smoothly
+                if (_spawnExitTimer <= 0f)
+                {
+                    Vector2 currentDir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
+                    _orbitAngle = Mathf.Atan2(currentDir.y, currentDir.x) * Mathf.Rad2Deg;
+                }
             }
             return;
         }
@@ -261,6 +268,13 @@ public class MinionBrain : MonoBehaviour
             if (role == Role.Support)
             {
                 _nextSupportFireTime = Time.time + Random.Range(0.5f, 1.5f);
+            }
+            // Reset orbit angle when switching back to Patrol so we don't fly across map
+            if (role == Role.Patrol && _owner != null)
+            {
+                Vector2 currentDir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
+                _orbitAngle = Mathf.Atan2(currentDir.y, currentDir.x) * Mathf.Rad2Deg;
+                _spawnExitTimer = 0f; // No delay if we were already active
             }
         }
     }
