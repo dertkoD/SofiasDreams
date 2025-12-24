@@ -130,8 +130,8 @@ public class MinionBrain : MonoBehaviour
                 if (dir == Vector2.zero) dir = Random.insideUnitCircle.normalized;
                 
                 // Move towards orbit radius
-                float orbitRadius = _owner.MinionOrbitRadius;
-                Vector2 targetPos = (Vector2)_owner.transform.position + dir * orbitRadius;
+                float initialOrbitRadius = _owner.MinionOrbitRadius;
+                Vector2 targetPos = (Vector2)_owner.transform.position + dir * initialOrbitRadius;
                 _motor.MoveTo(targetPos, _config.patrolSpeed);
             }
             return;
