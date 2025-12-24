@@ -58,7 +58,8 @@ public class MinionBrain : MonoBehaviour
         // Ensure health is full when spawned from pool
         if (_health)
         {
-            _health.HealFull();
+            if (_health.CanHeal())
+                _health.Heal(_health.MaxHP);
         }
     }
 
