@@ -97,6 +97,8 @@ public class SwarmEnemyBrain : MonoBehaviour
             {
                 _player = _health.LastHit.source;
             }
+            
+            _forgetTimer = _config.aggroForgetSeconds;
             // Trigger Evasion immediately
         }
 
@@ -118,6 +120,14 @@ public class SwarmEnemyBrain : MonoBehaviour
             if (_state != State.Aggro && _state != State.Evasion)
             {
                 EnterAggro();
+            }
+        }
+        else if (_state == State.Aggro || _state == State.Evasion)
+        {
+            _forgetTimer -= Time.deltaTime;
+            if (_forgetTimer <= 0f)
+            {
+                EnterReturnToPatrol();
             }
         }
 
