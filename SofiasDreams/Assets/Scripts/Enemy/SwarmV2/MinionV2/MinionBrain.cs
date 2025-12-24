@@ -22,6 +22,7 @@ public class MinionBrain : MonoBehaviour
     // Patrol
     float _orbitAngle;
     float _orbitDirection = 1f; // 1 for clockwise, -1 for counter-clockwise
+    float _spawnExitTimer; // Time to just fly away from center before orbiting
 
     // Support
     float _supportLateralSide; // 1 or -1
@@ -54,6 +55,7 @@ public class MinionBrain : MonoBehaviour
         _supportLateralSide = Random.Range(0, 2) == 0 ? 1f : -1f;
         _currentRole = Role.Patrol;
         _localForgetTimer = 0f;
+        _spawnExitTimer = 0.5f; // Give 0.5s to exit spawn area
 
         // Ensure health is full when spawned from pool
         if (_health)
@@ -116,6 +118,24 @@ public class MinionBrain : MonoBehaviour
     void TickPatrol()
     {
         if (_config == null) return;
+
+        // Spawn Exit Logic
+        if (_spawnExitTimer > 0f)
+        {
+            _spawnExitTimer -= Time.deltaTime;
+            // Simply move away from owner's center to get to orbit radius
+            if (_owner != null)
+            {
+                Vector2 dir = ((Vector2)transform.position - (Vector2)_owner.transform.position).normalized;
+                if (dir == Vector2.zero) dir = Random.insideUnitCircle.normalized;
+                
+                // Move towards orbit radius
+                float orbitRadius = _owner.MinionOrbitRadius;
+                Vector2 targetPos = (Vector2)_owner.transform.position + dir * orbitRadius;
+                _motor.MoveTo(targetPos, _config.patrolSpeed);
+            }
+            return;
+        }
 
         // Logic for reversing orbit on obstacle:
         // We can check if we are stuck.

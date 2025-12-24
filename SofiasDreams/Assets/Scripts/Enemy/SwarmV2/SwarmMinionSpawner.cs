@@ -210,7 +210,12 @@ public class SwarmMinionSpawner : MonoBehaviour
 
     void SetupMinion(MinionBrain m, int index)
     {
-        Vector3 spawnPos = transform.position;
+        // Distribute spawn points around the Swarm to prevent stacking
+        float spawnRadius = 1.5f; // Small radius to spawn outside center
+        float angle = index * (360f / 3f) * Mathf.Deg2Rad; // 3 directions: 0, 120, 240
+        Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * spawnRadius;
+        
+        Vector3 spawnPos = transform.position + offset;
         m.transform.position = spawnPos;
         m.transform.rotation = Quaternion.identity;
         
@@ -224,9 +229,10 @@ public class SwarmMinionSpawner : MonoBehaviour
             m.transform.position = spawnPos;
         }
 
-        int n = Mathf.Max(1, _config.maxMinions);
-        float baseDeg = (index % n) * (360f / n);
-        float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
+        // Removed old jitter logic as we want specific directions
+        // int n = Mathf.Max(1, _config.maxMinions);
+        // float baseDeg = (index % n) * (360f / n);
+        // float ang = (baseDeg + Random.Range(-startAngleJitterDeg, +startAngleJitterDeg)) * Mathf.Deg2Rad;
         
         RaiseSortingAboveSwarm(m.gameObject, sortingOrderOffset);
     }
