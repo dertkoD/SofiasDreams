@@ -21,6 +21,7 @@ public class MinionBrain : MonoBehaviour
 
     // Patrol
     float _orbitAngle;
+    float _orbitDirection = 1f; // 1 for clockwise, -1 for counter-clockwise
 
     // Support
     float _supportLateralSide; // 1 or -1
@@ -49,9 +50,17 @@ public class MinionBrain : MonoBehaviour
     public void OnSpawn()
     {
         _orbitAngle = Random.Range(0f, 360f);
+        _orbitDirection = Random.Range(0, 2) == 0 ? 1f : -1f;
         _supportLateralSide = Random.Range(0, 2) == 0 ? 1f : -1f;
         _currentRole = Role.Patrol;
         _localForgetTimer = 0f;
+
+        // Initialize Health from config if available
+        if (_health && _config && _config.healthConfig)
+        {
+            _health.SetMaxHealth(_config.healthConfig.maxHealth);
+            _health.HealFull();
+        }
     }
 
     void OnEnable()
@@ -108,8 +117,24 @@ public class MinionBrain : MonoBehaviour
     {
         if (_config == null) return;
 
+        // Check if we are stuck or pushing something (using velocity or custom collision logic if needed)
+        // Simple heuristic: if velocity is very low but we are trying to move, maybe flip direction?
+        // But bumping into Swarm is physics layer issue or navmesh agent avoidance.
+        // Assuming NavMeshAgent handles movement. If they push Swarm, Swarm should be heavier or they should have avoidance.
+        // "Minions push Swarm" -> Swarm Rigidbody likely Dynamic and affected by collisions.
+        // Ideally Swarm RB is Kinematic or high mass, or layers set so they don't collide physically but use avoidance.
+        
+        // Logic for reversing orbit on obstacle:
+        // We can check if we are stuck.
+        if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
+        {
+             // Maybe stuck?
+             // Flip orbit direction
+             _orbitDirection *= -1f;
+        }
+
         // Orbit around owner
-        _orbitAngle += _config.orbitSpeed * Time.deltaTime * Mathf.Rad2Deg;
+        _orbitAngle += _config.orbitSpeed * _orbitDirection * Time.deltaTime * Mathf.Rad2Deg;
         
         float rads = _orbitAngle * Mathf.Deg2Rad;
         Vector2 offset = new Vector2(Mathf.Cos(rads), Mathf.Sin(rads)) * _config.orbitRadius;

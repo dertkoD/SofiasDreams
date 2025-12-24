@@ -11,6 +11,8 @@ public class MinionMotor2D : MonoBehaviour
     bool _frozen;
     float _baseScaleX;
 
+    public bool IsMoving => _agent && !_agent.isStopped && _agent.hasPath;
+
     public Vector2 Velocity => _agent ? (Vector2)_agent.velocity : Vector2.zero;
 
     [Inject]

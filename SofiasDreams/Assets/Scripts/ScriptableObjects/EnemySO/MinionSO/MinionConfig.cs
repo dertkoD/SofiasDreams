@@ -32,6 +32,7 @@ public class MinionConfig : ScriptableObject
     [Header("Behavior")]
     public float forgetTime = 3.0f; // Time to return to patrol after losing player
     public float visionRadius = 8.0f;
+    public PlayerHealthConfig healthConfig; // Added for HP initialization
 
     [Header("Refs")]
     public GameObject bulletPrefab;
