@@ -16,9 +16,14 @@ public class UnlockGrapplePointInteractable : MonoBehaviour, IInteractable
 
     public void Interact(Transform interactor)
     {
-        if (!CanInteract) return;
+        Debug.Log($"[GrappleUnlock] Interact called. targetLock={(targetLock ? targetLock.name : "NULL")} locked(before)={targetLock?.IsLocked}");
 
+        if (!CanInteract) return;
+        
         targetLock.Unlock();
+        
+        Debug.Log($"[GrappleUnlock] after Unlock. locked(after)={targetLock?.IsLocked}");
+        
         _used = true;
 
         // optional: animation/sfx/vfx

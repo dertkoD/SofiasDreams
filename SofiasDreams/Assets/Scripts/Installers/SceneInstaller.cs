@@ -16,6 +16,8 @@ public class SceneInstaller : MonoInstaller
 
         // Services
         Container.Bind<Spawner>().AsSingle();
+        
+        Container.Bind<IPlayerAbilities>().To<PlayerAbilities>().AsSingle();
 
         // Factory that spawns the player later
         Container.BindFactory<PlayerFacade, PlayerFactory>()
@@ -50,8 +52,17 @@ public class SceneInstaller : MonoInstaller
             .FromComponentInHierarchy()
             .AsSingle();
         
-        // Game-over
-        Container.BindInterfacesAndSelfTo<PlayerDeathSceneReloader>()
-            .AsSingle();
+        // Bonfire signals
+        Container.DeclareSignal<BonfireRestStateChanged>();
+        Container.DeclareSignal<BonfireCheckpointChanged>();
+        Container.DeclareSignal<PlayerRespawnedAtBonfire>();
+        Container.DeclareSignal<BonfireRespawnRequested>();
+        Container.DeclareSignal<BonfireEnemiesRespawnRequested>();
+
+        // Bonfire services
+        Container.BindInterfacesAndSelfTo<BonfireService>().AsSingle();
+        Container.BindInterfacesAndSelfTo<BonfireRespawnOnDeath>().AsSingle();
+
+        Container.Bind<IEnemyCombatGate>().To<EnemyCombatGate>().AsSingle();
     }
 }

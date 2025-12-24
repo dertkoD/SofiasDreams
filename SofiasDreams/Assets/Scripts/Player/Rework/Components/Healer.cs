@@ -106,4 +106,16 @@ public class Healer : MonoBehaviour, IHealer
 
         _bus.Fire(new HealFinished());
     }
+    
+    public void RestoreChargesToMax()
+    {
+        // If you want bonfire to also cancel an in-progress heal:
+        if (_healing)
+            CancelHealing();
+
+        _kills = 0;
+        _charges = _maxCharges;
+
+        _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
+    }
 }

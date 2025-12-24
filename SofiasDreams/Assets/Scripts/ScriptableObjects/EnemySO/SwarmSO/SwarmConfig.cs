@@ -1,26 +1,28 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SwarmConfig", menuName = "Configs/Swarm")]
-public class SwarmConfig  : ScriptableObject
+public class SwarmConfig : ScriptableObject
 {
-    [Header("Levitation")]
-    public float hoverAmplitude = 0.4f;
-    public float hoverFrequency = 0.7f;
-    public float driftSpeed = 0.35f;
+    [Header("Movement (NavMesh)")]
+    public float patrolSpeed = 2.0f;
+    public float aggroSpeed = 2.0f; // Speed when keeping distance/following
+    public float fleeSpeed = 4.0f;
+    public float acceleration = 8.0f;
+    public float angularSpeed = 120f;
+    public float stoppingDistance = 0.5f;
 
-    [Header("Vision & Proximity")]
-    public float proximityRadius = 10f;   // триггер «подлетел игрок» -> начинаем спавнить
-    public float visionRadius = 8f;       // «вижу игрока» -> отлетаю
-
-    [Header("Retreat")]
-    public float desiredDistance = 6f;    // на какой дистанции держаться от игрока
-    public float retreatSpeed = 2.0f;     // скорость отлёта
-    public float maxRoamDistance = 8f;    // далеко от точки старта не улетать
+    [Header("Behavior")]
+    public float visionRadius = 10f;       // «вижу игрока»
+    public float fleeDistance = 3.0f;     // DEPRECATED logic-wise, replaced by maintainDistance
+    public float maintainDistance = 8.0f; // Дистанция, которую пытаемся держать (убегаем, если ближе)
+    public float aggroForgetSeconds = 3.0f;
+    public float patrolPathSearchRadius = 50f;
+    public float waypointArriveDistance = 1.0f;
 
     [Header("Spawning (minions)")]
     public int maxMinions = 3;
-    public float spawnInterval = 1.0f;    // интервал выпуска при близости игрока
-    public float respawnDelay = 2.0f;     // задержка перед замещением убитого миниона
+    public float spawnInterval = 1.5f;    // Интервал между спавном
+    public int poolInitialSize = 5;
 
     [Header("Damage")]
     public int contactDamage = 1;

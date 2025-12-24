@@ -3,6 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Configs/PlayerDash")]
 public class PlayerDashConfig : ScriptableObject
 {
+    [Header("Unlock")]
+    public bool startUnlocked = false;
+    
     [Header("Base")]
     public float dashSpeed    = 15f;
     public float cooldown     = 0.5f;

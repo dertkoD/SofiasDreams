@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ab4abb720ce29f4aa49b8359836732b, type: 3}
+  m_Name: SwarmConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SwarmConfig
+  patrolSpeed: 2
+  aggroSpeed: 2
+  fleeSpeed: 4
+  acceleration: 8
+  angularSpeed: 120
+  stoppingDistance: 0.5
+  visionRadius: 8
+  fleeDistance: 8
+  maintainDistance: 8
+  aggroForgetSeconds: 3
+  patrolPathSearchRadius: 50
+  waypointArriveDistance: 1
+  maxMinions: 3
+  spawnInterval: 1.5
+  poolInitialSize: 5
+  contactDamage: 1
+  minionConfig: {fileID: 11400000, guid: 23394192b8a39a449b8cea5b9466c2ab, type: 2}
+  minionPrefab: {fileID: 5123599858426812987, guid: b847cd6c4591bec499042a9b3330ff24, type: 3}

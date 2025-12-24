@@ -9,6 +9,8 @@ public class Spawner
     readonly JumpingEnemyFactory _jumpingEnemyFactory;
     readonly WormEnemyFactory _wormEnemyFactory;
     readonly SignalBus _bus;
+    PlayerFacade _currentPlayer;
+
     
     public Spawner(
         PlayerFactory playerFactory,
@@ -28,8 +30,33 @@ public class Spawner
 
     public PlayerFacade SpawnPlayer(Vector3 pos)
     {
+        if (_currentPlayer != null)
+        {
+            GameObject.Destroy(_currentPlayer.gameObject);
+            _currentPlayer = null;
+        }
+
         var player = _playerFactory.Create();
         player.transform.position = pos;
+
+        // ---- Zero physics state on spawn ----
+        var rb = player.GetComponent<Rigidbody2D>();
+        if (rb == null)
+            rb = player.GetComponentInChildren<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+
+            // Optional: also clear residual forces/jitter
+            rb.Sleep();
+            rb.WakeUp();
+        }
+        // ------------------------------------
+
+        _currentPlayer = player;
+
         _bus.Fire(new PlayerSpawned { facade = player });
         return player;
     }
