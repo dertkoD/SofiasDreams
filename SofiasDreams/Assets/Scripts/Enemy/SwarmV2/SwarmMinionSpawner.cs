@@ -107,71 +107,13 @@ public class SwarmMinionSpawner : MonoBehaviour
     {
         if (target == null) return;
         
+        // This is called by Minions OR Swarm.
+        // If called by Minions, it triggers squad aggro.
+        // It DOES NOT trigger Swarm spawning anymore. SwarmBrain handles that separately.
+        
         _squadTarget = target;
         _squadInAggro = true;
         _squadForgetTimer = _config.aggroForgetSeconds;
-    }
-
-    void UpdateSquadRoles()
-    {
-        if (_active.Count == 0) return;
-
-        if (!_squadInAggro)
-        {
-            // All Patrol
-            foreach (var m in _active) m.SetRole(MinionBrain.Role.Patrol);
-            _currentAggressor = null;
-            return;
-        }
-
-        // We are in Aggro
-        // Ensure one Aggressor
-        if (_currentAggressor == null || !_currentAggressor.gameObject.activeInHierarchy)
-        {
-            AssignNewAggressor();
-        }
-
-        // Assign roles
-        foreach (var m in _active)
-        {
-            if (m == _currentAggressor)
-                m.SetRole(MinionBrain.Role.Aggressor);
-            else
-                m.SetRole(MinionBrain.Role.Support);
-        }
-    }
-
-    void AssignNewAggressor()
-    {
-        if (_squadTarget == null) return;
-
-        MinionBrain best = null;
-        float bestD = float.MaxValue;
-
-        foreach (var m in _active)
-        {
-            if (!m.gameObject.activeInHierarchy) continue;
-            float d = Vector2.Distance(m.transform.position, _squadTarget.position);
-            if (d < bestD) { bestD = d; best = m; }
-        }
-
-        _currentAggressor = best;
-    }
-
-    void CreateMinionInPool()
-    {
-        if (_config.minionPrefab == null) return;
-        
-        // Use Zenject to instantiate so dependencies (Config, Motor, Brain) are injected
-        GameObject go = _container.InstantiatePrefab(_config.minionPrefab, spawnParent);
-        
-        var m = go.GetComponent<MinionBrain>();
-        if (m)
-        {
-            m.Initialize(this);
-            go.SetActive(false);
-            _pool.Enqueue(m);
-        }
     }
 
     public void EnableSpawning(bool enable)
@@ -187,6 +129,9 @@ public class SwarmMinionSpawner : MonoBehaviour
     // Called by SwarmBrain when Swarm itself sees player
     public void SetAggroTarget(Transform target)
     {
+        // When Swarm sees player, we want to enable spawning AND trigger squad aggro.
+        // SwarmBrain manages EnableSpawning(true/false).
+        // Here we just update the target for minions.
         ReportEnemySeen(target);
     }
 
