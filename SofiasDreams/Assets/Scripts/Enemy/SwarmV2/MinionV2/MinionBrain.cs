@@ -92,7 +92,7 @@ public class MinionBrain : MonoBehaviour
         // Animator logic (simple)
         if (_animator)
         {
-            _animator.SetBool("Aggro", _currentRole != Role.Patrol);
+            // _animator.SetBool("Aggro", _currentRole != Role.Patrol); // Removed as parameter does not exist
         }
     }
 
