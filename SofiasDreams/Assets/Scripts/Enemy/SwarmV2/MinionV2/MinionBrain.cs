@@ -24,6 +24,7 @@ public class MinionBrain : MonoBehaviour
     float _orbitAngle;
     float _orbitDirection = 1f; // 1 for clockwise, -1 for counter-clockwise
     float _spawnExitTimer; // Time to just fly away from center before orbiting
+    float _stuckFlipCooldown; // Cooldown for flipping direction when stuck
 
     // Support
     float _supportLateralSide; // 1 or -1
@@ -145,11 +146,6 @@ public class MinionBrain : MonoBehaviour
                 float initialOrbitRadius = _owner.MinionOrbitRadius;
                 Vector2 targetPos = (Vector2)_owner.transform.position + dir * initialOrbitRadius;
                 _motor.MoveTo(targetPos, _config.patrolSpeed);
-                
-                if (_spawnExitTimer <= 0f)
-                {
-                    // No need for orbit angle state, we calculate dynamically
-                }
             }
             return;
         }
@@ -160,13 +156,17 @@ public class MinionBrain : MonoBehaviour
         // 1. Calculate current angle from owner
         Vector2 toMinion = (Vector2)transform.position - (Vector2)_owner.transform.position;
         float currentAngleRad = Mathf.Atan2(toMinion.y, toMinion.x);
-        float currentDist = toMinion.magnitude;
         float orbitRadius = _owner.MinionOrbitRadius;
 
         // Check if stuck
-        if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
+        if (_stuckFlipCooldown > 0f)
+        {
+            _stuckFlipCooldown -= Time.deltaTime;
+        }
+        else if (_motor.Velocity.sqrMagnitude < 0.1f && _motor.IsMoving)
         {
              _orbitDirection *= -1f;
+             _stuckFlipCooldown = 1.0f; // Wait 1s before flipping again
         }
 
         // 2. Project target ahead on the circle
