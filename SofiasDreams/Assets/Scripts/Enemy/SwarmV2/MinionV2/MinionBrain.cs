@@ -45,6 +45,8 @@ public class MinionBrain : MonoBehaviour
         if (!_health) _health = GetComponent<Health>();
         
         _collider = GetComponent<Collider2D>();
+        
+        if (_vision) _vision.useTransformRotation = true;
     }
 
     public void Initialize(SwarmMinionSpawner owner)

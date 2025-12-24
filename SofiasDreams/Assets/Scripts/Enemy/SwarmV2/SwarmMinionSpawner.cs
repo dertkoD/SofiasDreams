@@ -211,7 +211,7 @@ public class SwarmMinionSpawner : MonoBehaviour
     void SetupMinion(MinionBrain m, int index)
     {
         // Distribute spawn points around the Swarm to prevent stacking
-        float spawnRadius = 1.5f; // Small radius to spawn outside center
+        float spawnRadius = 5.0f; // Spawn outside Swarm body (radius ~3.8)
         float angle = index * (360f / 3f) * Mathf.Deg2Rad; // 3 directions: 0, 120, 240
         Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * spawnRadius;
         
