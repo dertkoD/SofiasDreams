@@ -160,18 +160,29 @@ public class MinionOrbitBrain2D : MonoBehaviour
         // фиксируем слот на цель: +1 "вверх", -1 "вниз"
         if (_assignedSide == 0) _assignedSide = AllocateSide(_supportTarget);
 
-        Vector2 playerPos = _supportTarget.position;
-        Vector2 selfPos   = transform.position;
+        // New logic: Halfway between Swarm and Aggro Minion
+        Vector2 swarmPos = (binder && binder.Target) ? (Vector2)binder.Target.position : (Vector2)transform.position;
+        
+        Vector2 aggroMinionPos = swarmPos;
+        if (_spawner && _spawner.HasAggressor)
+        {
+            aggroMinionPos = _spawner.Aggressor.transform.position;
+        }
+        else
+        {
+            // Fallback if no specific aggressor minion found (shouldn't happen in support mode usually)
+            aggroMinionPos = _supportTarget.position; 
+        }
 
-        Vector2 toPlayer    = playerPos - selfPos;
-        Vector2 dirToPlayer = toPlayer.sqrMagnitude > 1e-6f ? toPlayer.normalized : Vector2.right;
-        Vector2 perp        = new Vector2(-dirToPlayer.y, dirToPlayer.x);
+        Vector2 midPoint = (swarmPos + aggroMinionPos) * 0.5f;
 
-        // единственная ручка: насколько «вбок» уезжают саппорты
-        Vector2 desiredPos = playerPos
-                             - dirToPlayer * supportDesiredDistance
-                             + perp * (_assignedSide * supportLateralOffset);
+        // Offset slightly up/down (World Y)
+        // Using supportLateralOffset as the magnitude
+        Vector2 offset = Vector2.up * (_assignedSide * supportLateralOffset);
 
+        Vector2 desiredPos = midPoint + offset;
+
+        Vector2 selfPos = transform.position;
         Vector2 toDesired = desiredPos - selfPos;
         float dist = toDesired.magnitude;
 
@@ -185,11 +196,13 @@ public class MinionOrbitBrain2D : MonoBehaviour
         else                  { moveDir = Vector2.zero; spd = 0f; }
 
         mover.MoveInDirection(moveDir, spd);
-        if (lookAt) lookAt.SetFacing(toPlayer);
+        
+        // Look at the target (Player)
+        if (lookAt) lookAt.SetFacing(_supportTarget.position - transform.position);
 
         if (shooter && Time.time >= _nextSupportShotAt)
         {
-            shooter.TryFireAt(playerPos);
+            shooter.TryFireAt(_supportTarget.position);
             float interval = Random.Range(supportFireIntervalMin, supportFireIntervalMax);
             _nextSupportShotAt = Time.time + Mathf.Max(0.05f, interval);
         }

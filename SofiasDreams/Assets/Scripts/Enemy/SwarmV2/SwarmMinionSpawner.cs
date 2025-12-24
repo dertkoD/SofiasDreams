@@ -214,7 +214,7 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (HasAggressor) return false;
         if (m == null || !_active.Contains(m) || !m.gameObject.activeInHierarchy) return false;
         _aggressor = m;
-        _lastSeenPlayer = player;                    // NEW
+        // _lastSeenPlayer = player; 
         m.EnterAttackMode(player);
         return true;
     }
