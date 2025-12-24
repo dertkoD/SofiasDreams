@@ -139,6 +139,8 @@ public class MinionBrain : MonoBehaviour
         _motor.FaceTowards(target.position);
 
         // Shoot
+        // Uses shootRange or detectRange if shootRange missing (config update needed)
+        // But we added shootRange to config.
         if (dist < _config.shootRange)
         {
             _shooter.TryFireAt(target.position);

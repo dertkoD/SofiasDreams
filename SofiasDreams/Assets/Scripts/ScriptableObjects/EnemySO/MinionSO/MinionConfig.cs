@@ -17,6 +17,7 @@ public class MinionConfig : ScriptableObject
     [Header("Roles - Aggressor")]
     public float attackDistance = 3.0f; // Try to get this close
     public float attackBackoffDistance = 2.0f; // Back off if too close
+    public float shootRange = 5.0f; // Max range to shoot
 
     [Header("Roles - Support")]
     public float supportDistance = 6.0f;
