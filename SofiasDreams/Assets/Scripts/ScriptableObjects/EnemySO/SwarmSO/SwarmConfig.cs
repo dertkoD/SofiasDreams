@@ -12,7 +12,7 @@ public class SwarmConfig : ScriptableObject
     public float stoppingDistance = 0.5f;
 
     [Header("Behavior")]
-    public float visionRadius = 10f;       // «вижу игрока»
+    public float visionRadius = 10f;       
     public float fleeDistance = 3.0f;     // DEPRECATED logic-wise, replaced by maintainDistance
     public float maintainDistance = 8.0f; // Дистанция, которую пытаемся держать (убегаем, если ближе)
     public float aggroForgetSeconds = 3.0f;
@@ -24,7 +24,7 @@ public class SwarmConfig : ScriptableObject
 
     [Header("Spawning (minions)")]
     public int maxMinions = 3;
-    public float spawnInterval = 1.5f;    // Интервал между спавном
+    public float spawnInterval = 1.5f;    
     public int poolInitialSize = 5;
 
     [Header("Damage")]
@@ -32,5 +32,5 @@ public class SwarmConfig : ScriptableObject
 
     [Header("Refs")]
     public MinionConfig minionConfig;
-    public GameObject minionPrefab; // квадрат с MinionController
+    public GameObject minionPrefab; 
 }

@@ -39,7 +39,7 @@ public class EnemyFacade : MonoBehaviour
         _patrolController?.SetPath(path);
         _jumpingBrain?.SetPatrolPath(path);
         _wormBrain?.SetPatrolPath(path);
-        //_swarmBrain?.SetPatrolPath(path);
+        _swarmBrain?.SetPatrolPath(path);
     }
     
     public void ApplyDamage(DamageInfo info)

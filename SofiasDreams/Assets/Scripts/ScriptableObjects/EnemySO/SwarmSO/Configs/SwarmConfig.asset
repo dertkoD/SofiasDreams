@@ -17,16 +17,16 @@ MonoBehaviour:
   fleeSpeed: 4
   acceleration: 8
   angularSpeed: 120
-  stoppingDistance: 0.5
+  stoppingDistance: 0.14
   visionRadius: 8
   fleeDistance: 8
   maintainDistance: 8
-  aggroForgetSeconds: 3
+  aggroForgetSeconds: 4
   patrolPathSearchRadius: 50
   waypointArriveDistance: 1
   minionOrbitRadius: 6.5
   maxMinions: 3
-  spawnInterval: 1.5
+  spawnInterval: 3
   poolInitialSize: 5
   contactDamage: 1
   minionConfig: {fileID: 11400000, guid: 23394192b8a39a449b8cea5b9466c2ab, type: 2}

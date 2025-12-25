@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
 
 public class Spawner
@@ -8,9 +9,9 @@ public class Spawner
     readonly FlyingEnemyFactory _flyingEnemyFactory;
     readonly JumpingEnemyFactory _jumpingEnemyFactory;
     readonly WormEnemyFactory _wormEnemyFactory;
+    readonly SwarmEnemyFactory _swarmEnemyFactory;
     readonly SignalBus _bus;
     PlayerFacade _currentPlayer;
-
     
     public Spawner(
         PlayerFactory playerFactory,
@@ -18,6 +19,7 @@ public class Spawner
         FlyingEnemyFactory flyingEnemyFactory, 
         JumpingEnemyFactory jumpingEnemyFactory,
         WormEnemyFactory wormEnemyFactory,
+        SwarmEnemyFactory swarmEnemyFactory,
         SignalBus bus)
     {
         _playerFactory       = playerFactory;
@@ -25,6 +27,7 @@ public class Spawner
         _flyingEnemyFactory  = flyingEnemyFactory;
         _jumpingEnemyFactory = jumpingEnemyFactory;
         _wormEnemyFactory    = wormEnemyFactory;
+        _swarmEnemyFactory = swarmEnemyFactory;
         _bus           = bus;
     }
 
@@ -63,34 +66,41 @@ public class Spawner
 
     public EnemyFacade SpawnEnemy(EnemySpawnPoint sp)
     {
-        if (sp == null)
-            return null;
+        if (sp == null) return null;
 
         EnemyFacade enemy;
-
         switch (sp.Kind)
         {
-            case EnemyMovementMode.Planar2D:
-                enemy = _flyingEnemyFactory.Create();
-                break;
-            case EnemyMovementMode.Jumping:
-                enemy = _jumpingEnemyFactory.Create();
-                break;
-            case EnemyMovementMode.Worm:
-                enemy = _wormEnemyFactory.Create();
-                break;
-            case EnemyMovementMode.GroundOnly:
-            default:
-                enemy = _groundEnemyFactory.Create();
-                break;
+            case EnemyMovementMode.Planar2D: enemy = _flyingEnemyFactory.Create(); break;
+            case EnemyMovementMode.Jumping:  enemy = _jumpingEnemyFactory.Create(); break;
+            case EnemyMovementMode.Worm:     enemy = _wormEnemyFactory.Create(); break;
+            case EnemyMovementMode.Swarm:    enemy = _swarmEnemyFactory.Create(); break;
+            default:                         enemy = _groundEnemyFactory.Create(); break;
         }
 
         var tr = enemy.transform;
-        tr.position = sp.transform.position;
+
+        var desired = sp.transform.position;
+
+        if (NavMesh.SamplePosition(desired, out var hit, 0.5f, NavMesh.AllAreas))
+            desired = hit.position;
+        else
+            Debug.LogWarning($"No NavMesh near spawn point: {sp.name} at {sp.transform.position}");
+
+        tr.position = desired;
+
+        var agent = enemy.GetComponent<NavMeshAgent>() ?? enemy.GetComponentInChildren<NavMeshAgent>();
+        if (agent != null)
+        {
+            if (!agent.enabled) agent.enabled = true;
+
+            agent.Warp(desired);
+            agent.ResetPath();
+        }
 
         var path = sp._patrolPath;
         if (path != null)
-            enemy.SetPatrolPath(path);   
+            enemy.SetPatrolPath(path);
 
         return enemy;
     }

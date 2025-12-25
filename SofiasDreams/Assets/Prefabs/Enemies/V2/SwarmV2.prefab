@@ -435,7 +435,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7851447040320294286}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 3.81
   m_Speed: 3.5
@@ -526,6 +526,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   faceByScaleX: 1
+  useTransformRotation: 0
   fixedFacingSign: 1
   showGizmos: 1
   gizmoColor: {r: 1, g: 0.9, b: 0, a: 0.35}

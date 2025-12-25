@@ -36,7 +36,7 @@ TagManager:
   - ObjectDamageable
   - CameraBounds
   - Interactable
-  - 
+  - EnemySwarmAndMinionZone
   - 
   - 
   - 
