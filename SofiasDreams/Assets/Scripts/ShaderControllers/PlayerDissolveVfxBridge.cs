@@ -10,7 +10,12 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
     private bool _deathVfxPlaying;
 
     [Inject]
-    void Construct(SignalBus bus) => _bus = bus;
+    void Construct(SignalBus bus)
+    {
+        _bus = bus;
+        // Subscribe here because OnEnable runs BEFORE injection for factory-spawned prefabs.
+        SubscribeSignals();
+    }
 
     private void Awake()
     {
@@ -19,10 +24,15 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
 
     private void OnEnable()
     {
-        _bus.Subscribe<Died>(OnDied);
+        // Only subscribe if bus is ready (it won't be on first frame of spawn, but will be on re-enable)
+        if (_bus != null)
+            SubscribeSignals();
+    }
 
+    private void SubscribeSignals()
+    {
+        _bus.TrySubscribe<Died>(OnDied);
         _bus.TrySubscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
-
         _bus.TrySubscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
