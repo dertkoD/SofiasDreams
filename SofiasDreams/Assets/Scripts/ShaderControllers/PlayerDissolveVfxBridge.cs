@@ -52,18 +52,27 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
 
     private void OnPlayerSpawned(PlayerSpawned s)
     {
-        // Check if s.facade matches the current object (if multiple players were possible)
-        // or just play because this script is on the player prefab
+        Debug.Log($"[VFX_DEBUG] OnPlayerSpawned received. Facade matches: {s.facade != null && s.facade.gameObject == gameObject}");
         if (s.facade != null && s.facade.gameObject == gameObject)
         {
-             // Force a small delay or initialization if needed, but usually Instant apply works
              PlayRespawnVfx();
         }
     }
 
     private void PlayRespawnVfx()
     {
-        if (!bundle || !bundle.respawn) return;
+        if (!bundle) 
+        {
+            Debug.LogError("[VFX_DEBUG] Bundle is missing!");
+            return;
+        }
+        if (!bundle.respawn)
+        {
+            Debug.LogError("[VFX_DEBUG] Bundle.Respawn setting is missing!");
+            return;
+        }
+
+        Debug.Log($"[VFX_DEBUG] Playing Respawn VFX. Start: {bundle.respawn.startAmount}, End: {bundle.respawn.endAmount}");
 
         // Ensure sprite renderer is enabled and material props are set immediately
         dissolve.ApplyInstant(bundle.respawn, bundle.respawn.startAmount, bundle.respawn.outlineStartThickness);

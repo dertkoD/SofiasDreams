@@ -34,6 +34,8 @@ public class SpriteDissolveController : MonoBehaviour
     {
         if (!spriteRenderer || !s) return;
 
+        Debug.Log($"[VFX_DEBUG] ApplyInstant: Amount={amount}, Thickness={thickness}");
+
         spriteRenderer.enabled = true;
 
         spriteRenderer.GetPropertyBlock(mpb);
@@ -48,6 +50,7 @@ public class SpriteDissolveController : MonoBehaviour
 
     private IEnumerator Routine(DissolveVfxSettingsSO s, Action onFinished)
     {
+        Debug.Log("[VFX_DEBUG] Coroutine started.");
         spriteRenderer.enabled = true;
 
         // constants
