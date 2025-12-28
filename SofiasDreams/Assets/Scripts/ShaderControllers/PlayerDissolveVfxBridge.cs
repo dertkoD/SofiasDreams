@@ -21,7 +21,7 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
     {
         _bus.Subscribe<Died>(OnDied);
         // PlayerSpawned is enough for both initial spawn and respawn
-        _bus.TrySubscribe<PlayerSpawned>(OnPlayerSpawned);
+        _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
     private void OnDisable()
