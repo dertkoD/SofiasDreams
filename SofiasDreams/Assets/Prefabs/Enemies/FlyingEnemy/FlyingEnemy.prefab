@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 8769078522641367920}
   - component: {fileID: 3241030974704444127}
   - component: {fileID: 2042417011476068454}
+  - component: {fileID: -6154622815944501037}
   m_Layer: 9
   m_Name: FlyingEnemy
   m_TagString: Untagged
@@ -432,6 +433,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
   spriteRenderer: {fileID: 4353169174539410497}
+--- !u!114 &-6154622815944501037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5001793755108328482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca958986c8b8e9a41a673c036b32ba4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
+  dissolveController: {fileID: 2042417011476068454}
+  dissolveSettings: {fileID: 11400000, guid: 08846cd0c3e8ede4ba5d5fcf0d5659df, type: 2}
 --- !u!1 &5782868299914000527
 GameObject:
   m_ObjectHideFlags: 0
