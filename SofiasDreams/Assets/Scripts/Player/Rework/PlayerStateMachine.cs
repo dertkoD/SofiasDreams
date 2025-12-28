@@ -74,6 +74,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.Subscribe<PlayerGrappleRequested>(OnGrappleRequested);
         _bus.Subscribe<GrappleFinished>(OnGrappleFinished);
         _bus.Subscribe<InteractPressed>(OnInteractPressed);
+        // _bus.Subscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged); // Using try subscribe to avoid crashes if signal not declared
         _bus.Subscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
     }
 
