@@ -12,11 +12,10 @@
       "url": "https://package.openupm.com"
     },
     "com.h8man.2d.navmeshplus": {
-      "version": "https://github.com/h8man/NavMeshPlus.git",
+      "version": "file:NavMeshPlus-master",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "b9abbd9c6304f502d83517e4e51b09054c8b9e0e"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.2d.animation": {
       "version": "13.0.2",

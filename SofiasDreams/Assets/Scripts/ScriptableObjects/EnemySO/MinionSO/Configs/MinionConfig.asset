@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30c269299edfad9498ed35bd23675db4, type: 3}
   m_Name: MinionConfig
   m_EditorClassIdentifier: Assembly-CSharp::MinionConfig
-  patrolSpeed: 3.5
-  aggroSpeed: 5
+  patrolSpeed: 2
+  aggroSpeed: 3
   acceleration: 12
   angularSpeed: 360
   stoppingDistance: 0.5
   orbitSpeed: 90
   attackDistance: 3
   attackBackoffDistance: 2
-  shootRange: 6
+  shootRange: 10
   supportDistance: 6
   supportLateralSpread: 2.5
   supportFireIntervalMin: 1.5
   supportFireIntervalMax: 2.5
-  fireCooldown: 0.8
+  fireCooldown: 5
   initialFireDelay: 0.5
   forgetTime: 3
   visionRadius: 8

@@ -67,8 +67,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 2
+  m_Offset: {x: 0.0000011920929, y: 0}
+  m_Radius: 1.1317867
 --- !u!114 &4260864843923193177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +218,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6421789148335544916}
@@ -386,7 +386,7 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4096
-  radius: 5.83
+  radius: 10
   fov: 90
   requireLineOfSight: 1
   obstacleLayers:
