@@ -26,12 +26,19 @@ public class RespawnManager : MonoBehaviour
     [Tooltip("Prevents retriggering immediately after teleport.")]
     [SerializeField] private float triggerCooldown = 0.25f;
 
+    [Zenject.Inject(Optional = true)]
+    IBonfireService _bonfire;
+
     bool _cooldown;
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (_cooldown) return;
         if (!other.CompareTag("Player")) return;
+
+        // If resting, ignore respawn zones (prevents loop if bonfire is near hazard)
+        if (_bonfire != null && _bonfire.IsResting)
+            return;
 
         if (spawnPoint == null)
         {
