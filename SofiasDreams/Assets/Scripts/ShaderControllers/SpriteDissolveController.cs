@@ -9,12 +9,12 @@ public class SpriteDissolveController : MonoBehaviour
     private MaterialPropertyBlock mpb;
     private Coroutine routine;
 
-    private static readonly int DisolveAmountId     = Shader.PropertyToID("DisolveAmount");
-    private static readonly int OutlineThicknessId  = Shader.PropertyToID("OutlineThickness");
-    private static readonly int OutlineColorId      = Shader.PropertyToID("OutlineColor");
-    private static readonly int DisolveScaleId      = Shader.PropertyToID("DisolveScale");
-    private static readonly int VerticalDisolveId   = Shader.PropertyToID("VerticalDisolve");
-    private static readonly int SpiralStrenghtId    = Shader.PropertyToID("SpiralStrenght");
+    private static readonly int DisolveAmountId     = Shader.PropertyToID("_DisolveAmount");
+    private static readonly int OutlineThicknessId  = Shader.PropertyToID("_OutlineThickness");
+    private static readonly int OutlineColorId      = Shader.PropertyToID("_OutlineColor");
+    private static readonly int DisolveScaleId      = Shader.PropertyToID("_DisolveScale");
+    private static readonly int VerticalDisolveId   = Shader.PropertyToID("_VerticalDisolve");
+    private static readonly int SpiralStrenghtId    = Shader.PropertyToID("_SpiralStrenght");
 
     private void Awake()
     {
