@@ -68246,7 +68246,7 @@ MonoBehaviour:
   lethalDamage: 0
   damageAmount: 1
   bypassInvuln: 1
-  damageType: 0
+  damageType: 2
   respawnDelay: 0
   triggerCooldown: 0.25
 --- !u!61 &344372904
@@ -78993,7 +78993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d5579472a33444cbcc2791b02b903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: 11.2, y: -20, z: 0}
+  startPos: {x: 11.19, y: -20, z: 0}
   _enemySpawnPoints:
   - {fileID: 783268736}
   - {fileID: 767699206}

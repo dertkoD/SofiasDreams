@@ -26,6 +26,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly IPlayerAbilities _abilities;
     readonly IPlayerAbilityConfigurator _abilityConfigurator;
     readonly HitReactionConfig _hitSO;
+    readonly IBonfireService _bonfire;
 
     float       _moveX;
     AttackMode? _activeAttack;
@@ -37,6 +38,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
         Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor, 
         IPlayerAbilities abilities, IPlayerAbilityConfigurator abilityConfigurator,
+        IBonfireService bonfire,
         [Inject(Optional = true)] HitReactionConfig hitSO)
     {
         _bus                 = bus;
@@ -54,6 +56,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _interactor          = interactor;
         _abilities           = abilities;
         _abilityConfigurator = abilityConfigurator;
+        _bonfire             = bonfire;
         _hitSO               = hitSO;
     }
 
