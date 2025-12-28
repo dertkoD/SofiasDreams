@@ -34,6 +34,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4353169174539410497
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -52,10 +53,12 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -73,11 +76,12 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1545498483048865764, guid: 7c9f9a7709e19474096447f944a69ef6,
-    type: 3}
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 1545498483048865764, guid: 7c9f9a7709e19474096447f944a69ef6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0
@@ -86,7 +90,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &5001793755108328482
 GameObject:
@@ -112,6 +115,7 @@ GameObject:
   - component: {fileID: 2081703633637273424}
   - component: {fileID: 8769078522641367920}
   - component: {fileID: 3241030974704444127}
+  - component: {fileID: 2042417011476068454}
   m_Layer: 9
   m_Name: FlyingEnemy
   m_TagString: Untagged
@@ -286,6 +290,7 @@ MonoBehaviour:
   _health: {fileID: 6227272584779357697}
   _jumpingBrain: {fileID: 0}
   _wormBrain: {fileID: 0}
+  _swarmBrain: {fileID: 0}
 --- !u!114 &2240562265475578678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,6 +419,19 @@ MonoBehaviour:
   - {fileID: 4353169174539410497}
   _health: {fileID: 6227272584779357697}
   _hitConfig: {fileID: 11400000, guid: 78cb74ae3a2223a41a10c1f64c26438d, type: 2}
+--- !u!114 &2042417011476068454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5001793755108328482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 4353169174539410497}
 --- !u!1 &5782868299914000527
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,12 +495,12 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.035377502, y: 1.322123}
-  m_Size: {x: 1.4003754, y: 2.5991507}
+  m_Offset: {x: 0, y: 1.17}
+  m_Size: {x: 1.74, y: 2.96}
   m_Direction: 0
 --- !u!114 &6058861881810890545
 MonoBehaviour:
@@ -560,12 +578,12 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.024763107, y: 1.0461788}
-  m_Size: {x: 1.223484, y: 1.8916035}
+  m_Offset: {x: 0, y: 1.17}
+  m_Size: {x: 1.74, y: 2.96}
   m_Direction: 0
 --- !u!114 &6828326011456730797
 MonoBehaviour:
