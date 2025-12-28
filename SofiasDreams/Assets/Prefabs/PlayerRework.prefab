@@ -324,6 +324,8 @@ GameObject:
   - component: {fileID: -4872943389680325650}
   - component: {fileID: 4954444520845149196}
   - component: {fileID: 8145989154712843356}
+  - component: {fileID: 4575646902207013832}
+  - component: {fileID: 8026534820593938046}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -810,6 +812,33 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 524288
   originOverride: {fileID: 0}
+--- !u!114 &4575646902207013832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 293a084edf8c5414c811c9e5fe85ae9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDissolveVfxBridge
+  dissolve: {fileID: 8026534820593938046}
+  bundle: {fileID: 11400000, guid: 8632034f2f04b764e8624b54acda59fd, type: 2}
+--- !u!114 &8026534820593938046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 1582578690030096884}
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,7 +899,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -893,12 +922,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 4438370541146361172, guid: a9248ea569a598a42a87018d40a4862a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a9248ea569a598a42a87018d40a4862a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.7, y: 2.26}
+  m_Size: {x: 9.53125, y: 6.28125}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

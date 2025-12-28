@@ -14,15 +14,15 @@ public class BonfireRespawnOnDeath : IInitializable, IDisposable
 
     public void Initialize()
     {
-        _bus.Subscribe<Died>(OnDied);
+        _bus.Subscribe<PlayerDeathVfxFinished>(OnDeathVfxFinished);
     }
 
     public void Dispose()
     {
-        _bus.Unsubscribe<Died>(OnDied);
+        _bus.Unsubscribe<PlayerDeathVfxFinished>(OnDeathVfxFinished);
     }
 
-    void OnDied(Died _)
+    void OnDeathVfxFinished(PlayerDeathVfxFinished _)
     {
         _bonfire.RespawnPlayerAtCheckpoint();
     }

@@ -24,6 +24,7 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<EnemyHit>();
         container.DeclareSignal<InteractPressed>();
         container.DeclareSignal<DashUnlocked>();
+        container.DeclareSignal<PlayerDeathVfxFinished>();
     }
 
     public static void DeclarePlayerSignals(DiContainer container)

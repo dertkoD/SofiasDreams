@@ -446,5 +446,10 @@ namespace Zenject
 
             return null;
         }
+
+        public void TrySubscribe<T>(Action<T> onRespawnedAtBonfire)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
