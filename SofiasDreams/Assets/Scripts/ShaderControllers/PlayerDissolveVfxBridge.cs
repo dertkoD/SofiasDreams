@@ -56,11 +56,22 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
             PlayRespawnVfx();
     }
 
-    private void PlayRespawnVfx()
+    public void PlayRespawnVfx()
     {
         if (!bundle || !bundle.respawn) return;
 
         dissolve.ApplyInstant(bundle.respawn, bundle.respawn.startAmount, bundle.respawn.outlineStartThickness);
         dissolve.Play(bundle.respawn);
+    }
+
+    public void PlayDeathVfx(System.Action onFinished = null)
+    {
+        if (!bundle || !bundle.death)
+        {
+            onFinished?.Invoke();
+            return;
+        }
+
+        dissolve.Play(bundle.death, onFinished);
     }
 }

@@ -77,6 +77,22 @@ public class RespawnManager : MonoBehaviour
     IEnumerator RespawnRoutine(Transform playerTransform, Rigidbody2D playerRb)
     {
         _cooldown = true;
+        
+        // Try to find the dissolve bridge on the player
+        var dissolveBridge = playerTransform.GetComponentInChildren<PlayerDissolveVfxBridge>();
+        
+        if (dissolveBridge != null)
+        {
+            // Lock physics during dissolve
+            if (playerRb != null) playerRb.simulated = false;
+
+            // 1. Play dissolve OUT (death effect)
+            bool dissolved = false;
+            dissolveBridge.PlayDeathVfx(() => dissolved = true);
+
+            // Wait until dissolve is finished
+            while (!dissolved) yield return null;
+        }
 
         if (respawnDelay > 0f)
             yield return new WaitForSeconds(respawnDelay);
@@ -89,6 +105,9 @@ public class RespawnManager : MonoBehaviour
 
             // Prefer rb.position to avoid weirdness with interpolation
             playerRb.position = spawnPoint.position;
+            
+            // Re-enable physics simulation if we disabled it
+            if (dissolveBridge != null) playerRb.simulated = true;
         }
         else
         {
@@ -97,6 +116,12 @@ public class RespawnManager : MonoBehaviour
 
         if (triggerCooldown > 0f)
             yield return new WaitForSeconds(triggerCooldown);
+
+        // 2. Play dissolve IN (respawn effect)
+        if (dissolveBridge != null)
+        {
+            dissolveBridge.PlayRespawnVfx();
+        }
 
         _cooldown = false;
     }
