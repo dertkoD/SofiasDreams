@@ -64,6 +64,10 @@ public class RespawnManager : MonoBehaviour
             );
 
             playerHealth.ApplyDamage(info);
+
+            // If the player died from this damage, let the Death/Bonfire system handle it.
+            // Do not teleport a dying/dissolving player.
+            if (!playerHealth.IsAlive) return;
         }
 
         // Teleport + cleanup (optionally delayed)
