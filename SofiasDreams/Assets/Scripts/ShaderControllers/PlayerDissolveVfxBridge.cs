@@ -31,9 +31,17 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
 
     private void SubscribeSignals()
     {
-        _bus.TrySubscribe<Died>(OnDied);
-        _bus.TrySubscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
-        _bus.TrySubscribe<PlayerSpawned>(OnPlayerSpawned);
+        // Use TryUnsubscribe before Subscribe to avoid duplicate subscriptions
+        // Zenject's TrySubscribe is apparently not fully implemented in some versions or bindings
+        
+        _bus.TryUnsubscribe<Died>(OnDied);
+        _bus.Subscribe<Died>(OnDied);
+
+        _bus.TryUnsubscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
+        _bus.Subscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
+
+        _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
+        _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
     private void OnDisable()
