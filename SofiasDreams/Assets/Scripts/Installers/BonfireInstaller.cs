@@ -1,4 +1,4 @@
-﻿using Zenject;
+using Zenject;
 
 public class BonfireInstaller : MonoInstaller
 {
@@ -22,6 +22,6 @@ public class BonfireInstaller : MonoInstaller
 
         // Bonfire service
         Container.BindInterfacesTo<BonfireService>().AsSingle();
-        Container.BindInterfacesTo<BonfireRespawnOnDeath>().AsSingle();
+        // Container.BindInterfacesTo<BonfireRespawnOnDeath>().AsSingle(); // Moved to SceneInstaller
     }
 }

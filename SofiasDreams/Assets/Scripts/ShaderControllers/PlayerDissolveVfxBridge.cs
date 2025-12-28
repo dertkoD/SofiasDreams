@@ -20,22 +20,27 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
     private void OnEnable()
     {
         _bus.Subscribe<Died>(OnDied);
-
-        _bus.TrySubscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
-
+        // PlayerSpawned is enough for both initial spawn and respawn
         _bus.TrySubscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
     private void OnDisable()
     {
         _bus.TryUnsubscribe<Died>(OnDied);
-        _bus.TryUnsubscribe<PlayerRespawnedAtBonfire>(OnRespawnedAtBonfire);
         _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
     private void OnDied(Died _)
     {
         if (_deathVfxPlaying) return;
+        
+        if (!bundle || !bundle.death)
+        {
+            // If no bundle/settings, just fire finished immediately so respawn can proceed
+            _bus.Fire(new PlayerDeathVfxFinished());
+            return;
+        }
+
         _deathVfxPlaying = true;
 
         dissolve.Play(bundle.death, () =>
@@ -43,11 +48,6 @@ public class PlayerDissolveVfxBridge : MonoBehaviour
             _deathVfxPlaying = false;
             _bus.Fire(new PlayerDeathVfxFinished());
         });
-    }
-
-    private void OnRespawnedAtBonfire(PlayerRespawnedAtBonfire _)
-    {
-        PlayRespawnVfx();
     }
 
     private void OnPlayerSpawned(PlayerSpawned s)

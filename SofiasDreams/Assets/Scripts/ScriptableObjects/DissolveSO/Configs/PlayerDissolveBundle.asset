@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61eb77eee81d0f4baa03e8d7fbded99, type: 3}
   m_Name: PlayerDissolveBundle
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDissolveBundleSO
-  death: {fileID: 0}
-  respawn: {fileID: 0}
+  death: {fileID: 11400000, guid: 08846cd0c3e8ede4ba5d5fcf0d5659df, type: 2}
+  respawn: {fileID: 11400000, guid: 10b3881ae0cd03543a933c57b2c900ce, type: 2}
