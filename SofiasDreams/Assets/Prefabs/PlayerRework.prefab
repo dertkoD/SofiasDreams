@@ -349,7 +349,6 @@ Transform:
   - {fileID: 6148590750428317015}
   - {fileID: 6297661449941217374}
   - {fileID: 8712056195396883696}
-  - {fileID: 1349831690664682519}
   - {fileID: 5782165281123169340}
   - {fileID: 6787567438191937835}
   - {fileID: 2650796127034818553}
@@ -566,7 +565,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01cbf1db1da8ce444ae87eb29162b184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundCheck: {fileID: 1349831690664682519}
+  groundCheck: {fileID: 0}
   groundRadius: 0.42
   groundMask:
     serializedVersion: 2
@@ -1210,37 +1209,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
---- !u!1 &5475067511311232447
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1349831690664682519}
-  m_Layer: 6
-  m_Name: GroundChecker
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1349831690664682519
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5475067511311232447}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.582, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4225169607234761225}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5588803443986654724
 GameObject:
   m_ObjectHideFlags: 0
