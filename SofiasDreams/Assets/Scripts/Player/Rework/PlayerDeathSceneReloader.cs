@@ -7,13 +7,17 @@ public class PlayerDeathSceneReloader : IInitializable, ITickable, IDisposable
 {
     readonly SignalBus _bus;
     readonly float _reloadDelay;
+    readonly IBonfireService _bonfire;
 
     bool _pendingReload;
     float _timer;
 
-    public PlayerDeathSceneReloader(SignalBus bus, [Inject(Optional = true)] float reloadDelay = 1.0f)
+    public PlayerDeathSceneReloader(SignalBus bus, 
+        [Inject(Optional = true)] IBonfireService bonfire,
+        [Inject(Optional = true)] float reloadDelay = 1.0f)
     {
         _bus = bus;
+        _bonfire = bonfire;
         _reloadDelay = reloadDelay;
     }
 
@@ -29,6 +33,11 @@ public class PlayerDeathSceneReloader : IInitializable, ITickable, IDisposable
 
     void OnPlayerDied(Died _)
     {
+        // If we have a checkpoint, the Bonfire system (BonfireRespawnOnDeath) 
+        // will handle respawn. Don't reload the scene.
+        if (_bonfire != null && _bonfire.HasCheckpoint)
+            return;
+
         if (_pendingReload)
             return;
 
