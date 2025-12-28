@@ -34,13 +34,12 @@ public class Bootstrapper : MonoBehaviour
         PlayerPrefs.DeleteKey("checkpoint.y");
         PlayerPrefs.DeleteKey("checkpoint.z");
 #endif
-        // Spawn player at saved checkpoint if available
-        var p = (_bonfire != null && _bonfire.HasCheckpoint) ? startPos /* will be replaced by respawn signal later */ : startPos;
-        // We don't have direct access to checkpoint position here (kept inside BonfireService),
-        // so we rely on BonfireService calling BonfireRespawnRequested on death.
-        // Initial spawn uses startPos.
         _spawner.SpawnPlayer(startPos);
 
+        // If player dies before touching a bonfire, respawn at scene start
+        if (_bonfire != null && !_bonfire.HasCheckpoint)
+            _bonfire.SetCheckpoint("scene_start", startPos);
+        
         SpawnEnemies();
     }
 

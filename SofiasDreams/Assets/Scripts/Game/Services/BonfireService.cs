@@ -37,7 +37,7 @@ public class BonfireService : IBonfireService, IInitializable
     {
         _isResting = true;
 
-        SetCheckpoint(bonfireId, bonfirePos);
+        SetCheckpointInternal(bonfireId, bonfirePos);
 
         _enemyCombatGate.SetBonfireSafe(true);
 
@@ -82,7 +82,13 @@ public class BonfireService : IBonfireService, IInitializable
         });
     }
 
-    void SetCheckpoint(string bonfireId, Vector3 pos)
+    public void SetCheckpoint(string id, Vector3 pos)
+    {
+        // do NOT change resting state; just set/save checkpoint
+        SetCheckpointInternal(id, pos);
+    }
+    
+    void SetCheckpointInternal(string bonfireId, Vector3 pos)
     {
         _checkpointId = bonfireId;
         _checkpointPos = pos;

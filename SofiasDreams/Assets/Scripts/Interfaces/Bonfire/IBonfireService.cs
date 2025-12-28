@@ -7,4 +7,6 @@ public interface IBonfireService
 
     void ToggleRest(string bonfireId, Vector3 bonfirePos);
     void RespawnPlayerAtCheckpoint();
+    
+    void SetCheckpoint(string id, Vector3 pos);
 }
