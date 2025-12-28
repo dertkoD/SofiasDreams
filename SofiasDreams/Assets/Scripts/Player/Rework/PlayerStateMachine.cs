@@ -257,13 +257,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     void OnInteractPressed(InteractPressed _)
     {
-        if (_state == PlayerState.BonfireRest)
-        {
-            // Force exit rest to avoid soft-lock if interactor fails
-            _bonfire.ToggleRest("", Vector3.zero);
-            return;
-        }
-
+        
         if (_state == PlayerState.Dead || _state == PlayerState.Hurt || _state == PlayerState.Dash ||
             _state == PlayerState.Attack || _state == PlayerState.Grapple || _state == PlayerState.Heal)
             return;

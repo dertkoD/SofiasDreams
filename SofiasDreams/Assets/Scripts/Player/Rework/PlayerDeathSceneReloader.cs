@@ -33,9 +33,12 @@ public class PlayerDeathSceneReloader : IInitializable, ITickable, IDisposable
 
     void OnPlayerDied(Died _)
     {
+        // Check for checkpoint via PlayerPrefs to avoid dependency injection issues if this class isn't properly bound
+        bool hasCheckpoint = PlayerPrefs.HasKey("checkpoint.bonfireId");
+        
         // If we have a checkpoint, the Bonfire system (BonfireRespawnOnDeath) 
         // will handle respawn. Don't reload the scene.
-        if (_bonfire != null && _bonfire.HasCheckpoint)
+        if (hasCheckpoint)
             return;
 
         if (_pendingReload)
