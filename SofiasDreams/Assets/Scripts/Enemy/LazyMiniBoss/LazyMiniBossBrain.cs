@@ -40,6 +40,7 @@ public class LazyMiniBossBrain : MonoBehaviour
     // Combat
     float _nextMeleeAttackTime;
     float _nextShootAttackTime;
+    bool _hasPerformedFirstMelee; // New flag
     
     // Internal flags for melee sequence
     bool _attack1Triggered;
@@ -159,6 +160,8 @@ public class LazyMiniBossBrain : MonoBehaviour
         _motor.Stop();
         _anim.TriggerPatrol();
         _hasSeenPlayer = false;
+        _hasPerformedFirstMelee = false; // Reset on lost agro? Or keep it? Usually reset means "new encounter"
+        // If we want him to ALWAYS do melee first on every new encounter, reset it.
     }
     
     void TickPatrol()
@@ -204,7 +207,7 @@ public class LazyMiniBossBrain : MonoBehaviour
                  return;
              }
         }
-        else if (seesPlayer && dist >= _config.shootRangeMin) // Shoot Range
+        else if (seesPlayer && dist >= _config.shootRangeMin && _hasPerformedFirstMelee) // Shoot Range only after first melee
         {
             if (Time.time >= _nextShootAttackTime)
             {
@@ -216,10 +219,21 @@ public class LazyMiniBossBrain : MonoBehaviour
         // Move towards target if not attacking
         if (dist > _config.closeRangeThreshold * 0.8f) // Keep some distance? Or close in?
         {
+             // If we haven't done first melee, we MUST close in
+             bool forceCloseIn = !_hasPerformedFirstMelee;
+             
              // If we are far, run towards
              // If we are in shoot range, maybe stop to shoot?
-             // Assuming chase logic:
-             _motor.Move(Mathf.Sign(dx) * _config.agroRunSpeed);
+             // Only stop if we CAN shoot (i.e. has performed first melee)
+             if (!forceCloseIn && seesPlayer && dist >= _config.shootRangeMin && dist <= _config.shootRangeMin + 2f && Time.time < _nextShootAttackTime)
+             {
+                 // Maybe wait for cooldown?
+                 _motor.Stop();
+             }
+             else
+             {
+                 _motor.Move(Mathf.Sign(dx) * _config.agroRunSpeed);
+             }
         }
         else
         {
@@ -234,6 +248,7 @@ public class LazyMiniBossBrain : MonoBehaviour
         _attack1Triggered = true;
         _attack2Triggered = false;
         _anim.SetAttack1(true);
+        _hasPerformedFirstMelee = true; // Mark as done
         _nextMeleeAttackTime = Time.time + _config.meleeAttackCooldown;
     }
 
@@ -265,13 +280,15 @@ public class LazyMiniBossBrain : MonoBehaviour
         _state = State.AttackShoot;
         _motor.Stop();
         _anim.TriggerShoot();
-        // Spawn projectile immediately or delay?
-        // Let's spawn with a slight delay or now. 
-        // Ideally we use animation event.
-        // I will invoke a method after 0.2s as a fallback.
-        Invoke(nameof(SpawnProjectile), 0.2f);
-        
+        // Spawn is now handled by Animation Event (AnimationEvent_SpawnProjectile)
         _nextShootAttackTime = Time.time + _config.shootAttackCooldown;
+    }
+    
+    // Called by Animation Event
+    public void AnimationEvent_SpawnProjectile()
+    {
+        if (_state != State.AttackShoot) return;
+        SpawnProjectile();
     }
 
     void TickAttackShoot()
