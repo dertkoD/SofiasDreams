@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetLock: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  unlockedGrapple: {fileID: 21300000, guid: d99ceb53266e6c843abc0d0785f607a8, type: 3}
   oneShot: 1
 --- !u!58 &2871434311929193309
 CircleCollider2D:
