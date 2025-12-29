@@ -46,6 +46,8 @@ public class LazyMiniBossBrain : MonoBehaviour
     bool _attack1Triggered;
     bool _attack2Triggered;
 
+    int _lastHp;
+
     [Inject]
     public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus)
     {
@@ -65,6 +67,20 @@ public class LazyMiniBossBrain : MonoBehaviour
         
         if (!_patrolPath) _patrolPath = FindNearestPatrolPath();
         _path = _patrolPath;
+    }
+    
+    void OnEnable()
+    {
+        if (_health)
+        {
+            _lastHp = _health.CurrentHP;
+            _health.OnHealthChanged += OnHealthChanged;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (_health) _health.OnHealthChanged -= OnHealthChanged;
     }
 
     void Start()
@@ -482,6 +498,39 @@ public class LazyMiniBossBrain : MonoBehaviour
         {
             _pathIndex = FindNearestWaypointIndex(transform.position);
         }
+    }
+
+    void OnHealthChanged()
+    {
+        if (_health == null) return;
+        int current = _health.CurrentHP;
+        
+        if (current < _lastHp)
+        {
+            // If we took damage and are not already in combat (agro/attack)
+            // Or even if we are, maybe we should turn to face the damage source?
+            // Worm logic: if in patrol, turn and enter trigger.
+            
+            if (_state == State.Patrol)
+            {
+                // Try to find source
+                if (_health.LastHit != null && _health.LastHit.source != null)
+                {
+                    Transform src = _health.LastHit.source.transform;
+                    float dx = src.position.x - transform.position.x;
+                    if (Mathf.Abs(dx) > 0.1f)
+                    {
+                        _motor.Face(dx > 0 ? 1 : -1);
+                    }
+                    
+                    // Also remember position as last seen?
+                    _lastSeenPos = src.position;
+                    // Trigger Agro
+                    EnterTriggerAgro();
+                }
+            }
+        }
+        _lastHp = current;
     }
 
     void OnDrawGizmos()
