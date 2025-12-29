@@ -273,24 +273,68 @@ public class LazyMiniBossBrain : MonoBehaviour
 
     void TickAttackMelee()
     {
-        // Simple sequencer
-        // If in Attack1 and haven't triggered Attack2 yet -> Trigger Attack2
-        if (_anim.IsInAttack1() && !_attack2Triggered)
+        // Force sequencer: Attack1 -> Attack2
+        
+        // If we are currently playing Attack1, we MUST ensure Attack1 bool is off so it doesn't loop,
+        // and set Attack2 bool ON to queue the transition.
+        if (_anim.IsInAttack1())
         {
-             _anim.SetAttack1(false); // Reset boolean
-             _anim.SetAttack2(true);
-             _attack2Triggered = true;
+             // We want to transition to Attack2. 
+             // The transition condition is "Attack2 == true".
+             // The exit transition from Attack1 to Agro is "Attack1 == false".
+             // Since we want to go to Attack2, we must ensure Attack2 is true.
+             // Usually, turning off Attack1 is fine as long as Attack2 is set, priority depends on Animator.
+             // But to be safe, let's keep Attack1 true until we are sure? 
+             // No, "Attack1 = false" triggers exit. So we should NOT set Attack1 false if we want to chain?
+             // Actually, usually "Has Exit Time" or specific conditions handle this.
+             // User says: "From Attack1 transition bool Attack1=true -> Attack1State" (wait, entering).
+             // "From Attack1 transition bool Attack2=true -> Attack2State".
+             // "From Attack1 transition bool Attack1=false -> AgroMovement".
+             
+             // So if we want to go 1 -> 2:
+             // We must Set Attack2 = true.
+             // We must NOT Set Attack1 = false immediately if that causes early exit before Attack2 transition is picked up?
+             // Unity picks first valid transition.
+             
+             if (!_attack2Triggered)
+             {
+                 _anim.SetAttack2(true);
+                 _attack2Triggered = true;
+                 
+                 // We can turn off Attack1 now, assuming Attack2 transition will take precedence or 
+                 // Attack1->Agro has a condition that we can avoid?
+                 // User said: "Attack1 transition bool Attack1=false -> AgroMovement".
+                 // So if we set Attack1=false, it might go to Agro.
+                 // We should keep Attack1=true UNTIL we are in Attack2? 
+                 // But then it might loop Attack1 if it's set to loop?
+                 // Assuming Attack1 is not looping.
+                 
+                 // Let's keep Attack1 TRUE until we see we are in Attack2 state.
+             }
         }
         
         if (_anim.IsInAttack2())
         {
-            _anim.SetAttack2(false); // Reset boolean
+            // Now we are safely in Attack2.
+            // Turn off triggers/bools.
+            _anim.SetAttack1(false);
+            _anim.SetAttack2(false); 
+        }
+        else if (_attack2Triggered && !_anim.IsInAttack1()) 
+        {
+            // We triggered attack 2, and we are NOT in attack 1 anymore.
+            // Maybe we are transitioning? Or maybe we finished?
+            // If we are back in Agro, then the combo finished.
         }
 
         // Check for exit
+        // If we finished Attack2 and returned to Agro
         if (_anim.IsInAgroMovement() && _attack2Triggered) 
         {
              _state = State.Agro;
+             // Reset flags
+             _anim.SetAttack1(false);
+             _anim.SetAttack2(false);
         }
     }
 
