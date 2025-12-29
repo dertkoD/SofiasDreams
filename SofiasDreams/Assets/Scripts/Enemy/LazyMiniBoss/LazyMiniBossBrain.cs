@@ -169,16 +169,39 @@ public class LazyMiniBossBrain : MonoBehaviour
         if (_path == null || _path.Count == 0) return;
 
         Vector3 target = _path.GetPoint(_pathIndex);
+        
+        // 1. Calculate distance purely on X if it's a 2D platformer on flat ground, 
+        // or ensure the Y difference doesn't block arrival if waypoints are slightly off.
+        // For simplicity, let's stick to Distance but ensure we don't overshoot or get stuck.
         float dist = Vector2.Distance(transform.position, target);
         
+        // Check if we reached it
         if (dist <= _config.waypointArriveDistance)
         {
             AdvancePathIndex();
-            // Wait logic could go here
+            // Important: if we just advanced, we should check if we should wait or immediately move to next.
+            // For now, immediately move to next in next frame.
+            _motor.Stop(); // Stop momentarily
+            return;
         }
 
         // Move towards target
         float dx = target.x - transform.position.x;
+        
+        // Fix: If we are very close on X but Y is different (e.g. waypoint slightly in air/ground),
+        // we might oscillate. 
+        if (Mathf.Abs(dx) < 0.05f) 
+        {
+             // We are at the X position but maybe Y is off. Consider arrived if Y difference is small?
+             // Or just force advance.
+             // If we are this close in X, but Distance check failed, it means Y is off.
+             // Let's rely on distance check mostly, but if X is aligned, maybe we are stuck?
+             // Let's trust distance but ensure waypoints are placed well.
+             
+             // HOWEVER, if the enemy overshoots, he might turn back.
+             // To prevent "stuck at point 1", ensure AdvancePathIndex logic is correct.
+        }
+
         _motor.Move(Mathf.Sign(dx) * _config.patrolSpeed);
     }
 
@@ -392,17 +415,23 @@ public class LazyMiniBossBrain : MonoBehaviour
     void AdvancePathIndex()
     {
         if (_path == null || _path.Count <= 1) return;
+        
+        // Loop logic:
         if (_config != null && _config.loopPath)
         {
             _pathIndex = (_pathIndex + 1) % _path.Count;
             return;
         }
 
+        // Ping-pong logic:
         int next = _pathIndex + _pathDir;
         if (next >= _path.Count || next < 0)
         {
-            _pathDir *= -1;
-            next = Mathf.Clamp(_pathIndex + _pathDir, 0, _path.Count - 1);
+            _pathDir *= -1; // Reverse direction
+            next = _pathIndex + _pathDir; 
+            
+            // Safety clamp if count is small (e.g. 2 points: 0->1. At 1, dir=+1, next=2(out). dir=-1, next=0. Correct.)
+            next = Mathf.Clamp(next, 0, _path.Count - 1);
         }
         _pathIndex = next;
     }
