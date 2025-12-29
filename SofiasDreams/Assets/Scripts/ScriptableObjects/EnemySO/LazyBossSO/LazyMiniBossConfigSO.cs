@@ -5,10 +5,8 @@ public class LazyMiniBossConfigSO : ScriptableObject
 {
     [Header("Patrol")]
     [Min(0f)] public float patrolSpeed = 2f;
-    [Min(0f)] public float patrolPathSearchRadius = 100f;
     public bool loopPath = true;
     [Min(0.01f)] public float waypointArriveDistance = 0.2f;
-    [Min(0f)] public float patrolWaitTime = 1f;
 
     [Header("Agro Movement")]
     [Min(0f)] public float agroRunSpeed = 4f;
@@ -23,6 +21,5 @@ public class LazyMiniBossConfigSO : ScriptableObject
     [Header("Projectile")]
     [Min(0f)] public float projectileSpeed = 10f;
     [Min(0f)] public int projectileDamage = 1;
-    [Min(0f)] public float projectileLifeTime = 5f;
     public GameObject projectilePrefab;
 }

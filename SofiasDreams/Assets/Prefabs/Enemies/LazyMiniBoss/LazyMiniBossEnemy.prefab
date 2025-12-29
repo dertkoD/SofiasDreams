@@ -13,11 +13,16 @@ GameObject:
   - component: {fileID: 1475023466729518131}
   - component: {fileID: 1267568116224067778}
   - component: {fileID: 3943784034358652647}
+  - component: {fileID: 4707049794961537889}
   - component: {fileID: 973517408187533830}
+  - component: {fileID: 8805173338956872490}
+  - component: {fileID: 1824828091787262381}
+  - component: {fileID: 7336129628416338089}
   - component: {fileID: 3381260791312273194}
   - component: {fileID: 9152025712290700921}
   - component: {fileID: 2289333444942668526}
   - component: {fileID: 7918499548286637425}
+  - component: {fileID: 1569286708402585278}
   m_Layer: 9
   m_Name: LazyMiniBossEnemy
   m_TagString: Untagged
@@ -154,10 +159,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Zenject::Zenject.GameObjectContext
   _scriptableObjectInstallers: []
-  _monoInstallers: []
+  _monoInstallers:
+  - {fileID: 4707049794961537889}
   _installerPrefabs: []
   _autoRun: 1
   _kernel: {fileID: 0}
+--- !u!114 &4707049794961537889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d08c6e340e5c814a91630a0c029b11c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LazyMiniBossInstaller
+  _enemyConfig: {fileID: 11400000, guid: d45976f68c9ec2c4084ee1fa2682c185, type: 2}
+  _healthConfig: {fileID: 11400000, guid: d045e33062f5dcb49b3b8d7a537c514f, type: 2}
+  _health: {fileID: 3381260791312273194}
+  _brain: {fileID: 8805173338956872490}
+  _motor: {fileID: 1824828091787262381}
+  _animator: {fileID: 7336129628416338089}
+  _vision: {fileID: 380739008702332261}
 --- !u!114 &973517408187533830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,6 +202,66 @@ MonoBehaviour:
   _jumpingBrain: {fileID: 0}
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
+  _lazyMiniBossBrain: {fileID: 8805173338956872490}
+--- !u!114 &8805173338956872490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b629352e7013148aabc89d16a9915e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LazyMiniBossBrain
+  _motor: {fileID: 1824828091787262381}
+  _anim: {fileID: 7336129628416338089}
+  _vision: {fileID: 380739008702332261}
+  _health: {fileID: 3381260791312273194}
+  _patrolPath: {fileID: 0}
+  _projectileSpawnPoint: {fileID: 5458077606868776040}
+--- !u!114 &1824828091787262381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33660a2f1dbd99348ac84f75ac6fd40a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LazyMiniBossMotor2D
+  _rb: {fileID: 1475023466729518131}
+  _facingTransform: {fileID: 0}
+--- !u!114 &7336129628416338089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fde9fdc6b569f584cb55191cf4c7c4b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LazyMiniBossAnimatorAdapter
+  _animator: {fileID: 1267568116224067778}
+  _xVelocity: xVelocity
+  _triggerAgro: TriggerAgro
+  _triggerPatrol: TriggerPatrol
+  _deathTrigger: Death
+  _attack1Bool: Attack1
+  _attack2Bool: Attack2
+  _shootTrigger: Shoot
+  _patrolMovementState: PatrolMovement
+  _agroMovementState: AgroMovement
+  _triggerAgroState: TriggerAgro
+  _triggerPatrolState: TriggerPatrol
+  _attack1State: Attack1
+  _attack2State: Attack2
+  _shootState: Shoot
 --- !u!114 &3381260791312273194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,6 +321,27 @@ MonoBehaviour:
   - {fileID: 3182692422168544452}
   _health: {fileID: 3381260791312273194}
   _hitConfig: {fileID: 11400000, guid: 39a3efd0d16f64e4996421b8c32794ed, type: 2}
+--- !u!114 &1569286708402585278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1df15f150767a694783821acffca915e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathHandler
+  _health: {fileID: 3381260791312273194}
+  _movement: {fileID: 0}
+  _facade: {fileID: 973517408187533830}
+  _rb: {fileID: 1475023466729518131}
+  _colliders:
+  - {fileID: 2365259932720127883}
+  - {fileID: 6025732696848912576}
+  - {fileID: 2761739726538464526}
+  _destroyDelay: 1
 --- !u!1 &3207133190380383240
 GameObject:
   m_ObjectHideFlags: 0
