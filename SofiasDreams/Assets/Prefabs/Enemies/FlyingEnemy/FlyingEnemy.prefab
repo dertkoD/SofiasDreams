@@ -446,7 +446,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
   dissolveController: {fileID: 2042417011476068454}
-  dissolveSettings: {fileID: 11400000, guid: 08846cd0c3e8ede4ba5d5fcf0d5659df, type: 2}
+  dissolveSettings: {fileID: 11400000, guid: 66b73a87634eefe489d6cf58517ff82e, type: 2}
 --- !u!1 &5782868299914000527
 GameObject:
   m_ObjectHideFlags: 0
