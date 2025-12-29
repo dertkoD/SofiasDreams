@@ -68,6 +68,8 @@ public class MinionBrain : MonoBehaviour
 
     public void OnSpawn()
     {
+        enabled = true; // SAFETY: pooled instances might have been disabled before pooling
+        
         _orbitAngle = Random.Range(0f, 360f);
         _orbitDirection = Random.Range(0, 2) == 0 ? 1f : -1f;
         _supportLateralSide = Random.Range(0, 2) == 0 ? 1f : -1f;
@@ -323,5 +325,32 @@ public class MinionBrain : MonoBehaviour
     public void Release()
     {
         _owner.Release(this);
+    }
+    
+    public void ForceReturnToPool()
+    {
+        // Stop any delayed release coroutine from Kill()
+        StopAllCoroutines();
+
+        // IMPORTANT: if Kill() previously did `enabled = false`,
+        // it will stay false even after pooling unless we reset it.
+        enabled = true;
+
+        // Stop motion and any shooting activity
+        if (_motor) _motor.Stop();
+        
+        // Reset animator so we don't stay in Death state (optional but recommended)
+        if (_animator)
+        {
+            _animator.ResetTrigger("Death");
+            _animator.Rebind();
+            _animator.Update(0f);
+        }
+
+        // Make sure collider isn't left disabled by damage/death logic
+        if (_collider) _collider.enabled = true;
+
+        // Return to pool
+        Release();
     }
 }

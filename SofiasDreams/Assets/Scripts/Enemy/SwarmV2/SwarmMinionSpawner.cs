@@ -4,6 +4,8 @@ using Zenject;
 
 public class SwarmMinionSpawner : MonoBehaviour
 {
+    SignalBus _bus;
+    
     [Header("Internal Pool")]
     public Transform spawnParent;
     public int sortingOrderOffset = 5;
@@ -36,12 +38,31 @@ public class SwarmMinionSpawner : MonoBehaviour
     public float MinionOrbitRadius => _config != null ? _config.minionOrbitRadius : 3.0f;
 
     [Inject]
-    public void Construct(SwarmConfig config, DiContainer container)
+    public void Construct(SwarmConfig config, DiContainer container, SignalBus bus)
     {
         _config = config;
         _container = container;
+        _bus = bus;
     }
 
+    void OnEnable()
+    {
+        if (_bus != null)
+            _bus.Subscribe<BonfireEnemiesRespawnRequested>(OnBonfireEnemiesRespawnRequested);
+    }
+
+    void OnDisable()
+    {
+        if (_bus != null)
+            _bus.TryUnsubscribe<BonfireEnemiesRespawnRequested>(OnBonfireEnemiesRespawnRequested);
+    }
+
+    void OnBonfireEnemiesRespawnRequested(BonfireEnemiesRespawnRequested _)
+    {
+        // Force-return all minions so we don’t leave AFK hitboxes.
+        ReturnAllToPoolImmediate();
+    }
+    
     void Awake()
     {
         _swarmSR = GetComponentInChildren<SpriteRenderer>();
@@ -191,6 +212,10 @@ public class SwarmMinionSpawner : MonoBehaviour
         {
             SetupMinion(m, _spawnIdxPhase++);
             m.gameObject.SetActive(true);
+            
+            // SAFETY reset (important if minion was previously killed)
+            m.enabled = true;
+            
             m.OnSpawn();
             _active.Add(m);
             _nextSpawnAt = Time.time + _config.spawnInterval;
@@ -203,12 +228,18 @@ public class SwarmMinionSpawner : MonoBehaviour
         if (_pool.Count == 0) return null;
 
         var m = _pool.Dequeue();
-        m.transform.SetParent(null); // Detach parent but keep pos/rot/scale
+        
+        // DO NOT detach; keep under the swarm's spawnParent so ClearEnemies destroys them.
+        m.transform.SetParent(spawnParent, true); // keep world position
+        
         return m;
     }
 
     void SetupMinion(MinionBrain m, int index)
     {
+        // Ensure hierarchy is correct even if something reparented it
+        m.transform.SetParent(spawnParent, true);
+        
         // Distribute spawn points around the Swarm to prevent stacking
         float spawnRadius = 5.0f; // Spawn outside Swarm body (radius ~3.8)
         float angle = index * (360f / 3f) * Mathf.Deg2Rad; // 3 directions: 0, 120, 240
@@ -278,5 +309,28 @@ public class SwarmMinionSpawner : MonoBehaviour
             var m = _active[i];
             if (m == null || !m.gameObject.activeInHierarchy) _active.RemoveAt(i);
         }
+    }
+    
+    public void ReturnAllToPoolImmediate()
+    {
+        CleanActive();
+
+        // Reset squad state
+        _squadInAggro = false;
+        _squadForgetTimer = 0f;
+        _squadTarget = null;
+        _currentAggressor = null;
+
+        // Force-return every active minion
+        for (int i = _active.Count - 1; i >= 0; i--)
+        {
+            var m = _active[i];
+            if (!m) { _active.RemoveAt(i); continue; }
+
+            // This will call _owner.Release(this) internally
+            m.ForceReturnToPool();
+        }
+
+        _active.Clear();
     }
 }
