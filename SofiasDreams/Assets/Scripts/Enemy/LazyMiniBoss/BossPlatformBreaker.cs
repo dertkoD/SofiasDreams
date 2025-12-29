@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class BossPlatformBreaker : MonoBehaviour
 {
-    [SerializeField] Tilemap _tilemap;
+    [SerializeField] List<GameObject> _platformParts;
     [SerializeField] float _breakDelay = 0.1f;
     [SerializeField] bool _triggered;
 
@@ -18,34 +17,55 @@ public class BossPlatformBreaker : MonoBehaviour
 
     IEnumerator BreakRoutine()
     {
-        if (_tilemap == null) yield break;
-
-        BoundsInt bounds = _tilemap.cellBounds;
-        List<Vector3Int> tiles = new List<Vector3Int>();
-
-        for (int x = bounds.xMin; x <= bounds.xMax; x++)
+        // If it is just a single Sprite+Collider object
+        if (_platformParts == null || _platformParts.Count == 0)
         {
-            for (int y = bounds.yMin; y <= bounds.yMax; y++)
-            {
-                Vector3Int pos = new Vector3Int(x, y, 0);
-                if (_tilemap.HasTile(pos))
-                {
-                    tiles.Add(pos);
-                }
-            }
+             if (transform.childCount > 0)
+             {
+                 _platformParts = new List<GameObject>();
+                 foreach(Transform child in transform)
+                 {
+                     _platformParts.Add(child.gameObject);
+                 }
+                 _platformParts.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+             }
+             else
+             {
+                 // Single object case:
+                 // We can't break it piece by piece easily if it's one sprite.
+                 // We can try to shake it then disable it?
+                 // Or just disable it immediately.
+                 // Since the user asked for "breaking", and it's a single object, 
+                 // the most reasonable thing is to just remove it so the boss falls.
+                 
+                 // Maybe play a particle effect here? (Not requested, but good practice)
+                 
+                 var colSingle = GetComponent<Collider2D>();
+                 if (colSingle) colSingle.enabled = false;
+                 
+                 var rend = GetComponent<Renderer>();
+                 if (rend) rend.enabled = false;
+                 
+                 yield break;
+             }
         }
 
-        // Sort by X to break from left to right (or any other pattern)
-        tiles.Sort((a, b) => a.x.CompareTo(b.x));
-
-        foreach (var pos in tiles)
+        foreach (var part in _platformParts)
         {
-            _tilemap.SetTile(pos, null);
+            if (part != null)
+            {
+                // Disable or Destroy
+                // Part might be just a sprite object
+                part.SetActive(false); // or Destroy(part);
+            }
             yield return new WaitForSeconds(_breakDelay);
         }
         
-        // Disable collider if any remaining attached to this object (e.g. composite)
+        // Disable main collider if it exists on root
         var col = GetComponent<Collider2D>();
         if (col) col.enabled = false;
+        
+        // Destroy self eventually
+        Destroy(gameObject, 1f);
     }
 }
