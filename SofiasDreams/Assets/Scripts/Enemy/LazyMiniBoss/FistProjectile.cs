@@ -6,18 +6,28 @@ public class FistProjectile : MonoBehaviour
     [SerializeField] float lifetime = 5f;
     [SerializeField] int damage = 1;
     [SerializeField] LayerMask groundLayers;
+    
+    [Header("VFX")]
+    [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
 
     Rigidbody2D _rb;
+    SpriteDissolveController _dissolveController;
+    Collider2D _col;
     float _dieAt;
+    bool _isDissolving;
     
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _dissolveController = GetComponent<SpriteDissolveController>();
+        _col = GetComponent<Collider2D>();
     }
 
     void OnEnable()
     {
         _dieAt = Time.time + lifetime;
+        _isDissolving = false;
+        if (_col) _col.enabled = true;
     }
 
     public void Setup(int dmg)
@@ -37,14 +47,18 @@ public class FistProjectile : MonoBehaviour
 
     void Update()
     {
+        if (_isDissolving) return;
+
         if (Time.time >= _dieAt)
         {
-            Destroy(gameObject);
+            DissolveAndDestroy();
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (_isDissolving) return;
+
         // Check for player hurtbox or damageable
         IDamageable target = other.GetComponent<IDamageable>();
         if (target == null)
@@ -56,17 +70,40 @@ public class FistProjectile : MonoBehaviour
         if (target != null)
         {
             target.ApplyDamage(damage, transform.position, Vector2.zero, gameObject);
-            Destroy(gameObject);
+            DissolveAndDestroy();
         }
         else if (other.GetComponent<Hurtbox2D>() != null)
         {
-            Destroy(gameObject);
+            DissolveAndDestroy();
         }
     }
 
     void OnCollisionEnter2D(Collision2D col)
     {
+        if (_isDissolving) return;
+
         if (((1 << col.gameObject.layer) & groundLayers.value) != 0)
+        {
+            DissolveAndDestroy();
+        }
+    }
+
+    void DissolveAndDestroy()
+    {
+        if (_isDissolving) return;
+        _isDissolving = true;
+
+        // Stop movement
+        if (_rb) _rb.linearVelocity = Vector2.zero;
+        
+        // Disable collider to prevent further hits
+        if (_col) _col.enabled = false;
+
+        if (_dissolveController && _dissolveSettings)
+        {
+            _dissolveController.Play(_dissolveSettings, () => Destroy(gameObject));
+        }
+        else
         {
             Destroy(gameObject);
         }
