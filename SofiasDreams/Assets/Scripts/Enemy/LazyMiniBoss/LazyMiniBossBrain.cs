@@ -425,14 +425,21 @@ public class LazyMiniBossBrain : MonoBehaviour
 
         // Ping-pong logic:
         int next = _pathIndex + _pathDir;
-        if (next >= _path.Count || next < 0)
+        if (next >= _path.Count)
         {
-            _pathDir *= -1; // Reverse direction
-            next = _pathIndex + _pathDir; 
-            
-            // Safety clamp if count is small (e.g. 2 points: 0->1. At 1, dir=+1, next=2(out). dir=-1, next=0. Correct.)
-            next = Mathf.Clamp(next, 0, _path.Count - 1);
+            _pathDir = -1;
+            next = _path.Count - 2; 
         }
+        else if (next < 0)
+        {
+            _pathDir = 1;
+            next = 1;
+        }
+
+        // Final safety check
+        if (next < 0) next = 0;
+        else if (next >= _path.Count) next = _path.Count - 1;
+
         _pathIndex = next;
     }
     
