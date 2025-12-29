@@ -91,9 +91,4 @@ public class LazyMiniBossAnimatorAdapter : MonoBehaviour
     public bool IsInAttack1() => IsInState(_attack1State);
     public bool IsInAttack2() => IsInState(_attack2State);
     public bool IsInShoot() => IsInState(_shootState);
-    public bool IsInState(string stateName)
-    {
-        if (!_animator) return false;
-        return _animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
-    }
 }
