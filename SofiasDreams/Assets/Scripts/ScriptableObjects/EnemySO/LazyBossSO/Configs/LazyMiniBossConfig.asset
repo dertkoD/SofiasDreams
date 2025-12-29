@@ -20,7 +20,7 @@ MonoBehaviour:
   closeRangeThreshold: 9.72
   meleeAttackCooldown: 2
   shootAttackCooldown: 3
-  shootRangeMin: 16.1
+  shootRangeMin: 9.72
   projectileSpeed: 10
   projectileDamage: 1
   projectilePrefab: {fileID: 9070739300854532536, guid: aeceacc58001aa94a953170e83afe612, type: 3}

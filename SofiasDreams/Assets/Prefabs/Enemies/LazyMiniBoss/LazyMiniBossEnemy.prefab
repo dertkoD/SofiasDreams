@@ -714,9 +714,9 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4096
-  radius: 18.7
+  radius: 15.6
   fov: 89
-  requireLineOfSight: 0
+  requireLineOfSight: 1
   obstacleLayers:
     serializedVersion: 2
     m_Bits: 128

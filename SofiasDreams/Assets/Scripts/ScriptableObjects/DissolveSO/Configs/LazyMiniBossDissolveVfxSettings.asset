@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1ae199ecfca7f94abe1b357b03db075, type: 3}
   m_Name: LazyMiniBossDissolveVfxSettings
   m_EditorClassIdentifier: Assembly-CSharp::DissolveVfxSettingsSO
-  duration: 4
+  duration: 1
   curve:
     serializedVersion: 2
     m_Curve:
@@ -39,7 +39,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   startAmount: 0
   endAmount: 1.1
-  dissolveScale: 30
+  dissolveScale: 50.7
   verticalDisolve: 0
   spiralStrenght: 0
   animateOutlineThickness: 1
@@ -47,4 +47,4 @@ MonoBehaviour:
   outlineEndThickness: 0.15
   outlineColor: {r: 1, g: 0, b: 0.1585164, a: 1}
   outlineIntensity: 8
-  disableSpriteRendererOnFinish: 1
+  disableSpriteRendererOnFinish: 0

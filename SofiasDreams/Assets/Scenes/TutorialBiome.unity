@@ -68952,9 +68952,13 @@ PrefabInstance:
       propertyPath: _healthConfig
       value: 
       objectReference: {fileID: 11400000, guid: d045e33062f5dcb49b3b8d7a537c514f, type: 2}
+    - target: {fileID: 6890998192043064175, guid: 5fee84c3f51146c498e67015ed8bfe28, type: 3}
+      propertyPath: _platformBreaker
+      value: 
+      objectReference: {fileID: 1417762941}
     - target: {fileID: 8619072385059142345, guid: 5fee84c3f51146c498e67015ed8bfe28, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.6
+      value: 11.38
       objectReference: {fileID: 0}
     - target: {fileID: 8619072385059142345, guid: 5fee84c3f51146c498e67015ed8bfe28, type: 3}
       propertyPath: m_LocalPosition.y
@@ -69947,6 +69951,7 @@ GameObject:
   - component: {fileID: 1417762940}
   - component: {fileID: 1417762939}
   - component: {fileID: 1417762938}
+  - component: {fileID: 1417762941}
   m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
@@ -70074,6 +70079,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1417762941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417762937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4b3c50d7cb5aeb4cb1933293ef77d7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossPlatformBreaker
+  _platformParts: []
+  _breakDelay: 0.1
+  _triggered: 0
 --- !u!1 &1418419688
 GameObject:
   m_ObjectHideFlags: 0
