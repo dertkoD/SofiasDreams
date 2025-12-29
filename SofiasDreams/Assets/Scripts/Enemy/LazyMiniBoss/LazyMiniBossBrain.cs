@@ -378,14 +378,7 @@ public class LazyMiniBossBrain : MonoBehaviour
             
             // If player is known, aim at player? Or just forward?
             // "Shooting projectile" - usually linear.
-            if (_player)
-            {
-                Vector2 diff = _player.position - spawnPos;
-                if (diff.x * dir > 0) // only if in front
-                {
-                   direction = diff.normalized;
-                }
-            }
+            // Request: shoot strictly straight, no aiming.
             
             if (proj) 
             {
