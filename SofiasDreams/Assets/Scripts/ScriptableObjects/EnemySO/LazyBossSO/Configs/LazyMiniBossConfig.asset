@@ -12,18 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e8f1a953e3d414985872aaff6bd275, type: 3}
   m_Name: LazyMiniBossConfig
   m_EditorClassIdentifier: Assembly-CSharp::LazyMiniBossConfigSO
-  patrolSpeed: 2
-  patrolPathSearchRadius: 100
+  patrolSpeed: 1
   loopPath: 1
   waypointArriveDistance: 0.2
-  patrolWaitTime: 1
-  agroRunSpeed: 4
+  agroRunSpeed: 2
   agroForgetSeconds: 3
-  closeRangeThreshold: 2
+  closeRangeThreshold: 9.72
   meleeAttackCooldown: 2
   shootAttackCooldown: 3
-  shootRangeMin: 5
+  shootRangeMin: 16.1
   projectileSpeed: 10
   projectileDamage: 1
-  projectileLifeTime: 5
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 9070739300854532536, guid: aeceacc58001aa94a953170e83afe612, type: 3}
