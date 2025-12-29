@@ -21,8 +21,8 @@ public class LazyMiniBossBrain : MonoBehaviour
     [SerializeField] Health _health;
     [SerializeField] EnemyPatrolPath _patrolPath;
     [SerializeField] Transform _projectileSpawnPoint;
+    [SerializeField] LazyMiniBossConfigSO _config;
 
-    LazyMiniBossConfigSO _config;
     IHealth _iHealth;
     SignalBus _bus;
     Transform _player;
@@ -388,5 +388,18 @@ public class LazyMiniBossBrain : MonoBehaviour
             next = Mathf.Clamp(_pathIndex + _pathDir, 0, _path.Count - 1);
         }
         _pathIndex = next;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (_config == null) return;
+
+        // Draw Close Range (Melee)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _config.closeRangeThreshold);
+
+        // Draw Shoot Range (Min distance)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, _config.shootRangeMin);
     }
 }
