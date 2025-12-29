@@ -3,6 +3,8 @@
 public class UnlockGrapplePointInteractable : MonoBehaviour, IInteractable
 {
     [SerializeField] GrapplePointLock targetLock;
+    [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] Sprite unlockedGrapple;
     [SerializeField] bool oneShot = true;
 
     bool _used;
@@ -21,6 +23,7 @@ public class UnlockGrapplePointInteractable : MonoBehaviour, IInteractable
         if (!CanInteract) return;
         
         targetLock.Unlock();
+        spriteRenderer.sprite = unlockedGrapple;
         
         Debug.Log($"[GrappleUnlock] after Unlock. locked(after)={targetLock?.IsLocked}");
         
