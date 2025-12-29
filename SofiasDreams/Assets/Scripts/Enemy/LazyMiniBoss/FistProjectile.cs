@@ -15,6 +15,7 @@ public class FistProjectile : MonoBehaviour
     Collider2D _col;
     float _dieAt;
     bool _isDissolving;
+    bool _hasHitPlayer;
     
     void Awake()
     {
@@ -27,6 +28,7 @@ public class FistProjectile : MonoBehaviour
     {
         _dieAt = Time.time + lifetime;
         _isDissolving = false;
+        _hasHitPlayer = false;
         if (_col) _col.enabled = true;
     }
 
@@ -69,12 +71,11 @@ public class FistProjectile : MonoBehaviour
 
         if (target != null)
         {
-            target.ApplyDamage(damage, transform.position, Vector2.zero, gameObject);
-            DissolveAndDestroy();
-        }
-        else if (other.GetComponent<Hurtbox2D>() != null)
-        {
-            DissolveAndDestroy();
+            if (!_hasHitPlayer)
+            {
+                target.ApplyDamage(damage, transform.position, Vector2.zero, gameObject);
+                _hasHitPlayer = true;
+            }
         }
     }
 

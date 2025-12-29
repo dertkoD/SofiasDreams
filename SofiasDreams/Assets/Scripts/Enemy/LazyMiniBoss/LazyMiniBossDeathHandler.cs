@@ -17,6 +17,8 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
     [SerializeField] LayerMask _groundLayer; // For detecting landing
 
     bool _dead;
+    bool _fallTriggered;
+    bool _hasLanded;
 
     void Awake()
     {
@@ -30,6 +32,9 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
     void OnEnable()
     {
         if (_health) _health.OnHealthChanged += OnHealthChanged;
+        _dead = false;
+        _fallTriggered = false;
+        _hasLanded = false;
     }
 
     void OnDisable()
@@ -48,31 +53,44 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
         }
     }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!_dead) return;
+        // Check if landed on ground
+        if (((1 << collision.gameObject.layer) & _groundLayer.value) != 0)
+        {
+            _hasLanded = true;
+        }
+    }
+
     IEnumerator DeathSequenceMonitor()
     {
-        // 1. Wait until falling (velocity negative) or platform broken event logic handles physics enable.
-        // We wait for some downward velocity or a timeout to confirm we are falling.
+        // 0. Wait for animation event to trigger the fall
         float waitStart = Time.time;
-        while (Time.time < waitStart + 5f && (_rb.linearVelocity.y >= -0.1f))
+        while (!_fallTriggered && Time.time < waitStart + 5f)
         {
             yield return null;
         }
 
-        // 2. Wait until landed on ground (below platform)
-        // We check if we hit something in ground layer.
-        bool landed = false;
-        while (!landed)
+        // 1. Wait until falling (velocity negative)
+        // We wait for some downward velocity or a timeout to confirm we are falling.
+        waitStart = Time.time;
+        while (Time.time < waitStart + 3f && (_rb.linearVelocity.y >= -0.1f))
         {
-            // Simple check: is velocity near zero? Or Raycast down?
-            // Since we fall from high, impact might be high velocity -> zero.
-            
-            // Check if grounded using Raycast or Collider
+            yield return null;
+        }
+
+        // 2. Wait until landed on ground
+        // Note: _hasLanded might be set via OnCollisionEnter2D, or we check manually
+        while (!_hasLanded)
+        {
+            // Fallback check using Raycast or velocity
             if (_rb.linearVelocity.y > -0.1f && _rb.linearVelocity.y < 0.1f)
             {
                  // Possibly landed or stuck. Check ground.
                  if (Physics2D.Raycast(transform.position, Vector2.down, 1.5f, _groundLayer))
                  {
-                     landed = true;
+                     _hasLanded = true;
                  }
             }
             
@@ -83,7 +101,7 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
                 yield break;
             }
 
-            yield return new WaitForSeconds(0.1f);
+            yield return null;
         }
 
         // 3. Play Dissolve
@@ -106,6 +124,8 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
     // Called by Animation Event
     public void AnimationEvent_BreakPlatform()
     {
+        _fallTriggered = true;
+
         // 1. Break Platform
         if (_platformBreaker)
         {
