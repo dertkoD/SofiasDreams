@@ -170,9 +170,8 @@ public class LazyMiniBossBrain : MonoBehaviour
 
         Vector3 target = _path.GetPoint(_pathIndex);
         
-        // 1. Calculate distance purely on X if it's a 2D platformer on flat ground, 
-        // or ensure the Y difference doesn't block arrival if waypoints are slightly off.
-        // For simplicity, let's stick to Distance but ensure we don't overshoot or get stuck.
+        // 1. Calculate distance purely on X if it's a 2D platformer on flat ground
+        // We use full distance normally, but if we are "stuck" we might need X only check.
         float dist = Vector2.Distance(transform.position, target);
         
         // Check if we reached it
@@ -188,18 +187,15 @@ public class LazyMiniBossBrain : MonoBehaviour
         // Move towards target
         float dx = target.x - transform.position.x;
         
-        // Fix: If we are very close on X but Y is different (e.g. waypoint slightly in air/ground),
-        // we might oscillate. 
-        if (Mathf.Abs(dx) < 0.05f) 
+        // Anti-stuck: if dx is tiny but dist is large (meaning Y diff), force advance if close enough in X?
+        // OR simply ignore Y for arrival check if it's a flat platformer.
+        // Let's rely on X distance for arrival if configured, or just be more lenient.
+        if (Mathf.Abs(dx) < 0.1f) 
         {
-             // We are at the X position but maybe Y is off. Consider arrived if Y difference is small?
-             // Or just force advance.
-             // If we are this close in X, but Distance check failed, it means Y is off.
-             // Let's rely on distance check mostly, but if X is aligned, maybe we are stuck?
-             // Let's trust distance but ensure waypoints are placed well.
-             
-             // HOWEVER, if the enemy overshoots, he might turn back.
-             // To prevent "stuck at point 1", ensure AdvancePathIndex logic is correct.
+             // Close enough in X. Treating as arrived to prevent oscillation.
+             AdvancePathIndex();
+             _motor.Stop();
+             return;
         }
 
         _motor.Move(Mathf.Sign(dx) * _config.patrolSpeed);
@@ -428,17 +424,16 @@ public class LazyMiniBossBrain : MonoBehaviour
         if (next >= _path.Count)
         {
             _pathDir = -1;
-            next = _path.Count - 2; 
+            next = Mathf.Max(0, _path.Count - 2); 
         }
         else if (next < 0)
         {
             _pathDir = 1;
-            next = 1;
+            next = Mathf.Min(1, _path.Count - 1);
         }
 
         // Final safety check
-        if (next < 0) next = 0;
-        else if (next >= _path.Count) next = _path.Count - 1;
+        next = Mathf.Clamp(next, 0, _path.Count - 1);
 
         _pathIndex = next;
     }
