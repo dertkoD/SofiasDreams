@@ -79,7 +79,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1545498483048865764, guid: 7c9f9a7709e19474096447f944a69ef6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -292,6 +292,7 @@ MonoBehaviour:
   _jumpingBrain: {fileID: 0}
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
+  _lazyMiniBossBrain: {fileID: 0}
 --- !u!114 &2240562265475578678
 MonoBehaviour:
   m_ObjectHideFlags: 0

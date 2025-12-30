@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9d48ae47d694797498ad6b25908788b9
+guid: 128568fd93559b54db8861b2687d997d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7684994820359035490
-    second: boss_room_01_0
+      213: -8366067564511975507
+    second: x2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boss_room_01_0
+      name: x2_0
       rect:
         serializedVersion: 2
-        x: 50
-        y: 0
-        width: 2002
-        height: 1986
+        x: 25
+        y: 294
+        width: 806
+        height: 732
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 26a9730821696aa60800000000000000
-      internalID: 7684994820359035490
+      spriteID: da7a85a10e1c5eb80800000000000000
+      internalID: -8366067564511975507
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      boss_room_01_0: 7684994820359035490
+      x2_0: -8366067564511975507
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

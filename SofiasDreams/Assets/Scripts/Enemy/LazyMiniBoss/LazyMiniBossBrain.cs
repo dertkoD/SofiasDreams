@@ -40,13 +40,16 @@ public class LazyMiniBossBrain : MonoBehaviour
     // Combat
     float _nextMeleeAttackTime;
     float _nextShootAttackTime;
-    bool _hasPerformedFirstMelee; // New flag
     
     // Internal flags for melee sequence
     bool _attack1Triggered;
     bool _attack2Triggered;
 
     int _lastHp;
+    
+    float _zoneMinX;
+    float _zoneMaxX;
+    bool _zoneReady;
 
     [Inject]
     public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus)
@@ -91,9 +94,32 @@ public class LazyMiniBossBrain : MonoBehaviour
             _pathIndex = FindNearestWaypointIndex(transform.position);
         }
         
+        RecalcZoneBoundsFromPath();
+        
         // Try find player
          var pf = FindObjectOfType<PlayerFacade>();
          if (pf != null) _player = pf.transform;
+    }
+    
+    void RecalcZoneBoundsFromPath()
+    {
+        _zoneReady = false;
+        if (_path == null || _path.Count == 0) return;
+
+        float minX = float.PositiveInfinity;
+        float maxX = float.NegativeInfinity;
+
+        for (int i = 0; i < _path.Count; i++)
+        {
+            float x = _path.GetPoint(i).x;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+
+        const float pad = 0.05f;
+        _zoneMinX = minX - pad;
+        _zoneMaxX = maxX + pad;
+        _zoneReady = true;
     }
 
     void Update()
@@ -176,8 +202,6 @@ public class LazyMiniBossBrain : MonoBehaviour
         _motor.Stop();
         _anim.TriggerPatrol();
         _hasSeenPlayer = false;
-        _hasPerformedFirstMelee = false; // Reset on lost agro? Or keep it? Usually reset means "new encounter"
-        // If we want him to ALWAYS do melee first on every new encounter, reset it.
     }
     
     void TickPatrol()
@@ -225,24 +249,45 @@ public class LazyMiniBossBrain : MonoBehaviour
             return;
         }
 
-        Vector3 targetPos = seesPlayer ? _player.position : (Vector3)_lastSeenPos;
-        float dist = Vector2.Distance(transform.position, targetPos);
-        float dx = targetPos.x - transform.position.x;
-        
-        // Face the target
-        if (Mathf.Abs(dx) > 0.1f) _motor.Face(dx > 0 ? 1 : -1);
+        Vector3 rawTargetPos = seesPlayer ? _player.position : (Vector3)_lastSeenPos;
 
-        // Combat Logic
-        if (dist <= _config.closeRangeThreshold)
+        float distToPlayer = Vector2.Distance(transform.position, rawTargetPos);
+        float dxToPlayer = rawTargetPos.x - transform.position.x;
+
+        Vector3 moveTargetPos = rawTargetPos;
+        if (_zoneReady)
+            moveTargetPos.x = Mathf.Clamp(rawTargetPos.x, _zoneMinX, _zoneMaxX);
+
+        float distToMoveTarget = Vector2.Distance(transform.position, moveTargetPos);
+        float dxToMoveTarget = moveTargetPos.x - transform.position.x;
+
+        if (Mathf.Abs(dxToPlayer) > 0.1f)
+            _motor.Face(dxToPlayer > 0 ? 1 : -1);
+
+        if (_zoneReady)
         {
-             // Melee Range
-             if (Time.time >= _nextMeleeAttackTime)
-             {
-                 StartMeleeAttack();
-                 return;
-             }
+            if (transform.position.x < _zoneMinX)
+            {
+                _motor.Move(_config.agroRunSpeed);
+                return;
+            }
+
+            if (transform.position.x > _zoneMaxX)
+            {
+                _motor.Move(-_config.agroRunSpeed);
+                return;
+            }
         }
-        else if (seesPlayer && dist >= _config.shootRangeMin && _hasPerformedFirstMelee) // Shoot Range only after first melee
+
+        if (distToPlayer <= _config.closeRangeThreshold)
+        {
+            if (Time.time >= _nextMeleeAttackTime)
+            {
+                StartMeleeAttack();
+                return;
+            }
+        }
+        else if (seesPlayer && distToPlayer >= _config.shootRangeMin)
         {
             if (Time.time >= _nextShootAttackTime)
             {
@@ -251,24 +296,20 @@ public class LazyMiniBossBrain : MonoBehaviour
             }
         }
 
-        // Move towards target if not attacking
-        if (dist > _config.closeRangeThreshold * 0.8f) // Keep some distance? Or close in?
+        if (distToMoveTarget > _config.closeRangeThreshold * 0.8f)
         {
-             // If we haven't done first melee, we MUST close in
-             bool forceCloseIn = !_hasPerformedFirstMelee;
-             
-             // If we are far, run towards
-             // If we are in shoot range, maybe stop to shoot?
-             // Only stop if we CAN shoot (i.e. has performed first melee)
-             if (!forceCloseIn && seesPlayer && dist >= _config.shootRangeMin && dist <= _config.shootRangeMin + 2f && Time.time < _nextShootAttackTime)
-             {
-                 // Maybe wait for cooldown?
-                 _motor.Stop();
-             }
-             else
-             {
-                 _motor.Move(Mathf.Sign(dx) * _config.agroRunSpeed);
-             }
+            if (seesPlayer && distToPlayer >= _config.shootRangeMin &&
+                distToPlayer <= _config.shootRangeMin + 2f && Time.time < _nextShootAttackTime)
+            {
+                _motor.Stop();
+            }
+            else
+            {
+                if (Mathf.Abs(dxToMoveTarget) > 0.05f)
+                    _motor.Move(Mathf.Sign(dxToMoveTarget) * _config.agroRunSpeed);
+                else
+                    _motor.Stop();
+            }
         }
         else
         {
@@ -283,7 +324,6 @@ public class LazyMiniBossBrain : MonoBehaviour
         _attack1Triggered = true;
         _attack2Triggered = false;
         _anim.SetAttack1(true);
-        _hasPerformedFirstMelee = true; // Mark as done
         _nextMeleeAttackTime = Time.time + _config.meleeAttackCooldown;
     }
 
@@ -499,6 +539,8 @@ public class LazyMiniBossBrain : MonoBehaviour
 
         if (_path != null && _path.Count > 0)
             _pathIndex = FindNearestWaypointIndex(transform.position);
+        
+        RecalcZoneBoundsFromPath();
     }
 
     void OnHealthChanged()

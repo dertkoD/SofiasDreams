@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using Zenject;
 
 public class LazyMiniBossDeathHandler : MonoBehaviour
 {
@@ -15,6 +14,8 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
     [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
     [SerializeField] SpriteDissolveController _dissolveController;
     [SerializeField] LayerMask _groundLayer; // For detecting landing
+    
+    [SerializeField] Collider2D _hitboxCollider;
 
     bool _dead;
     bool _fallTriggered;
@@ -48,9 +49,15 @@ public class LazyMiniBossDeathHandler : MonoBehaviour
         if (!_health.IsAlive)
         {
             _dead = true;
+            DisableCombatColliders();
             // Only start sequence if not triggered by event
             StartCoroutine(DeathSequenceMonitor());
         }
+    }
+    
+    void DisableCombatColliders()
+    {
+        if (_hitboxCollider) _hitboxCollider.enabled = false;
     }
 
     void OnCollisionEnter2D(Collision2D collision)

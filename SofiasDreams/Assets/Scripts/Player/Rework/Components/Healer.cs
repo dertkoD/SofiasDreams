@@ -76,8 +76,7 @@ public class Healer : MonoBehaviour, IHealer
 
         _healing = true;
 
-        _charges = Mathf.Max(0, _charges - 1);
-        _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
+        
 
         _gate.BlockMovement(MobilityBlockReason.Heal);
         _gate.BlockJump(MobilityBlockReason.Heal);
@@ -102,7 +101,11 @@ public class Healer : MonoBehaviour, IHealer
         _healing = false;
 
         if (_health.CanHeal())
+        {
             _health.Heal(1);
+            _charges = Mathf.Max(0, _charges - 1);
+            _bus.Fire(new HealChargesChanged { current = _charges, max = _maxCharges });
+        }
 
         _bus.Fire(new HealFinished());
     }

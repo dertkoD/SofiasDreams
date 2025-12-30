@@ -12,6 +12,9 @@ public class CameraShakeConfig : ScriptableObject
 
     [Header("Damage Taken (Large Shake)")]
     public float damageTakenForce = 2.0f;
+    
+    [Header("Floor break")]
+    public float floorBreakForce = 1.0f;
 
     [Header("Continuous Shakes")]
     public float healShakeForce = 0.1f;

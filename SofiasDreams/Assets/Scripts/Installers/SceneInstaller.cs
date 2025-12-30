@@ -68,6 +68,7 @@ public class SceneInstaller : MonoInstaller
         Container.DeclareSignal<PlayerRespawnedAtBonfire>();
         Container.DeclareSignal<BonfireRespawnRequested>();
         Container.DeclareSignal<BonfireEnemiesRespawnRequested>();
+        Container.DeclareSignal<BossFloorBrokenSignal>();
 
         // Bonfire services
         Container.BindInterfacesAndSelfTo<BonfireService>().AsSingle();

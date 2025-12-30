@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: PlayerHealConfig
   m_EditorClassIdentifier: 
   healAmount: 25
-  castTime: 2.1
+  maxCharges: 3
+  killsPerCharge: 2

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SwarmHealthConfig
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthConfig
   maxHP: 5
-  invulnTime: 0.3
+  invulnTime: 0

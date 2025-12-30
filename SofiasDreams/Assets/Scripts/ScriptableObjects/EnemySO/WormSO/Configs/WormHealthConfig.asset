@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: WormHealthConfig
   m_EditorClassIdentifier: 
   maxHP: 5
-  invulnTime: 0.3
+  invulnTime: 0

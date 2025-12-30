@@ -68,6 +68,8 @@ public class CameraShakeService : MonoBehaviour
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
         _bus.Subscribe<TookDamage>(OnTookDamage);
         
+        _bus.Subscribe<BossFloorBrokenSignal>(OnBossFloorBroken);
+        
         // _bus.Subscribe<HealStarted>(OnHealStarted);
         // _bus.Subscribe<HealFinished>(OnHealFinished);
         // _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
@@ -82,12 +84,19 @@ public class CameraShakeService : MonoBehaviour
         _bus.Unsubscribe<EnemyHit>(OnEnemyHit);
         _bus.Unsubscribe<TookDamage>(OnTookDamage);
         
+        _bus.Unsubscribe<BossFloorBrokenSignal>(OnBossFloorBroken);
+        
         // _bus.Unsubscribe<HealStarted>(OnHealStarted);
         // _bus.Unsubscribe<HealFinished>(OnHealFinished);
         // _bus.Unsubscribe<HealInterrupted>(OnHealInterrupted);
         //
         // _bus.Unsubscribe<DashStarted>(OnDashStarted);
         // _bus.Unsubscribe<DashFinished>(OnDashFinished);
+    }
+    
+    void OnBossFloorBroken()
+    {
+        Shake(_config.floorBreakForce);
     }
 
     void OnAttackStarted()

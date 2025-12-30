@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: BugEnemyHealthConfig
   m_EditorClassIdentifier: 
   maxHP: 3
-  invulnTime: 1
+  invulnTime: 0

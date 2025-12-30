@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: LazyMiniBossHealthConfig
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthConfig
   maxHP: 2
-  invulnTime: 0.3
+  invulnTime: 0

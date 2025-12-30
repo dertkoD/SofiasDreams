@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MinionHealthConfig
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthConfig
   maxHP: 1
-  invulnTime: 0.3
+  invulnTime: 0
