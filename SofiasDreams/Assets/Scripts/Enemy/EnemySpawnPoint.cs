@@ -12,6 +12,7 @@ public class EnemySpawnPoint : MonoBehaviour
     [SerializeField] Color _gizmoColorJumpingEnemy = Color.yellow;
     [SerializeField] Color _gizmoColorWormEnemy = new Color(1.0f, 0.5f, 0.0f);
     [SerializeField] Color _gizmoColorSwarmEnemy = Color.deepPink;
+    [SerializeField] Color _gizmoColorLazyMiniBossEnemy = Color.blue;
     [SerializeField] float _radius = 0.25f;
 
     public Vector3 Position => transform.position;
@@ -40,6 +41,9 @@ public class EnemySpawnPoint : MonoBehaviour
                 break;
             case EnemyMovementMode.Swarm:
                 Gizmos.color = _gizmoColorSwarmEnemy;
+                break;
+            case EnemyMovementMode.LazyMiniBoss:
+                Gizmos.color = _gizmoColorLazyMiniBossEnemy;
                 break;
             case EnemyMovementMode.GroundOnly:
             default:

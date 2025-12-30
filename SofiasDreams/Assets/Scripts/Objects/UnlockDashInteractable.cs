@@ -3,6 +3,8 @@ using Zenject;
 public class UnlockDashInteractable : MonoBehaviour, IInteractable
 {
     [SerializeField] bool oneShot = true;
+    [SerializeField] WorldHintTextFade hint;
+    [SerializeField] bool destroyHintOnUse = true;
 
     IPlayerAbilities _abilities;
     SignalBus _bus;
@@ -22,6 +24,19 @@ public class UnlockDashInteractable : MonoBehaviour, IInteractable
 
     public string PromptText => CanInteract ? "Press F to learn Dash" : "";
 
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player")) return;
+        if (!CanInteract) return;
+        hint?.Show();
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player")) return;
+        hint?.Hide();
+    }
+    
     public void Interact(Transform interactor)
     {
         if (!CanInteract) return;
@@ -32,7 +47,7 @@ public class UnlockDashInteractable : MonoBehaviour, IInteractable
 
         _used = true;
 
-        // optional: remove pickup after use
-        gameObject.SetActive(false);
+        hint?.DisableForeverFade(destroyHintOnUse);
+
     }
 }

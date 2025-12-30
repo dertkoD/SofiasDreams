@@ -10,6 +10,7 @@ public class Spawner
     readonly JumpingEnemyFactory _jumpingEnemyFactory;
     readonly WormEnemyFactory _wormEnemyFactory;
     readonly SwarmEnemyFactory _swarmEnemyFactory;
+    readonly LazyMiniBossFactory _lazyMiniBossFactory;
     readonly SignalBus _bus;
     PlayerFacade _currentPlayer;
     
@@ -20,6 +21,7 @@ public class Spawner
         JumpingEnemyFactory jumpingEnemyFactory,
         WormEnemyFactory wormEnemyFactory,
         SwarmEnemyFactory swarmEnemyFactory,
+        LazyMiniBossFactory lazyMiniBossFactory,
         SignalBus bus)
     {
         _playerFactory       = playerFactory;
@@ -28,6 +30,7 @@ public class Spawner
         _jumpingEnemyFactory = jumpingEnemyFactory;
         _wormEnemyFactory    = wormEnemyFactory;
         _swarmEnemyFactory = swarmEnemyFactory;
+        _lazyMiniBossFactory = lazyMiniBossFactory;
         _bus           = bus;
     }
 
@@ -75,6 +78,7 @@ public class Spawner
             case EnemyMovementMode.Jumping:  enemy = _jumpingEnemyFactory.Create(); break;
             case EnemyMovementMode.Worm:     enemy = _wormEnemyFactory.Create(); break;
             case EnemyMovementMode.Swarm:    enemy = _swarmEnemyFactory.Create(); break;
+            case EnemyMovementMode.LazyMiniBoss: enemy =  _lazyMiniBossFactory.Create(); break;
             default:                         enemy = _groundEnemyFactory.Create(); break;
         }
 

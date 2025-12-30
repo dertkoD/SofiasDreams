@@ -6,6 +6,8 @@ public class UnlockGrapplePointInteractable : MonoBehaviour, IInteractable
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Sprite unlockedGrapple;
     [SerializeField] bool oneShot = true;
+    [SerializeField] WorldHintTextFade hint;
+    [SerializeField] bool destroyHintOnUse = true;
 
     bool _used;
 
@@ -16,19 +18,29 @@ public class UnlockGrapplePointInteractable : MonoBehaviour, IInteractable
 
     public string PromptText => CanInteract ? "Press F" : "";
 
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player")) return;
+        if (!CanInteract) return;
+
+        hint?.Show();
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        hint?.Hide();
+    }
+
     public void Interact(Transform interactor)
     {
-        Debug.Log($"[GrappleUnlock] Interact called. targetLock={(targetLock ? targetLock.name : "NULL")} locked(before)={targetLock?.IsLocked}");
-
         if (!CanInteract) return;
-        
+
         targetLock.Unlock();
         spriteRenderer.sprite = unlockedGrapple;
-        
-        Debug.Log($"[GrappleUnlock] after Unlock. locked(after)={targetLock?.IsLocked}");
-        
         _used = true;
-
-        // optional: animation/sfx/vfx
+        
+        hint?.DisableForeverFade(destroyHintOnUse);
     }
 }

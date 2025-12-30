@@ -4,5 +4,6 @@ public enum EnemyMovementMode
     Planar2D,
     Jumping,
     Worm,
-    Swarm
+    Swarm,
+    LazyMiniBoss
 }

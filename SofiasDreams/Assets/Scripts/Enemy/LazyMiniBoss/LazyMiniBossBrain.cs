@@ -494,10 +494,11 @@ public class LazyMiniBossBrain : MonoBehaviour
     public void SetPatrolPath(EnemyPatrolPath path)
     {
         _patrolPath = path;
-        if (_patrolPath != null && _patrolPath.Count > 0)
-        {
+        _path = _patrolPath;          
+        _pathDir = 1;                
+
+        if (_path != null && _path.Count > 0)
             _pathIndex = FindNearestWaypointIndex(transform.position);
-        }
     }
 
     void OnHealthChanged()

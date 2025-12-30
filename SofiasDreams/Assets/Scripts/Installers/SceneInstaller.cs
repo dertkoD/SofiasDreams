@@ -8,6 +8,7 @@ public class SceneInstaller : MonoInstaller
     public EnemyFacade jumpingEnemyPrefab;
     public EnemyFacade wormEnemyPrefab;
     public EnemyFacade swarmEnemyPrefab;
+    public EnemyFacade lazyMiniBossPrefab;
 
     public override void InstallBindings()
     {
@@ -43,6 +44,10 @@ public class SceneInstaller : MonoInstaller
         Container.BindFactory<EnemyFacade, SwarmEnemyFactory>()
             .FromComponentInNewPrefab(swarmEnemyPrefab)
             .UnderTransformGroup("Enemies_Swarm");
+        
+        Container.BindFactory<EnemyFacade, LazyMiniBossFactory>()
+            .FromComponentInNewPrefab(lazyMiniBossPrefab)
+            .UnderTransformGroup("Enemies_LazyMiniBoss");
 
         // Scene MonoBehaviours that need injection
         Container.BindInterfacesAndSelfTo<CameraTargetBinder>()
