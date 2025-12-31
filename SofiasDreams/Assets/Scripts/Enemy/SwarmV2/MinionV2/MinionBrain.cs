@@ -20,6 +20,7 @@ public class MinionBrain : MonoBehaviour
     // Aggro/Forget
     // float _localForgetTimer; // Removed: reliance on squad state
     bool _canSeeTarget; // Cached vision state
+    bool _wasInShootingRange;
 
     // Patrol
     float _orbitAngle;
@@ -215,7 +216,16 @@ public class MinionBrain : MonoBehaviour
 
         if (dist < _config.shootRange)
         {
+            if (!_wasInShootingRange)
+            {
+                _shooter.ApplyDelay(_config.firstShotDelay);
+            }
             _shooter.TryFireAt(target.position);
+            _wasInShootingRange = true;
+        }
+        else
+        {
+            _wasInShootingRange = false;
         }
     }
 
@@ -269,6 +279,7 @@ public class MinionBrain : MonoBehaviour
         if (_currentRole != role)
         {
             _currentRole = role;
+            _wasInShootingRange = false;
             if (role == Role.Support)
             {
                 _nextSupportFireTime = Time.time + Random.Range(0.5f, 1.5f);

@@ -47,7 +47,6 @@ public class WormBrain : MonoBehaviour
     
     // Logic
     bool _lastHitWasWall;
-    bool _isBoosted;
 
     public void SetPatrolPath(EnemyPatrolPath path)
     {
@@ -229,15 +228,16 @@ public class WormBrain : MonoBehaviour
     {
         _motor.SetFrozen(false);
         
-        // Check for player jump over if not already boosted
-        if (!_isBoosted && _motor.CheckPlayerAbove(_config.jumpOverRayHeight))
+        // Check for player jump over
+        if (_motor.CheckPlayerAbove(_config.jumpOverRayHeight))
         {
-            _isBoosted = true;
-            // Optionally could add a debug log here
-            // Debug.Log("[Worm] Player jumped over! Boosting speed.");
+             Debug.Log("[Worm] Player jumped over! Triggering wall hit behavior.");
+             _lastHitWasWall = true;
+             EnterStun();
+             return;
         }
 
-        float currentSpeed = _config.chargeSpeed * (_isBoosted ? _config.jumpOverSpeedMultiplier : 1f);
+        float currentSpeed = _config.chargeSpeed;
 
         // Movement
         _motor.Move(currentSpeed, _config.chargeAcceleration, (int)Mathf.Sign(_spinDirection.x));
@@ -357,7 +357,6 @@ public class WormBrain : MonoBehaviour
         Debug.Log("[Worm] Enter Spinning (Logic)");
         _state = State.Spinning;
         _stateTimer = 0;
-        _isBoosted = false;
         _motor.SetFrozen(false);
         // Note: No need to set triggers here, we are already in the state
     }

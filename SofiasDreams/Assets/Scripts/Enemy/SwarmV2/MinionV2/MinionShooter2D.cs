@@ -32,6 +32,15 @@ public class MinionShooter2D : MonoBehaviour
             _nextFireAt = Time.time + _config.initialFireDelay;
     }
 
+    public void ApplyDelay(float delay)
+    {
+        float proposedTime = Time.time + delay;
+        if (proposedTime > _nextFireAt)
+        {
+            _nextFireAt = proposedTime;
+        }
+    }
+
     public void TryFireAt(Vector2 targetPos)
     {
         if (_config == null || Time.time < _nextFireAt) return;

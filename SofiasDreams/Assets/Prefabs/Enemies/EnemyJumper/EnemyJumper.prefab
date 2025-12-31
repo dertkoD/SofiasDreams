@@ -49,11 +49,12 @@ MonoBehaviour:
     m_Bits: 4096
   radius: 12
   fov: 61
-  requireLineOfSight: 0
+  requireLineOfSight: 1
   obstacleLayers:
     serializedVersion: 2
     m_Bits: 128
   faceByScaleX: 1
+  useTransformRotation: 0
   fixedFacingSign: 1
   showGizmos: 1
   gizmoColor: {r: 1, g: 1, b: 0, a: 0.35}
@@ -600,6 +601,8 @@ MonoBehaviour:
   _health: {fileID: 6149265313361646971}
   _jumpingBrain: {fileID: 8677910553421361380}
   _wormBrain: {fileID: 0}
+  _swarmBrain: {fileID: 0}
+  _lazyMiniBossBrain: {fileID: 0}
 --- !u!1 &9163621309807500896
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,7 +26,8 @@ MonoBehaviour:
   supportFireIntervalMin: 1.5
   supportFireIntervalMax: 2.5
   fireCooldown: 5
-  initialFireDelay: 0.5
+  initialFireDelay: 1.5
+  firstShotDelay: 1.5
   forgetTime: 3
   visionRadius: 8
   bulletPrefab: {fileID: 3387642050197491261, guid: 5055cf96d55b39b49bf1b3f3eeec060f, type: 3}
