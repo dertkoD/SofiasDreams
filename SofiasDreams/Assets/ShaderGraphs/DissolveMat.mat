@@ -108,7 +108,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DisolveAmount: 0
-    - _DisolveScale: 96
+    - _DisolveScale: 0
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -125,7 +125,7 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SpiralStrenght: 0
+    - _SpiralStrenght: 53.3
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
