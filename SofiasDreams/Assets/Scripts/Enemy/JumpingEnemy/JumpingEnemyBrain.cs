@@ -214,6 +214,15 @@ public class JumpingEnemyBrain : MonoBehaviour
             TickGlobalAggroTimer(sees);
         }
 
+        // RETRY Logic: If we have a pending trigger (e.g. from mid-air sight) and we are now stable on ground,
+        // force the transition. This catches cases where TickAnimatorParams() failed to transition due to velocity jitter.
+        if (_pendingAggroTrigger && IsStableOnGround())
+        {
+            _pendingAggroTrigger = false;
+            _pendingPatrolTrigger = false;
+            EnterAggroTrigger();
+        }
+
         switch (_state)
         {
             case State.Patrol:
@@ -298,6 +307,10 @@ public class JumpingEnemyBrain : MonoBehaviour
     void TickPatrol()
     {
         if (_config == null || _motor == null) return;
+        
+        // If aggro is pending (waiting for landing), do NOT jump again or continue patrol logic.
+        if (_pendingAggroTrigger) return;
+        
         if (!_motor.IsGrounded) return;
         if (Time.time < _landingStunUntil) return;
         if (Time.time < _nextJumpAt) return;
@@ -418,6 +431,9 @@ public class JumpingEnemyBrain : MonoBehaviour
     void TickReturnToPatrol()
     {
         if (_config == null || _motor == null) return;
+        
+        // If aggro is pending (waiting for landing), do NOT jump again or continue logic.
+        if (_pendingAggroTrigger) return;
 
         // Animator can be in PatrolTrigger after Attack->PatrolTrigger transition: stay locked until it ends.
         if (_anim != null && _anim.IsInPatrolTrigger())
