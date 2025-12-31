@@ -215,8 +215,7 @@ public class JumpingEnemyBrain : MonoBehaviour
                 break;
 
             case State.AggroTrigger:
-                if (sees) _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
-                TickAggroTrigger();
+                TickAggroTrigger(sees);
                 break;
 
             case State.Aggro:
@@ -338,8 +337,26 @@ public class JumpingEnemyBrain : MonoBehaviour
             _nextJumpAt = Time.time + _config.patrolJumpCooldown;
     }
 
-    void TickAggroTrigger()
+    void TickAggroTrigger(bool sees)
     {
+        // Timer logic during trigger
+        if (sees)
+        {
+            _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
+            _lostSightTimerRunning = false;
+        }
+        else
+        {
+            if (!_lostSightTimerRunning)
+            {
+                _lostSightTimerRunning = true;
+            }
+            else
+            {
+                _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
+            }
+        }
+
         if (_anim == null) { _state = State.Aggro; return; }
 
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
@@ -347,8 +364,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             _state = State.Aggro;
             _nextJumpAt = Time.time; // allow immediate first jump if grounded
-            if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
-            _lostSightTimerRunning = false;
+            // Do NOT reset timer here. We inherit the timer state from Trigger.
         }
     }
 
