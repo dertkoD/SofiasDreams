@@ -207,6 +207,13 @@ public class JumpingEnemyBrain : MonoBehaviour
                 _player = target;
         }
 
+        // Global Aggro Timer Logic (active if we have Pending Aggro or are in Aggro states)
+        bool aggroTimerActive = _pendingAggroTrigger || _state == State.Aggro || _state == State.AggroTrigger;
+        if (aggroTimerActive)
+        {
+            TickGlobalAggroTimer(sees);
+        }
+
         switch (_state)
         {
             case State.Patrol:
@@ -337,9 +344,8 @@ public class JumpingEnemyBrain : MonoBehaviour
             _nextJumpAt = Time.time + _config.patrolJumpCooldown;
     }
 
-    void TickAggroTrigger(bool sees)
+    void TickGlobalAggroTimer(bool sees)
     {
-        // Timer logic during trigger
         if (sees)
         {
             _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
@@ -356,7 +362,18 @@ public class JumpingEnemyBrain : MonoBehaviour
                 _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
             }
         }
+        
+        // If timer expired, cancel pending aggro.
+        if (_forgetLeft <= 0f && _pendingAggroTrigger)
+        {
+            _pendingAggroTrigger = false;
+        }
+    }
 
+    void TickAggroTrigger(bool sees)
+    {
+        // Timer logic is handled globally now (TickGlobalAggroTimer)
+        
         if (_anim == null) { _state = State.Aggro; return; }
 
         // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
@@ -372,28 +389,7 @@ public class JumpingEnemyBrain : MonoBehaviour
     {
         if (_config == null || _motor == null) return;
 
-        // Forget timer behaviour:
-        // - while player is visible: refresh timer and stop countdown
-        // - when player becomes NOT visible: start countdown
-        // - if player is seen again: refresh + stop countdown
-        if (sees)
-        {
-            _forgetLeft = _config.aggroForgetSeconds;
-            _lostSightTimerRunning = false;
-            // If we regained sight mid-air after timer expired, cancel the pending return.
-            _pendingPatrolTrigger = false;
-        }
-        else
-        {
-            if (!_lostSightTimerRunning)
-            {
-                _lostSightTimerRunning = true; // start countdown from next frame
-            }
-            else
-            {
-                _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
-            }
-        }
+        // Timer logic is handled globally now (TickGlobalAggroTimer)
 
         if (_forgetLeft <= 0f)
         {
@@ -521,19 +517,21 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (!IsStableOnGround())
         {
             _pendingAggroTrigger = true;
-            _forgetLeft = _config.aggroForgetSeconds;
+            // Removed forced timer reset here
+            // _forgetLeft = _config.aggroForgetSeconds;
             return;
         }
 
         // already aggro: only refresh timer
         if (_state == State.Aggro || _state == State.AggroTrigger)
         {
-            _forgetLeft = _config.aggroForgetSeconds;
+            // Removed forced timer reset here - handled by GlobalTimer and RequestAggroTrigger
+            // _forgetLeft = _config.aggroForgetSeconds;
             return;
         }
 
         _state = State.AggroTrigger;
-        _forgetLeft = _config.aggroForgetSeconds;
+        // _forgetLeft = _config.aggroForgetSeconds; // handled by Request/Global
         _lostSightTimerRunning = false;
 
         _motor?.StopAll();
@@ -603,12 +601,21 @@ public class JumpingEnemyBrain : MonoBehaviour
     void RequestAggroTrigger()
     {
         if (_state == State.Dead) return;
+
+        // If not already tracking aggro, init timer
+        bool wasAggro = _pendingAggroTrigger || _state == State.Aggro || _state == State.AggroTrigger;
+        if (!wasAggro)
+        {
+             if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
+        }
+
         // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
         if (_jumpBool || !IsStableOnGround())
         {
             _pendingAggroTrigger = true;
             _pendingPatrolTrigger = false;
-            if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
+            // Removed forced timer reset here to respect global timer flow
+            // if (_config != null) _forgetLeft = _config.aggroForgetSeconds; 
             return;
         }
 
