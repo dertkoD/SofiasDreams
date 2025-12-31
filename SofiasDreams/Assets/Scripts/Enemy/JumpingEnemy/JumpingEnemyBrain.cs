@@ -382,7 +382,10 @@ public class JumpingEnemyBrain : MonoBehaviour
         {
             _state = State.Aggro;
             _nextJumpAt = Time.time; // allow immediate first jump if grounded
-            // Do NOT reset timer here. We inherit the timer state from Trigger.
+            
+            // Refill timer when entering Aggro state to ensure we at least start chasing
+            if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
+            _lostSightTimerRunning = false;
         }
     }
 
