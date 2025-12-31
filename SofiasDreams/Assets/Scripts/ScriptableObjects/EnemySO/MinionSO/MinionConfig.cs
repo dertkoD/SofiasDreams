@@ -27,6 +27,7 @@ public class MinionConfig : ScriptableObject
     [Header("Shooting")]
     public float fireCooldown = 0.8f;
     public float initialFireDelay = 0.5f;
+    public float firstShotDelay = 0.5f;
 
     [Header("Behavior")]
     public float forgetTime = 3.0f; // Time to return to patrol after losing player
