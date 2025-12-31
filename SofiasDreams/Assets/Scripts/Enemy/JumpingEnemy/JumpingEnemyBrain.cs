@@ -364,10 +364,11 @@ public class JumpingEnemyBrain : MonoBehaviour
         }
         
         // If timer expired, cancel pending aggro.
-        if (_forgetLeft <= 0f && _pendingAggroTrigger)
-        {
-            _pendingAggroTrigger = false;
-        }
+        // Removed: logic changed, we want to at least enter Aggro state (trigger) even if timer expired in air.
+        // if (_forgetLeft <= 0f && _pendingAggroTrigger)
+        // {
+        //     _pendingAggroTrigger = false;
+        // }
     }
 
     void TickAggroTrigger(bool sees)
