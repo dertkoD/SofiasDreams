@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45b0d4fe88164714b87fea82c2b89871, type: 3}
   m_Name: SwarmHitReactionConfig
   m_EditorClassIdentifier: Assembly-CSharp::HitReactionConfig
-  hitStun: 0.15
-  knockbackForce: 5
+  hitStun: 0.1
+  knockbackForce: 1
   dragDuringStun: 20
   knockbackX: 4.5
   knockbackY: 2

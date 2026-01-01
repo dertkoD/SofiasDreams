@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45b0d4fe88164714b87fea82c2b89871, type: 3}
   m_Name: enemyJumperHitReactionConfig
   m_EditorClassIdentifier: 
-  hitStun: 0.15
-  knockbackForce: 5
+  hitStun: 0.1
+  knockbackForce: 0.5
   dragDuringStun: 2
   knockbackX: 4.5
   knockbackY: 2
