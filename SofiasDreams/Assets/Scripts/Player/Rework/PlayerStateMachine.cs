@@ -344,8 +344,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public void Tick()
     {
         if (_state == PlayerState.Hurt &&
-            !_knock.IsInHitStun &&          
-            !_health.IsInvincible)            
+            !_knock.IsInHitStun)            
         {
             Unblock(MobilityBlockReason.Hurt);
             _mover.StopHorizontal();         
