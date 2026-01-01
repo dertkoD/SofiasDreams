@@ -12,7 +12,6 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<TookDamage>();
         container.DeclareSignal<Died>();
         container.DeclareSignal<PlayerSpawned>();
-        container.DeclareSignal<EnemyKilled>();
         container.DeclareSignal<HealChargesChanged>();
         container.DeclareSignal<DashStarted>();
         container.DeclareSignal<DashFinished>();

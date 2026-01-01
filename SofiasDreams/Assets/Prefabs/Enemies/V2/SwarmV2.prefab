@@ -172,7 +172,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -288,8 +288,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.28550437, y: -0.051447604}
-  m_Size: {x: 8.645337, y: 5.7411284}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 11.48, y: 6.77}
   m_Direction: 1
 --- !u!1 &7851447040320294286
 GameObject:
@@ -316,6 +316,9 @@ GameObject:
   - component: {fileID: 886458832230391531}
   - component: {fileID: 8159019171785614817}
   - component: {fileID: 7224677834442953510}
+  - component: {fileID: 6957148836746755398}
+  - component: {fileID: 1957813915052056473}
+  - component: {fileID: 3737029513936843539}
   m_Layer: 9
   m_Name: SwarmV2
   m_TagString: Swarm
@@ -437,7 +440,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 7851447040320294286}
   m_Enabled: 0
   m_AgentTypeID: 0
-  m_Radius: 3.81
+  m_Radius: 2.84
   m_Speed: 3.5
   m_Acceleration: 20
   avoidancePriority: 50
@@ -662,3 +665,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _facade: {fileID: 8125583343641682487}
   _hitConfig: {fileID: 11400000, guid: 6f3a795c782c202479b7472e5a390cb3, type: 2}
+--- !u!114 &6957148836746755398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7851447040320294286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ab4935c59b4dcdb4b13ac23d9fe503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
+  SpawnId: 
+  RespawnMode: 0
+--- !u!114 &1957813915052056473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7851447040320294286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 1182162107477552078}
+--- !u!114 &3737029513936843539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7851447040320294286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca958986c8b8e9a41a673c036b32ba4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
+  dissolveController: {fileID: 1957813915052056473}
+  dissolveSettings: {fileID: 11400000, guid: 3be79cc28ff86c1418b33f43c0cb032c, type: 2}

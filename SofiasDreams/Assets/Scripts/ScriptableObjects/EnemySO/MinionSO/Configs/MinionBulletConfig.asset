@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: MinionBulletConfig
   m_EditorClassIdentifier: Assembly-CSharp::MinionBulletConfig
   damage: 1
-  speed: 10
+  speed: 5
   lifetime: 3

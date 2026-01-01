@@ -7,7 +7,7 @@ public class MinionBullet : MonoBehaviour
     [SerializeField] float lifetime = 3f;
 
     [Header("Collision")]
-    [SerializeField] LayerMask groundLayers;   // слой(я) стен/пола (НЕ триггер)
+    [SerializeField] LayerMask groundLayers;   
 
     [Header("Word (показывать после Appearance)")]
     [SerializeField] GameObject wordRoot;
@@ -18,6 +18,12 @@ public class MinionBullet : MonoBehaviour
     [Header("Word stabilizer")]
     [SerializeField] bool keepWordUpright = true;
     [SerializeField] bool preventWordMirror = true;
+    
+    [Header("Dissolve")]
+    [SerializeField] SpriteDissolveController _dissolveController;
+    [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
+
+    bool _isDissolving;
 
     Rigidbody2D _rb;
     Animator _anim;
@@ -38,10 +44,12 @@ public class MinionBullet : MonoBehaviour
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             _rb.freezeRotation = true;
         }
+        
+        if (!_dissolveController)
+            _dissolveController = GetComponentInChildren<SpriteDissolveController>();
 
         _allCols = GetComponentsInChildren<Collider2D>(true);
 
-        // Корневой коллайдер можно оставить триггером (Hitbox). "Body" — НЕ триггер, на дочернем объекте.
         var rootCol = GetComponent<Collider2D>();
         if (rootCol) rootCol.isTrigger = true;
 
@@ -62,6 +70,7 @@ public class MinionBullet : MonoBehaviour
 
     void OnEnable()
     {
+        _isDissolving = false;
         if (_rb)
         {
             _rb.simulated = true;
@@ -124,7 +133,6 @@ public class MinionBullet : MonoBehaviour
         }
     }
 
-    // Триггер-хитбокс: игрок/триггерные поверхности
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.GetComponent<Hurtbox2D>() != null)
@@ -133,7 +141,6 @@ public class MinionBullet : MonoBehaviour
         }
     }
 
-    // НЕ триггерный Body-коллайдер ловит жёсткие коллизии со стенами/полом
     void OnCollisionEnter2D(Collision2D col)
     {
         if (((1 << col.gameObject.layer) & groundLayers.value) != 0)
@@ -144,6 +151,35 @@ public class MinionBullet : MonoBehaviour
 
     void ReturnToPoolOrDestroy()
     {
+        if (_isDissolving) return;
+
+        if (_dissolveController != null && _dissolveSettings != null)
+        {
+            _isDissolving = true;
+
+            // Stop movement
+            if (_rb)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+                _rb.simulated = false; // Disable physics simulation
+            }
+
+            // Disable colliders
+            if (_allCols != null)
+                for (int i = 0; i < _allCols.Length; i++)
+                    if (_allCols[i]) _allCols[i].enabled = false;
+
+            _dissolveController.Play(_dissolveSettings, ActualReturnToPool);
+        }
+        else
+        {
+            ActualReturnToPool();
+        }
+    }
+
+    void ActualReturnToPool()
+    {
         if (_allCols != null)
             for (int i = 0; i < _allCols.Length; i++)
                 if (_allCols[i]) _allCols[i].enabled = false;
@@ -153,7 +189,6 @@ public class MinionBullet : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // Animation Event: конец Appearance
     public void AnimationEvent_AppearanceEnd_ShowWord()
     {
         if (wordRoot) wordRoot.SetActive(true);

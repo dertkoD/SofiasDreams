@@ -67,8 +67,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.0000011920929, y: 0}
-  m_Radius: 1.1317867
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 2
 --- !u!114 &4260864843923193177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +143,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -201,6 +201,9 @@ GameObject:
   - component: {fileID: 4241457840446402968}
   - component: {fileID: 5544273943376506240}
   - component: {fileID: 84165035687718964}
+  - component: {fileID: 1502161431222157453}
+  - component: {fileID: 48419645081767187}
+  - component: {fileID: 3287465201822495366}
   m_Layer: 9
   m_Name: MinionV2
   m_TagString: Enemy
@@ -321,7 +324,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5123599858426812987}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1
+  m_Radius: 1.42
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -416,6 +419,7 @@ MonoBehaviour:
   _jumpingBrain: {fileID: 0}
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
+  _lazyMiniBossBrain: {fileID: 0}
 --- !u!114 &441412287351680462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,6 +544,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MinionMotor2D
   _agent: {fileID: 974530763928110597}
   _facingTransform: {fileID: 0}
+--- !u!114 &1502161431222157453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ab4935c59b4dcdb4b13ac23d9fe503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
+  SpawnId: 
+  RespawnMode: 0
+--- !u!114 &48419645081767187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 6461326763262930368}
+--- !u!114 &3287465201822495366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123599858426812987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca958986c8b8e9a41a673c036b32ba4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
+  dissolveController: {fileID: 48419645081767187}
+  dissolveSettings: {fileID: 11400000, guid: 27882c0c0361064419600aa08b98875b, type: 2}
 --- !u!1 &5329806323310762567
 GameObject:
   m_ObjectHideFlags: 0

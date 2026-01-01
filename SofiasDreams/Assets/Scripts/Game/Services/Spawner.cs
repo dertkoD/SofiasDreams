@@ -105,6 +105,14 @@ public class Spawner
         var path = sp._patrolPath;
         if (path != null)
             enemy.SetPatrolPath(path);
+        
+        var meta = enemy.GetComponent<EnemySpawnMeta>() ??
+                   enemy.GetComponentInChildren<EnemySpawnMeta>() ??
+                   enemy.gameObject.AddComponent<EnemySpawnMeta>();
+        if (meta == null) meta = enemy.gameObject.AddComponent<EnemySpawnMeta>();
+
+        meta.SpawnId = sp.spawnId;
+        meta.RespawnMode = sp.respawnMode;
 
         return enemy;
     }

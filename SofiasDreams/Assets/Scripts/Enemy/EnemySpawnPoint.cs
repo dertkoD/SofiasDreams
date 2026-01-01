@@ -14,6 +14,11 @@ public class EnemySpawnPoint : MonoBehaviour
     [SerializeField] Color _gizmoColorSwarmEnemy = Color.deepPink;
     [SerializeField] Color _gizmoColorLazyMiniBossEnemy = Color.blue;
     [SerializeField] float _radius = 0.25f;
+    
+    [Header("Spawn Settings")]
+    [SerializeField] public string spawnId = "enemy_01";          // MUST be unique per enemy in the scene
+    [SerializeField] public EnemyRespawnMode respawnMode = EnemyRespawnMode.RespawnNormally;
+
 
     public Vector3 Position => transform.position;
     public EnemyMovementMode Kind      => _kind;

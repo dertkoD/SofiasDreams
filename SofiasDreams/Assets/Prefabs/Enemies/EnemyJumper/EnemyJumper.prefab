@@ -269,6 +269,9 @@ GameObject:
   - component: {fileID: 5742823276269154795}
   - component: {fileID: 4914608630048286448}
   - component: {fileID: 2835801810131246883}
+  - component: {fileID: 1702601706610800314}
+  - component: {fileID: -9049302676928836541}
+  - component: {fileID: -1074065922772761851}
   m_Layer: 9
   m_Name: EnemyJumper
   m_TagString: Untagged
@@ -603,6 +606,47 @@ MonoBehaviour:
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
   _lazyMiniBossBrain: {fileID: 0}
+--- !u!114 &1702601706610800314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823746511676703583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ab4935c59b4dcdb4b13ac23d9fe503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
+  SpawnId: 
+  RespawnMode: 0
+--- !u!114 &-9049302676928836541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823746511676703583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 7425912216409085134}
+--- !u!114 &-1074065922772761851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823746511676703583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca958986c8b8e9a41a673c036b32ba4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
+  dissolveController: {fileID: -9049302676928836541}
+  dissolveSettings: {fileID: 11400000, guid: 3a2338681d40943499aa07ccc80fc75b, type: 2}
 --- !u!1 &9163621309807500896
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,7 +705,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

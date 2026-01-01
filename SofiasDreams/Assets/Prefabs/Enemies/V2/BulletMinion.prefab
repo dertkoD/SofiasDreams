@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 6367887761115231992}
   - component: {fileID: 1742202171404961123}
   - component: {fileID: 7737646286020480411}
+  - component: {fileID: 7400538517942388631}
   m_Layer: 11
   m_Name: BulletMinion
   m_TagString: Untagged
@@ -188,6 +189,8 @@ MonoBehaviour:
   roundRobin: 1
   keepWordUpright: 0
   preventWordMirror: 1
+  _dissolveController: {fileID: 7400538517942388631}
+  _dissolveSettings: {fileID: 11400000, guid: 07f5ea54274506a4a8d107a768f59430, type: 2}
 --- !u!95 &1742202171404961123
 Animator:
   serializedVersion: 7
@@ -222,6 +225,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f1b4f25c2d823448b8cc69ed69dcacb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7400538517942388631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3387642050197491261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 8901462923913646590}
 --- !u!1 &4326509955664162288
 GameObject:
   m_ObjectHideFlags: 0

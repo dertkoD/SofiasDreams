@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 7918499548286637425}
   - component: {fileID: 6167449203077373188}
   - component: {fileID: 6890998192043064175}
+  - component: {fileID: 3657415328223587105}
   m_Layer: 9
   m_Name: LazyMiniBossEnemy
   m_TagString: Untagged
@@ -359,6 +360,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _hitboxCollider: {fileID: 6025732696848912576}
+--- !u!114 &3657415328223587105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ab4935c59b4dcdb4b13ac23d9fe503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
+  SpawnId: 
+  RespawnMode: 0
 --- !u!1 &3207133190380383240
 GameObject:
   m_ObjectHideFlags: 0

@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -158,7 +158,7 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.35762465, y: 0.73475087}
+  m_Offset: {x: -0.42, y: 0.86}
   m_Radius: 1.2756773
 --- !u!114 &123608623488109820
 MonoBehaviour:
@@ -243,7 +243,7 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.35762465, y: 0.73475087}
+  m_Offset: {x: -0.42, y: 0.86}
   m_Radius: 1.2756773
 --- !u!114 &4180206917627938028
 MonoBehaviour:
@@ -282,6 +282,9 @@ GameObject:
   - component: {fileID: 8791749440236852469}
   - component: {fileID: 940882525318117481}
   - component: {fileID: 1413346990785986338}
+  - component: {fileID: 7050368270687345463}
+  - component: {fileID: 6651519289427385914}
+  - component: {fileID: 3069474512940425214}
   m_Layer: 9
   m_Name: BugEnemyGround
   m_TagString: Untagged
@@ -341,7 +344,7 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.24, y: 0.86}
+  m_Offset: {x: -0.42, y: 0.86}
   m_Radius: 1.31
 --- !u!50 &8451830297677357593
 Rigidbody2D:
@@ -456,6 +459,7 @@ MonoBehaviour:
   _jumpingBrain: {fileID: 0}
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
+  _lazyMiniBossBrain: {fileID: 0}
 --- !u!114 &3486534548289669652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -584,3 +588,44 @@ MonoBehaviour:
   - {fileID: 9196540820971145099}
   _health: {fileID: 5959875013899935517}
   _hitConfig: {fileID: 11400000, guid: 7559f10ff4f0e4b4fb6717bc9fcc5e9b, type: 2}
+--- !u!114 &7050368270687345463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288131572571801195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9ab4935c59b4dcdb4b13ac23d9fe503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
+  SpawnId: 
+  RespawnMode: 0
+--- !u!114 &6651519289427385914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288131572571801195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e4bf9b52dc919444bc6b00d578b253e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
+  spriteRenderer: {fileID: 9196540820971145099}
+--- !u!114 &3069474512940425214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288131572571801195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca958986c8b8e9a41a673c036b32ba4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
+  dissolveController: {fileID: 6651519289427385914}
+  dissolveSettings: {fileID: 11400000, guid: 086ba5ec125ed6f45855a27f947825ed, type: 2}

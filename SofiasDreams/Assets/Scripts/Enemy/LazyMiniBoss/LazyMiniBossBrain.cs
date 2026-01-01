@@ -32,6 +32,11 @@ public class LazyMiniBossBrain : MonoBehaviour
     int _pathIndex;
     int _pathDir = 1;
 
+    // spawn meta (temporary)
+    IEnemyPersistenceService _persist;
+    EnemySpawnMeta _spawnMeta;
+    bool _permaKilledSaved;
+    
     // Agro
     float _forgetTimer;
     bool _hasSeenPlayer;
@@ -52,11 +57,12 @@ public class LazyMiniBossBrain : MonoBehaviour
     bool _zoneReady;
 
     [Inject]
-    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus)
+    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus, IEnemyPersistenceService persist)
     {
         _config = config;
         _iHealth = health;
         _bus = bus;
+        _persist = persist;
     }
 
     void Awake()
@@ -70,6 +76,10 @@ public class LazyMiniBossBrain : MonoBehaviour
         
         if (!_patrolPath) _patrolPath = FindNearestPatrolPath();
         _path = _patrolPath;
+        
+        _spawnMeta = GetComponent<EnemySpawnMeta>()
+                     ?? GetComponentInParent<EnemySpawnMeta>()
+                     ?? GetComponentInChildren<EnemySpawnMeta>(true);
     }
     
     void OnEnable()
@@ -126,6 +136,13 @@ public class LazyMiniBossBrain : MonoBehaviour
     {
         if (!_iHealth.IsAlive)
         {
+            // Save permanent kill ONCE
+            if (!_permaKilledSaved)
+            {
+                TryMarkKilledPermanently();
+                _permaKilledSaved = true;
+            }
+
             if (_state != State.Death) EnterDeath();
             return;
         }
@@ -181,6 +198,32 @@ public class LazyMiniBossBrain : MonoBehaviour
         UpdateAnimator();
     }
 
+    void TryMarkKilledPermanently()
+    {
+        if (_persist == null)
+        {
+            Debug.LogWarning("[PERSIST] No persistence service injected into LazyMiniBossBrain.");
+            return;
+        }
+
+        // We need the spawnId. Prefer meta if present.
+        var id = (_spawnMeta != null) ? _spawnMeta.SpawnId : "";
+
+        if (string.IsNullOrEmpty(id))
+        {
+            Debug.LogWarning($"[PERSIST] LazyMiniBoss died but SpawnId is empty. " +
+                             $"Make sure the EnemySpawnPoint copies spawnId into EnemySpawnMeta at spawn time.");
+            return;
+        }
+
+        // Only persist if this spawn is configured to be permanent
+        if (_spawnMeta != null && _spawnMeta.RespawnMode != EnemyRespawnMode.PersistOnceKilled)
+            return;
+
+        Debug.Log($"[PERSIST] MarkKilled (LazyMiniBoss): {id}");
+        _persist.MarkKilled(id);
+    }
+    
     void EnterDeath()
     {
         _state = State.Death;

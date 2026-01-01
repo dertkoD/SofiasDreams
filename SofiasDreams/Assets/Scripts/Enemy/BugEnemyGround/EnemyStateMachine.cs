@@ -61,7 +61,39 @@ public class EnemyStateMachine : MonoBehaviour
         _isDeadNotified = true;
         ChangeState(_deadState);
 
-        if (_bus != null && _facade != null)
+        if (_bus == null) return;
+
+        // ✅ Look for spawn meta on the whole hierarchy
+        // Prefer facade if it exists, but fall back to this GO, parent, children.
+        EnemySpawnMeta meta = null;
+
+        if (_facade != null)
+            meta = _facade.GetComponent<EnemySpawnMeta>();
+
+        if (meta == null)
+            meta = GetComponent<EnemySpawnMeta>();
+
+        if (meta == null)
+            meta = GetComponentInParent<EnemySpawnMeta>();
+
+        if (meta == null)
+            meta = GetComponentInChildren<EnemySpawnMeta>(true);
+
+        if (meta != null)
+        {
+            //Debug.Log($"[PERSIST] Enemy died. meta.SpawnId='{meta.SpawnId}' meta.Mode={meta.RespawnMode} on '{gameObject.name}'");
+            _bus.Fire(new EnemyKilledSignal
+            {
+                spawnId = meta.SpawnId,
+                respawnMode = meta.RespawnMode
+            });
+        }
+        else
+        {
+            //Debug.LogWarning($"[PERSIST] Enemy died but no EnemySpawnMeta found on '{gameObject.name}' (or facade).");
+        }
+
+        if (_facade != null)
             _bus.Fire(new EnemyDiedSignal(_facade));
     }
 

@@ -75,5 +75,12 @@ public class SceneInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<BonfireRespawnOnDeath>().AsSingle();
 
         Container.Bind<IEnemyCombatGate>().To<EnemyCombatGate>().AsSingle();
+        
+        // spawn meta
+        
+        Container.DeclareSignal<EnemyKilledSignal>();
+        Container.BindInterfacesAndSelfTo<EnemyKilledPersistenceListener>().AsSingle();
+        Container.Bind<IEnemyPersistenceService>().To<EnemyPersistenceService>().AsSingle();
+        
     }
 }

@@ -18,7 +18,7 @@ MonoBehaviour:
   angularSpeed: 360
   stoppingDistance: 0.5
   orbitSpeed: 90
-  attackDistance: 3
+  attackDistance: 8
   attackBackoffDistance: 2
   shootRange: 10
   supportDistance: 6

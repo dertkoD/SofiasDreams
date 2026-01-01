@@ -7,6 +7,8 @@ public class Bootstrapper : MonoBehaviour
     [Inject] Spawner _spawner;
     [Inject] SignalBus _bus;
     [Inject] IBonfireService _bonfire;
+    [Inject] IEnemyPersistenceService _persist;
+
 
     public Vector3 startPos;
 
@@ -47,7 +49,18 @@ public class Bootstrapper : MonoBehaviour
     {
         foreach (var sp in _enemySpawnPoints)
         {
+            
             if (sp == null) continue;
+
+            if (sp.respawnMode == EnemyRespawnMode.PersistOnceKilled &&
+                _persist != null &&
+                _persist.IsKilled(sp.spawnId))
+            {
+                // already killed in this save -> never respawn
+                continue;
+            }
+
+            //Debug.Log($"[PERSIST] IsKilled({sp.spawnId}) = {_persist.IsKilled(sp.spawnId)}  mode={sp.respawnMode}");
             var e = _spawner.SpawnEnemy(sp);
             if (e != null) _spawnedEnemies.Add(e);
         }
