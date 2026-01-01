@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Zenject;
 public class UnlockDashInteractable : MonoBehaviour, IInteractable
 {
@@ -6,9 +6,19 @@ public class UnlockDashInteractable : MonoBehaviour, IInteractable
     [SerializeField] WorldHintTextFade hint;
     [SerializeField] bool destroyHintOnUse = true;
 
+    [Header("Dissolve")]
+    [SerializeField] SpriteDissolveController _dissolveController;
+    [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
+
     IPlayerAbilities _abilities;
     SignalBus _bus;
     bool _used;
+
+    void Awake()
+    {
+        if (!_dissolveController)
+            _dissolveController = GetComponentInChildren<SpriteDissolveController>();
+    }
 
     [Inject]
     void Construct(IPlayerAbilities abilities, SignalBus bus)
@@ -49,5 +59,18 @@ public class UnlockDashInteractable : MonoBehaviour, IInteractable
 
         hint?.DisableForeverFade(destroyHintOnUse);
 
+        if (_dissolveController != null && _dissolveSettings != null)
+        {
+            // Disable collider to prevent further interaction or triggers
+            var col = GetComponent<Collider2D>();
+            if (col) col.enabled = false;
+
+            _dissolveController.Play(_dissolveSettings, () => Destroy(gameObject));
+        }
+        else
+        {
+            // Fallback if no dissolve settings
+            Destroy(gameObject);
+        }
     }
 }
