@@ -19,6 +19,12 @@ public class MinionBullet : MonoBehaviour
     [SerializeField] bool keepWordUpright = true;
     [SerializeField] bool preventWordMirror = true;
 
+    [Header("Dissolve")]
+    [SerializeField] SpriteDissolveController _dissolveController;
+    [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
+
+    bool _isDissolving;
+
     Rigidbody2D _rb;
     Animator _anim;
     Collider2D[] _allCols;
@@ -38,6 +44,9 @@ public class MinionBullet : MonoBehaviour
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             _rb.freezeRotation = true;
         }
+
+        if (!_dissolveController)
+            _dissolveController = GetComponentInChildren<SpriteDissolveController>();
 
         _allCols = GetComponentsInChildren<Collider2D>(true);
 
@@ -62,6 +71,7 @@ public class MinionBullet : MonoBehaviour
 
     void OnEnable()
     {
+        _isDissolving = false;
         if (_rb)
         {
             _rb.simulated = true;
@@ -143,6 +153,35 @@ public class MinionBullet : MonoBehaviour
     }
 
     void ReturnToPoolOrDestroy()
+    {
+        if (_isDissolving) return;
+
+        if (_dissolveController != null && _dissolveSettings != null)
+        {
+            _isDissolving = true;
+
+            // Stop movement
+            if (_rb)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+                _rb.simulated = false; // Disable physics simulation
+            }
+
+            // Disable colliders
+            if (_allCols != null)
+                for (int i = 0; i < _allCols.Length; i++)
+                    if (_allCols[i]) _allCols[i].enabled = false;
+
+            _dissolveController.Play(_dissolveSettings, ActualReturnToPool);
+        }
+        else
+        {
+            ActualReturnToPool();
+        }
+    }
+
+    void ActualReturnToPool()
     {
         if (_allCols != null)
             for (int i = 0; i < _allCols.Length; i++)
