@@ -1,19 +1,8 @@
 using UnityEngine;
 using Zenject;
 
-public class LazyMiniBossBrain : MonoBehaviour
+public class LazyMiniBossBrain : BaseEnemyBrain
 {
-    enum State
-    {
-        Patrol,
-        TriggerAgro,
-        Agro,
-        AttackMelee,
-        AttackShoot,
-        TriggerPatrol,
-        Death
-    }
-
     [Header("Refs")]
     [SerializeField] LazyMiniBossMotor2D _motor;
     [SerializeField] LazyMiniBossAnimatorAdapter _anim;
@@ -23,46 +12,58 @@ public class LazyMiniBossBrain : MonoBehaviour
     [SerializeField] Transform _projectileSpawnPoint;
     [SerializeField] LazyMiniBossConfigSO _config;
 
-    IHealth _iHealth;
-    SignalBus _bus;
-    Transform _player;
-    
-    State _state;
-    EnemyPatrolPath _path;
-    int _pathIndex;
-    int _pathDir = 1;
+    public LazyMiniBossMotor2D Motor => _motor;
+    public LazyMiniBossAnimatorAdapter Anim => _anim;
+    public VisionCone2D Vision => _vision;
+    public Health Health => _health;
+    public EnemyPatrolPath PatrolPath { get => _patrolPath; set => _patrolPath = value; }
+    public Transform ProjectileSpawnPoint => _projectileSpawnPoint;
+    public LazyMiniBossConfigSO Config => _config;
 
-    // spawn meta (temporary)
-    IEnemyPersistenceService _persist;
-    EnemySpawnMeta _spawnMeta;
-    bool _permaKilledSaved;
+    public IHealth IHealth { get; private set; }
+    public IEnemyPersistenceService Persist { get; private set; }
     
-    // Agro
-    float _forgetTimer;
-    bool _hasSeenPlayer;
-    Vector2 _lastSeenPos;
+    // States
+    public LazyPatrolState PatrolState { get; private set; }
+    public LazyTriggerAgroState TriggerAgroState { get; private set; }
+    public LazyAgroState AgroState { get; private set; }
+    public LazyAttackMeleeState AttackMeleeState { get; private set; }
+    public LazyAttackShootState AttackShootState { get; private set; }
+    public LazyTriggerPatrolState TriggerPatrolState { get; private set; }
+    public LazyDeadState DeadState { get; private set; }
 
+    // Runtime
+    public Transform Player { get; set; }
+    public Vector2 LastSeenPos { get; set; }
+    public bool HasSeenPlayer { get; set; }
+    public float ForgetTimer { get; set; }
+    
+    [HideInInspector] public EnemyPatrolPath CurrentPath;
+    [HideInInspector] public int PathIndex;
+    [HideInInspector] public int PathDir = 1;
+
+    // Zone
+    public float ZoneMinX { get; set; }
+    public float ZoneMaxX { get; set; }
+    public bool ZoneReady { get; set; }
+    
     // Combat
-    float _nextMeleeAttackTime;
-    float _nextShootAttackTime;
-    
-    // Internal flags for melee sequence
-    bool _attack1Triggered;
-    bool _attack2Triggered;
+    public float NextMeleeAttackTime { get; set; }
+    public float NextShootAttackTime { get; set; }
 
+    // Spawn Meta
+    public EnemySpawnMeta SpawnMeta { get; private set; }
+    bool _permaKilledSaved;
     int _lastHp;
-    
-    float _zoneMinX;
-    float _zoneMaxX;
-    bool _zoneReady;
 
     [Inject]
-    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus, IEnemyPersistenceService persist)
+    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus, IEnemyPersistenceService persist, [InjectOptional] PlayerFacade playerFacade)
     {
         _config = config;
-        _iHealth = health;
-        _bus = bus;
-        _persist = persist;
+        IHealth = health;
+        Persist = persist;
+        if (playerFacade != null) Player = playerFacade.transform;
+        ConstructBase(bus);
     }
 
     void Awake()
@@ -71,443 +72,192 @@ public class LazyMiniBossBrain : MonoBehaviour
         if (!_anim) _anim = GetComponent<LazyMiniBossAnimatorAdapter>();
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>();
         if (!_health) _health = GetComponent<Health>();
+        if (IHealth == null && _health) IHealth = _health;
         
-        if (_iHealth == null) _iHealth = _health as IHealth;
+        PatrolState = new LazyPatrolState(this);
+        TriggerAgroState = new LazyTriggerAgroState(this);
+        AgroState = new LazyAgroState(this);
+        AttackMeleeState = new LazyAttackMeleeState(this);
+        AttackShootState = new LazyAttackShootState(this);
+        TriggerPatrolState = new LazyTriggerPatrolState(this);
+        DeadState = new LazyDeadState(this);
         
-        if (!_patrolPath) _patrolPath = FindNearestPatrolPath();
-        _path = _patrolPath;
-        
-        _spawnMeta = GetComponent<EnemySpawnMeta>()
+        SpawnMeta = GetComponent<EnemySpawnMeta>()
                      ?? GetComponentInParent<EnemySpawnMeta>()
                      ?? GetComponentInChildren<EnemySpawnMeta>(true);
     }
     
+    void Start()
+    {
+        if (PatrolPath == null) PatrolPath = FindNearestPatrolPath();
+        CurrentPath = PatrolPath;
+        if (CurrentPath != null && CurrentPath.Count > 0)
+        {
+            PathIndex = FindNearestWaypointIndex(transform.position);
+        }
+        
+        RecalcZoneBoundsFromPath();
+        
+        ChangeState(PatrolState);
+    }
+    
     void OnEnable()
     {
-        if (_health)
+        if (Health)
         {
-            _lastHp = _health.CurrentHP;
-            _health.OnHealthChanged += OnHealthChanged;
+            _lastHp = Health.CurrentHP;
+            Health.OnHealthChanged += OnHealthChanged;
         }
     }
 
     void OnDisable()
     {
-        if (_health) _health.OnHealthChanged -= OnHealthChanged;
+        if (Health) Health.OnHealthChanged -= OnHealthChanged;
     }
 
-    void Start()
+    protected override void Update()
     {
-        _state = State.Patrol;
-        if (_path != null && _path.Count > 0)
+        if (!IHealth.IsAlive)
         {
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-        }
-        
-        RecalcZoneBoundsFromPath();
-        
-        // Try find player
-         var pf = FindObjectOfType<PlayerFacade>();
-         if (pf != null) _player = pf.transform;
-    }
-    
-    void RecalcZoneBoundsFromPath()
-    {
-        _zoneReady = false;
-        if (_path == null || _path.Count == 0) return;
-
-        float minX = float.PositiveInfinity;
-        float maxX = float.NegativeInfinity;
-
-        for (int i = 0; i < _path.Count; i++)
-        {
-            float x = _path.GetPoint(i).x;
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-        }
-
-        const float pad = 0.05f;
-        _zoneMinX = minX - pad;
-        _zoneMaxX = maxX + pad;
-        _zoneReady = true;
-    }
-
-    void Update()
-    {
-        if (!_iHealth.IsAlive)
-        {
-            // Save permanent kill ONCE
             if (!_permaKilledSaved)
             {
                 TryMarkKilledPermanently();
                 _permaKilledSaved = true;
             }
-
-            if (_state != State.Death) EnterDeath();
+            if (CurrentState != DeadState) ChangeState(DeadState);
             return;
         }
 
         bool seesPlayer = TrySense(out Transform target);
         if (seesPlayer)
         {
-            _player = target;
-            _lastSeenPos = target.position;
-            _hasSeenPlayer = true;
-            _forgetTimer = _config.agroForgetSeconds;
+            Player = target;
+            LastSeenPos = target.position;
+            HasSeenPlayer = true;
+            ForgetTimer = Config.agroForgetSeconds;
         }
         else
         {
-            if (_forgetTimer > 0) _forgetTimer -= Time.deltaTime;
+            if (ForgetTimer > 0) ForgetTimer -= Time.deltaTime;
         }
 
-        switch (_state)
-        {
-            case State.Patrol:
-                if (seesPlayer) EnterTriggerAgro();
-                else TickPatrol();
-                break;
-
-            case State.TriggerAgro:
-                if (_anim.IsInAgroMovement())
-                {
-                    _state = State.Agro;
-                }
-                break;
-
-            case State.Agro:
-                TickAgro(seesPlayer);
-                break;
-
-            case State.TriggerPatrol:
-                if (_anim.IsInPatrolMovement())
-                {
-                    _state = State.Patrol;
-                    _pathIndex = FindNearestWaypointIndex(transform.position);
-                }
-                break;
-                
-            case State.AttackMelee:
-                TickAttackMelee();
-                break;
-                
-            case State.AttackShoot:
-                TickAttackShoot();
-                break;
-        }
-        
-        UpdateAnimator();
-    }
-
-    void TryMarkKilledPermanently()
-    {
-        if (_persist == null)
-        {
-            Debug.LogWarning("[PERSIST] No persistence service injected into LazyMiniBossBrain.");
-            return;
-        }
-
-        // We need the spawnId. Prefer meta if present.
-        var id = (_spawnMeta != null) ? _spawnMeta.SpawnId : "";
-
-        if (string.IsNullOrEmpty(id))
-        {
-            Debug.LogWarning($"[PERSIST] LazyMiniBoss died but SpawnId is empty. " +
-                             $"Make sure the EnemySpawnPoint copies spawnId into EnemySpawnMeta at spawn time.");
-            return;
-        }
-
-        // Only persist if this spawn is configured to be permanent
-        if (_spawnMeta != null && _spawnMeta.RespawnMode != EnemyRespawnMode.PersistOnceKilled)
-            return;
-
-        Debug.Log($"[PERSIST] MarkKilled (LazyMiniBoss): {id}");
-        _persist.MarkKilled(id);
+        base.Update();
+        Anim.SetXVelocity(Mathf.Abs(Motor.Velocity.x));
     }
     
-    void EnterDeath()
-    {
-        _state = State.Death;
-        _motor.Stop();
-        _anim.TriggerDeath();
-        enabled = false;
-    }
-
-    void EnterTriggerAgro()
-    {
-        _state = State.TriggerAgro;
-        _motor.Stop();
-        _anim.TriggerAgro();
-    }
-
-    void EnterTriggerPatrol()
-    {
-        _state = State.TriggerPatrol;
-        _motor.Stop();
-        _anim.TriggerPatrol();
-        _hasSeenPlayer = false;
-    }
-    
-    void TickPatrol()
-    {
-        if (_path == null || _path.Count == 0) return;
-
-        Vector3 target = _path.GetPoint(_pathIndex);
-        
-        // 1. Calculate distance purely on X if it's a 2D platformer on flat ground
-        // We use full distance normally, but if we are "stuck" we might need X only check.
-        float dist = Vector2.Distance(transform.position, target);
-        
-        // Check if we reached it
-        if (dist <= _config.waypointArriveDistance)
-        {
-            AdvancePathIndex();
-            // Important: if we just advanced, we should check if we should wait or immediately move to next.
-            // For now, immediately move to next in next frame.
-            _motor.Stop(); // Stop momentarily
-            return;
-        }
-
-        // Move towards target
-        float dx = target.x - transform.position.x;
-        
-        // Anti-stuck: if dx is tiny but dist is large (meaning Y diff), force advance if close enough in X?
-        // OR simply ignore Y for arrival check if it's a flat platformer.
-        // Let's rely on X distance for arrival if configured, or just be more lenient.
-        if (Mathf.Abs(dx) < 0.1f) 
-        {
-             // Close enough in X. Treating as arrived to prevent oscillation.
-             AdvancePathIndex();
-             _motor.Stop();
-             return;
-        }
-
-        _motor.Move(Mathf.Sign(dx) * _config.patrolSpeed);
-    }
-
-    void TickAgro(bool seesPlayer)
-    {
-        if (_forgetTimer <= 0 && !seesPlayer)
-        {
-            EnterTriggerPatrol();
-            return;
-        }
-
-        Vector3 rawTargetPos = seesPlayer ? _player.position : (Vector3)_lastSeenPos;
-
-        float distToPlayer = Vector2.Distance(transform.position, rawTargetPos);
-        float dxToPlayer = rawTargetPos.x - transform.position.x;
-
-        Vector3 moveTargetPos = rawTargetPos;
-        if (_zoneReady)
-            moveTargetPos.x = Mathf.Clamp(rawTargetPos.x, _zoneMinX, _zoneMaxX);
-
-        float distToMoveTarget = Vector2.Distance(transform.position, moveTargetPos);
-        float dxToMoveTarget = moveTargetPos.x - transform.position.x;
-
-        if (Mathf.Abs(dxToPlayer) > 0.1f)
-            _motor.Face(dxToPlayer > 0 ? 1 : -1);
-
-        if (_zoneReady)
-        {
-            if (transform.position.x < _zoneMinX)
-            {
-                _motor.Move(_config.agroRunSpeed);
-                return;
-            }
-
-            if (transform.position.x > _zoneMaxX)
-            {
-                _motor.Move(-_config.agroRunSpeed);
-                return;
-            }
-        }
-
-        if (distToPlayer <= _config.closeRangeThreshold)
-        {
-            if (Time.time >= _nextMeleeAttackTime)
-            {
-                StartMeleeAttack();
-                return;
-            }
-        }
-        else if (seesPlayer && distToPlayer >= _config.shootRangeMin)
-        {
-            if (Time.time >= _nextShootAttackTime)
-            {
-                StartShootAttack();
-                return;
-            }
-        }
-
-        if (distToMoveTarget > _config.closeRangeThreshold * 0.8f)
-        {
-            if (seesPlayer && distToPlayer >= _config.shootRangeMin &&
-                distToPlayer <= _config.shootRangeMin + 2f && Time.time < _nextShootAttackTime)
-            {
-                _motor.Stop();
-            }
-            else
-            {
-                if (Mathf.Abs(dxToMoveTarget) > 0.05f)
-                    _motor.Move(Mathf.Sign(dxToMoveTarget) * _config.agroRunSpeed);
-                else
-                    _motor.Stop();
-            }
-        }
-        else
-        {
-            _motor.Stop();
-        }
-    }
-
-    void StartMeleeAttack()
-    {
-        _state = State.AttackMelee;
-        _motor.Stop();
-        _attack1Triggered = true;
-        _attack2Triggered = false;
-        _anim.SetAttack1(true);
-        _nextMeleeAttackTime = Time.time + _config.meleeAttackCooldown;
-    }
-
-    void TickAttackMelee()
-    {
-        // Force sequencer: Attack1 -> Attack2
-        
-        // If we are currently playing Attack1, we MUST ensure Attack1 bool is off so it doesn't loop,
-        // and set Attack2 bool ON to queue the transition.
-        if (_anim.IsInAttack1())
-        {
-             // We want to transition to Attack2. 
-             // The transition condition is "Attack2 == true".
-             // The exit transition from Attack1 to Agro is "Attack1 == false".
-             // Since we want to go to Attack2, we must ensure Attack2 is true.
-             // Usually, turning off Attack1 is fine as long as Attack2 is set, priority depends on Animator.
-             // But to be safe, let's keep Attack1 true until we are sure? 
-             // No, "Attack1 = false" triggers exit. So we should NOT set Attack1 false if we want to chain?
-             // Actually, usually "Has Exit Time" or specific conditions handle this.
-             // User says: "From Attack1 transition bool Attack1=true -> Attack1State" (wait, entering).
-             // "From Attack1 transition bool Attack2=true -> Attack2State".
-             // "From Attack1 transition bool Attack1=false -> AgroMovement".
-             
-             // So if we want to go 1 -> 2:
-             // We must Set Attack2 = true.
-             // We must NOT Set Attack1 = false immediately if that causes early exit before Attack2 transition is picked up?
-             // Unity picks first valid transition.
-             
-             if (!_attack2Triggered)
-             {
-                 _anim.SetAttack2(true);
-                 _attack2Triggered = true;
-                 
-                 // We can turn off Attack1 now, assuming Attack2 transition will take precedence or 
-                 // Attack1->Agro has a condition that we can avoid?
-                 // User said: "Attack1 transition bool Attack1=false -> AgroMovement".
-                 // So if we set Attack1=false, it might go to Agro.
-                 // We should keep Attack1=true UNTIL we are in Attack2? 
-                 // But then it might loop Attack1 if it's set to loop?
-                 // Assuming Attack1 is not looping.
-                 
-                 // Let's keep Attack1 TRUE until we see we are in Attack2 state.
-             }
-        }
-        
-        if (_anim.IsInAttack2())
-        {
-            // Now we are safely in Attack2.
-            // Turn off triggers/bools.
-            _anim.SetAttack1(false);
-            _anim.SetAttack2(false); 
-        }
-        else if (_attack2Triggered && !_anim.IsInAttack1()) 
-        {
-            // We triggered attack 2, and we are NOT in attack 1 anymore.
-            // Maybe we are transitioning? Or maybe we finished?
-            // If we are back in Agro, then the combo finished.
-        }
-
-        // Check for exit
-        // If we finished Attack2 and returned to Agro
-        if (_anim.IsInAgroMovement() && _attack2Triggered) 
-        {
-             _state = State.Agro;
-             // Reset flags
-             _anim.SetAttack1(false);
-             _anim.SetAttack2(false);
-        }
-    }
-
-    void StartShootAttack()
-    {
-        _state = State.AttackShoot;
-        _motor.Stop();
-        _anim.TriggerShoot();
-        // Spawn is now handled by Animation Event (AnimationEvent_SpawnProjectile)
-        _nextShootAttackTime = Time.time + _config.shootAttackCooldown;
-    }
-    
-    // Called by Animation Event
+    // Delegate to State
     public void AnimationEvent_SpawnProjectile()
     {
-        if (_state != State.AttackShoot) return;
-        SpawnProjectile();
-    }
-
-    void TickAttackShoot()
-    {
-        if (_anim.IsInAgroMovement())
+        if (CurrentState == AttackShootState)
         {
-            _state = State.Agro;
+            AttackShootState.SpawnProjectile();
         }
-    }
-
-    void SpawnProjectile()
-    {
-        if (_state != State.AttackShoot) return; // Cancel if interrupted
-        
-        if (_config.projectilePrefab)
-        {
-            Vector3 spawnPos = _projectileSpawnPoint ? _projectileSpawnPoint.position : transform.position;
-            GameObject go = Instantiate(_config.projectilePrefab, spawnPos, Quaternion.identity);
-            var proj = go.GetComponent<FistProjectile>();
-            
-            // Determine direction
-            int dir = _motor.IsFacingRight ? 1 : -1;
-            Vector2 direction = new Vector2(dir, 0);
-            
-            // If player is known, aim at player? Or just forward?
-            // "Shooting projectile" - usually linear.
-            // Request: shoot strictly straight, no aiming.
-            
-            if (proj) 
-            {
-                proj.Setup(_config.projectileDamage);
-                proj.Fire(direction, _config.projectileSpeed);
-            }
-        }
-    }
-
-    void UpdateAnimator()
-    {
-        if (_state == State.Patrol)
-        {
-            // Set xVelocity based on motor velocity
-            _anim.SetXVelocity(Mathf.Abs(_motor.Velocity.x));
-        }
-        else if (_state == State.Agro)
-        {
-            _anim.SetXVelocity(Mathf.Abs(_motor.Velocity.x));
-        }
-    }
-
-    bool TrySense(out Transform target)
-    {
-        target = null;
-        if (_vision == null) return false;
-        return _vision.TryGetClosestTarget(out target);
     }
     
-    // Path Utilities
+    // --- Helpers ---
+
+    void RecalcZoneBoundsFromPath()
+    {
+        ZoneReady = false;
+        if (CurrentPath == null || CurrentPath.Count == 0) return;
+
+        float minX = float.PositiveInfinity;
+        float maxX = float.NegativeInfinity;
+
+        for (int i = 0; i < CurrentPath.Count; i++)
+        {
+            float x = CurrentPath.GetPoint(i).x;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+
+        const float pad = 0.05f;
+        ZoneMinX = minX - pad;
+        ZoneMaxX = maxX + pad;
+        ZoneReady = true;
+    }
+    
+    void TryMarkKilledPermanently()
+    {
+        if (Persist == null) return;
+        var id = (SpawnMeta != null) ? SpawnMeta.SpawnId : "";
+        if (string.IsNullOrEmpty(id)) return;
+        if (SpawnMeta != null && SpawnMeta.RespawnMode != EnemyRespawnMode.PersistOnceKilled) return;
+
+        Debug.Log($"[PERSIST] MarkKilled (LazyMiniBoss): {id}");
+        Persist.MarkKilled(id);
+    }
+    
+    public bool TrySense(out Transform target)
+    {
+        target = null;
+        if (Vision == null) return false;
+        return Vision.TryGetClosestTarget(out target);
+    }
+    
+    void OnHealthChanged()
+    {
+        if (Health == null) return;
+        int current = Health.CurrentHP;
+        
+        if (current < _lastHp)
+        {
+            if (CurrentState == PatrolState)
+            {
+                if (Health.LastHit != null && Health.LastHit.source != null)
+                {
+                    Transform src = Health.LastHit.source.transform;
+                    float dx = src.position.x - transform.position.x;
+                    if (Mathf.Abs(dx) > 0.1f)
+                    {
+                        Motor.Face(dx > 0 ? 1 : -1);
+                    }
+                    LastSeenPos = src.position;
+                    ChangeState(TriggerAgroState);
+                }
+            }
+        }
+        _lastHp = current;
+    }
+
+    public void AdvancePathIndex()
+    {
+        if (CurrentPath == null || CurrentPath.Count <= 1) return;
+        
+        if (Config != null && Config.loopPath)
+        {
+            PathIndex = (PathIndex + 1) % CurrentPath.Count;
+            return;
+        }
+
+        int next = PathIndex + PathDir;
+        if (next >= CurrentPath.Count)
+        {
+            PathDir = -1;
+            next = Mathf.Max(0, CurrentPath.Count - 2); 
+        }
+        else if (next < 0)
+        {
+            PathDir = 1;
+            next = Mathf.Min(1, CurrentPath.Count - 1);
+        }
+        PathIndex = Mathf.Clamp(next, 0, CurrentPath.Count - 1);
+    }
+
+    public int FindNearestWaypointIndex(Vector2 pos)
+    {
+        if (CurrentPath == null || CurrentPath.Count == 0) return 0;
+        int bestIndex = 0;
+        float best = float.PositiveInfinity;
+        for (int i = 0; i < CurrentPath.Count; i++)
+        {
+            Vector2 p = CurrentPath.GetPoint(i);
+            float d = (p - pos).sqrMagnitude;
+            if (d < best) { best = d; bestIndex = i; }
+        }
+        return bestIndex;
+    }
+    
     EnemyPatrolPath FindNearestPatrolPath()
     {
         var all = FindObjectsOfType<EnemyPatrolPath>();
@@ -521,114 +271,294 @@ public class LazyMiniBossBrain : MonoBehaviour
         {
             if (p == null || p.Count == 0) continue;
             float d = Vector2.Distance(pos, p.transform.position);
-            if (d < best)
-            {
-                best = d;
-                bestPath = p;
-            }
+            if (d < best) { best = d; bestPath = p; }
         }
         return bestPath;
     }
     
-    int FindNearestWaypointIndex(Vector2 pos)
+    void OnDrawGizmos()
     {
-        if (_path == null || _path.Count == 0) return 0;
-        int bestIndex = 0;
-        float best = float.PositiveInfinity;
-        for (int i = 0; i < _path.Count; i++)
-        {
-            Vector2 p = _path.GetPoint(i);
-            float d = (p - pos).sqrMagnitude;
-            if (d < best) { best = d; bestIndex = i; }
-        }
-        return bestIndex;
+        if (Config == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, Config.closeRangeThreshold);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, Config.shootRangeMin);
     }
-    
-    void AdvancePathIndex()
+}
+
+// --- States ---
+
+public class LazyPatrolState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyPatrolState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter() { }
+
+    public void Tick()
     {
-        if (_path == null || _path.Count <= 1) return;
-        
-        // Loop logic:
-        if (_config != null && _config.loopPath)
+        if (_brain.TrySense(out Transform target))
         {
-            _pathIndex = (_pathIndex + 1) % _path.Count;
+             _brain.ChangeState(_brain.TriggerAgroState);
+             return;
+        }
+
+        if (_brain.CurrentPath == null || _brain.CurrentPath.Count == 0) return;
+
+        Vector3 targetPos = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+        float dist = Vector2.Distance(_brain.transform.position, targetPos);
+        
+        if (dist <= _brain.Config.waypointArriveDistance)
+        {
+            _brain.AdvancePathIndex();
+            _brain.Motor.Stop(); 
             return;
         }
 
-        // Ping-pong logic:
-        int next = _pathIndex + _pathDir;
-        if (next >= _path.Count)
+        float dx = targetPos.x - _brain.transform.position.x;
+        if (Mathf.Abs(dx) < 0.1f) 
         {
-            _pathDir = -1;
-            next = Mathf.Max(0, _path.Count - 2); 
-        }
-        else if (next < 0)
-        {
-            _pathDir = 1;
-            next = Mathf.Min(1, _path.Count - 1);
+             _brain.AdvancePathIndex();
+             _brain.Motor.Stop();
+             return;
         }
 
-        // Final safety check
-        next = Mathf.Clamp(next, 0, _path.Count - 1);
-
-        _pathIndex = next;
-    }
-    
-    public void SetPatrolPath(EnemyPatrolPath path)
-    {
-        _patrolPath = path;
-        _path = _patrolPath;          
-        _pathDir = 1;                
-
-        if (_path != null && _path.Count > 0)
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-        
-        RecalcZoneBoundsFromPath();
+        _brain.Motor.Move(Mathf.Sign(dx) * _brain.Config.patrolSpeed);
     }
 
-    void OnHealthChanged()
+    public void Exit() { }
+}
+
+public class LazyTriggerAgroState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyTriggerAgroState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
     {
-        if (_health == null) return;
-        int current = _health.CurrentHP;
-        
-        if (current < _lastHp)
+        _brain.Motor.Stop();
+        _brain.Anim.TriggerAgro();
+    }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInAgroMovement())
         {
-            // If we took damage and are not already in combat (agro/attack)
-            // Or even if we are, maybe we should turn to face the damage source?
-            // Worm logic: if in patrol, turn and enter trigger.
-            
-            if (_state == State.Patrol)
+            _brain.ChangeState(_brain.AgroState);
+        }
+    }
+    public void Exit() { }
+}
+
+public class LazyTriggerPatrolState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyTriggerPatrolState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+        _brain.Anim.TriggerPatrol();
+        _brain.HasSeenPlayer = false;
+    }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInPatrolMovement())
+        {
+            _brain.PathIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
+            _brain.ChangeState(_brain.PatrolState);
+        }
+    }
+    public void Exit() { }
+}
+
+public class LazyAgroState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyAgroState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter() { }
+
+    public void Tick()
+    {
+        bool seesPlayer = _brain.TrySense(out var t);
+
+        if (_brain.ForgetTimer <= 0 && !seesPlayer)
+        {
+            _brain.ChangeState(_brain.TriggerPatrolState);
+            return;
+        }
+
+        Vector3 rawTargetPos = seesPlayer ? _brain.Player.position : (Vector3)_brain.LastSeenPos;
+        float distToPlayer = Vector2.Distance(_brain.transform.position, rawTargetPos);
+        float dxToPlayer = rawTargetPos.x - _brain.transform.position.x;
+
+        Vector3 moveTargetPos = rawTargetPos;
+        if (_brain.ZoneReady)
+            moveTargetPos.x = Mathf.Clamp(rawTargetPos.x, _brain.ZoneMinX, _brain.ZoneMaxX);
+
+        float distToMoveTarget = Vector2.Distance(_brain.transform.position, moveTargetPos);
+        float dxToMoveTarget = moveTargetPos.x - _brain.transform.position.x;
+
+        if (Mathf.Abs(dxToPlayer) > 0.1f)
+            _brain.Motor.Face(dxToPlayer > 0 ? 1 : -1);
+
+        if (_brain.ZoneReady)
+        {
+            if (_brain.transform.position.x < _brain.ZoneMinX)
             {
-                // Try to find source
-                if (_health.LastHit != null && _health.LastHit.source != null)
-                {
-                    Transform src = _health.LastHit.source.transform;
-                    float dx = src.position.x - transform.position.x;
-                    if (Mathf.Abs(dx) > 0.1f)
-                    {
-                        _motor.Face(dx > 0 ? 1 : -1);
-                    }
-                    
-                    // Also remember position as last seen?
-                    _lastSeenPos = src.position;
-                    // Trigger Agro
-                    EnterTriggerAgro();
-                }
+                _brain.Motor.Move(_brain.Config.agroRunSpeed);
+                return;
+            }
+            if (_brain.transform.position.x > _brain.ZoneMaxX)
+            {
+                _brain.Motor.Move(-_brain.Config.agroRunSpeed);
+                return;
             }
         }
-        _lastHp = current;
+
+        if (distToPlayer <= _brain.Config.closeRangeThreshold)
+        {
+            if (Time.time >= _brain.NextMeleeAttackTime)
+            {
+                _brain.ChangeState(_brain.AttackMeleeState);
+                return;
+            }
+        }
+        else if (seesPlayer && distToPlayer >= _brain.Config.shootRangeMin)
+        {
+            if (Time.time >= _brain.NextShootAttackTime)
+            {
+                _brain.ChangeState(_brain.AttackShootState);
+                return;
+            }
+        }
+
+        if (distToMoveTarget > _brain.Config.closeRangeThreshold * 0.8f)
+        {
+            if (seesPlayer && distToPlayer >= _brain.Config.shootRangeMin &&
+                distToPlayer <= _brain.Config.shootRangeMin + 2f && Time.time < _brain.NextShootAttackTime)
+            {
+                _brain.Motor.Stop();
+            }
+            else
+            {
+                if (Mathf.Abs(dxToMoveTarget) > 0.05f)
+                    _brain.Motor.Move(Mathf.Sign(dxToMoveTarget) * _brain.Config.agroRunSpeed);
+                else
+                    _brain.Motor.Stop();
+            }
+        }
+        else
+        {
+            _brain.Motor.Stop();
+        }
     }
 
-    void OnDrawGizmos()
+    public void Exit() { }
+}
+
+public class LazyAttackMeleeState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    bool _attack2Triggered;
+    
+    public LazyAttackMeleeState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
     {
-        if (_config == null) return;
-
-        // Draw Close Range (Melee)
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _config.closeRangeThreshold);
-
-        // Draw Shoot Range (Min distance)
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _config.shootRangeMin);
+        _brain.Motor.Stop();
+        _attack2Triggered = false;
+        _brain.Anim.SetAttack1(true);
+        _brain.NextMeleeAttackTime = Time.time + _brain.Config.meleeAttackCooldown;
     }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInAttack1())
+        {
+             if (!_attack2Triggered)
+             {
+                 _brain.Anim.SetAttack2(true);
+                 _attack2Triggered = true;
+             }
+        }
+        
+        if (_brain.Anim.IsInAttack2())
+        {
+            _brain.Anim.SetAttack1(false);
+            _brain.Anim.SetAttack2(false); 
+        }
+
+        if (_brain.Anim.IsInAgroMovement() && _attack2Triggered) 
+        {
+             _brain.ChangeState(_brain.AgroState);
+             _brain.Anim.SetAttack1(false);
+             _brain.Anim.SetAttack2(false);
+        }
+    }
+
+    public void Exit() 
+    {
+         _brain.Anim.SetAttack1(false);
+         _brain.Anim.SetAttack2(false);
+    }
+}
+
+public class LazyAttackShootState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyAttackShootState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+        _brain.Anim.TriggerShoot();
+        _brain.NextShootAttackTime = Time.time + _brain.Config.shootAttackCooldown;
+    }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInAgroMovement())
+        {
+            _brain.ChangeState(_brain.AgroState);
+        }
+    }
+    
+    public void SpawnProjectile()
+    {
+        if (_brain.Config.projectilePrefab)
+        {
+            Vector3 spawnPos = _brain.ProjectileSpawnPoint ? _brain.ProjectileSpawnPoint.position : _brain.transform.position;
+            GameObject go = Object.Instantiate(_brain.Config.projectilePrefab, spawnPos, Quaternion.identity);
+            var proj = go.GetComponent<FistProjectile>();
+            
+            int dir = _brain.Motor.IsFacingRight ? 1 : -1;
+            Vector2 direction = new Vector2(dir, 0);
+            
+            if (proj) 
+            {
+                proj.Setup(_brain.Config.projectileDamage);
+                proj.Fire(direction, _brain.Config.projectileSpeed);
+            }
+        }
+    }
+
+    public void Exit() { }
+}
+
+public class LazyDeadState : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyDeadState(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+        _brain.Anim.TriggerDeath();
+        _brain.enabled = false;
+    }
+    public void Tick() { }
+    public void Exit() { }
 }
