@@ -57,11 +57,12 @@ public class LazyMiniBossBrain : BaseEnemyBrain
     int _lastHp;
 
     [Inject]
-    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus, IEnemyPersistenceService persist)
+    public void Construct(LazyMiniBossConfigSO config, IHealth health, SignalBus bus, IEnemyPersistenceService persist, [InjectOptional] PlayerFacade playerFacade)
     {
         _config = config;
         IHealth = health;
         Persist = persist;
+        if (playerFacade != null) Player = playerFacade.transform;
         ConstructBase(bus);
     }
 
@@ -97,9 +98,6 @@ public class LazyMiniBossBrain : BaseEnemyBrain
         
         RecalcZoneBoundsFromPath();
         
-        var pf = FindObjectOfType<PlayerFacade>();
-        if (pf != null) Player = pf.transform;
-
         ChangeState(PatrolState);
     }
     

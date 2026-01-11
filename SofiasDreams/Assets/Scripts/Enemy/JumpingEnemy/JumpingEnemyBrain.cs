@@ -74,11 +74,12 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public bool ArmedHpWatch;
 
     [Inject]
-    public void Construct(JumpingEnemyConfigSO config, IHealth health, SignalBus bus)
+    public void Construct(JumpingEnemyConfigSO config, IHealth health, SignalBus bus, [InjectOptional] PlayerFacade playerFacade)
     {
         Config = config;
         IHealth = health;
         SignalBus = bus;
+        if (playerFacade != null) Player = playerFacade.transform;
         ConstructBase(bus);
     }
 
@@ -103,11 +104,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     
     void Start()
     {
-        if (Player == null)
-        {
-            var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) Player = pf.transform;
-        }
+        // Player is injected via Construct or handled via Signal. 
+        // Removed FindObjectOfType fallback to adhere to DI pattern.
         
         if (PatrolPath == null)
             PatrolPath = FindNearestPatrolPath();

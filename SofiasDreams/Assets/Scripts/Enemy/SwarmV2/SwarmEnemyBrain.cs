@@ -39,9 +39,10 @@ public class SwarmEnemyBrain : BaseEnemyBrain
     [HideInInspector] public int PathDir = 1;
 
     [Inject]
-    public void Construct(SwarmConfig config)
+    public void Construct(SwarmConfig config, [InjectOptional] PlayerFacade playerFacade)
     {
         Config = config;
+        if (playerFacade != null) Player = playerFacade.transform;
     }
     
     void Awake()
@@ -64,12 +65,6 @@ public class SwarmEnemyBrain : BaseEnemyBrain
     {
         if (PatrolPath == null)
             PatrolPath = FindNearestPatrolPath();
-
-        if (Player == null)
-        {
-            var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) Player = pf.transform;
-        }
 
         if (PatrolPath != null && PatrolPath.Count > 0)
         {
