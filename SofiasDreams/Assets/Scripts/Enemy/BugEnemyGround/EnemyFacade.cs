@@ -38,10 +38,11 @@ public class EnemyFacade : MonoBehaviour
     public void SetPatrolPath(EnemyPatrolPath path)
     {
         _patrolController?.SetPath(path);
-        _jumpingBrain?.SetPatrolPath(path);
-        _wormBrain?.SetPatrolPath(path);
-        _swarmBrain?.SetPatrolPath(path);
-        _lazyMiniBossBrain?.SetPatrolPath(path);
+        
+        if (_jumpingBrain) _jumpingBrain.PatrolPath = path;
+        if (_wormBrain) _wormBrain.PatrolPath = path;
+        if (_swarmBrain) _swarmBrain.SetPatrolPath(path);
+        if (_lazyMiniBossBrain) _lazyMiniBossBrain.PatrolPath = path;
     }
     
     public void ApplyDamage(DamageInfo info)
