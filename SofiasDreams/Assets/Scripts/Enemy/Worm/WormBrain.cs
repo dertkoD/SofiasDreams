@@ -1,17 +1,8 @@
 using UnityEngine;
 using Zenject;
 
-public class WormBrain : MonoBehaviour
+public class WormBrain : BaseEnemyBrain
 {
-    public enum State
-    {
-        Patrol,
-        Trigger,  // Windup logic state (waiting for anim)
-        Spinning, // Active attack state
-        Stun,
-        Dead
-    }
-
     [Header("Refs")]
     [SerializeField] WormMotor2D _motor;
     [SerializeField] WormAnimatorAdapter _anim;
@@ -20,42 +11,42 @@ public class WormBrain : MonoBehaviour
     [SerializeField] EnemyPatrolPath _patrolPath;
     [SerializeField] EnemyContactDamage _contactDamage;
 
+    public WormMotor2D Motor => _motor;
+    public WormAnimatorAdapter Anim => _anim;
+    public VisionCone2D Vision => _vision;
+    public Health Health => _health;
+    public EnemyPatrolPath PatrolPath { get => _patrolPath; set => _patrolPath = value; }
+    public EnemyContactDamage ContactDamage => _contactDamage;
+
+    public WormConfigSO Config { get; private set; }
+    public IHealth IHealth { get; private set; }
+
+    // States
+    public WormPatrolState PatrolState { get; private set; }
+    public WormTriggerState TriggerState { get; private set; }
+    public WormSpinState SpinState { get; private set; }
+    public WormStunState StunState { get; private set; }
+    public WormDeadState DeadState { get; private set; }
+
+    // Runtime Data
+    public Transform Target { get; set; }
+    public Vector2 SpinDirection { get; set; }
+    public bool LastHitWasWall { get; set; }
+    public float StateTimer { get; set; }
+    public float ForgetTimer { get; set; }
+
+    // Patrol Runtime
+    public EnemyPatrolPath CurrentPath;
+    public int PathIndex;
+    public int PatrolDir = 1;
+
+    int _lastHp;
+
     [Inject]
     public void Construct(WormConfigSO config, IHealth health)
     {
-        _config = config;
-        _iHealth = health;
-    }
-
-    WormConfigSO _config;
-    IHealth _iHealth;
-    State _state;
-    
-    // Runtime
-    Transform _target;
-    Vector2 _spinDirection;
-    float _stateTimer;
-    float _forgetTimer;
-    
-    // Patrol Runtime
-    EnemyPatrolPath _path;
-    int _pathIndex;
-    int _patrolDir = 1;
-
-    // Health watch
-    int _lastHp;
-    
-    // Logic
-    bool _lastHitWasWall;
-
-    public void SetPatrolPath(EnemyPatrolPath path)
-    {
-        _patrolPath = path;
-        _path = _patrolPath;
-        if (_path != null && _path.Count > 0)
-        {
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-        }
+        Config = config;
+        IHealth = health;
     }
 
     void Awake()
@@ -65,338 +56,141 @@ public class WormBrain : MonoBehaviour
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>(true);
         if (!_health) _health = GetComponent<Health>();
         if (!_contactDamage) _contactDamage = GetComponent<EnemyContactDamage>();
-        
-        if (_iHealth == null && _health) _iHealth = _health;
+        if (IHealth == null && _health) IHealth = _health;
+
+        PatrolState = new WormPatrolState(this);
+        TriggerState = new WormTriggerState(this);
+        SpinState = new WormSpinState(this);
+        StunState = new WormStunState(this);
+        DeadState = new WormDeadState(this);
     }
 
     void OnEnable()
     {
-        if (_health)
+        if (Health)
         {
-            _lastHp = _health.CurrentHP;
-            _health.OnHealthChanged += OnHealthChanged;
+            _lastHp = Health.CurrentHP;
+            Health.OnHealthChanged += OnHealthChanged;
         }
 
-        if (_contactDamage) _contactDamage.OnPlayerContact += OnPlayerContact;
-        
-        // Start in Patrol
-        EnterPatrol();
-        
-        if (_patrolPath == null)
-            _patrolPath = FindNearestPatrolPath();
-        _path = _patrolPath;
-        if (_path != null && _path.Count > 0)
-            _pathIndex = FindNearestWaypointIndex(transform.position);
+        if (ContactDamage) ContactDamage.OnPlayerContact += OnPlayerContact;
+
+        if (PatrolPath == null)
+            PatrolPath = FindNearestPatrolPath();
+        CurrentPath = PatrolPath;
+        if (CurrentPath != null && CurrentPath.Count > 0)
+            PathIndex = FindNearestWaypointIndex(transform.position);
+
+        ChangeState(PatrolState);
     }
 
     void OnDisable()
     {
-        if (_health) _health.OnHealthChanged -= OnHealthChanged;
-        if (_contactDamage) _contactDamage.OnPlayerContact -= OnPlayerContact;
+        if (Health) Health.OnHealthChanged -= OnHealthChanged;
+        if (ContactDamage) ContactDamage.OnPlayerContact -= OnPlayerContact;
     }
 
-    void Update()
+    protected override void Update()
     {
-        if (_config == null || _iHealth == null) return;
+        if (Config == null || IHealth == null) return;
 
-        if (!_iHealth.IsAlive && _state != State.Dead)
+        if (!IHealth.IsAlive && CurrentState != DeadState)
         {
-            EnterDead();
+            ChangeState(DeadState);
             return;
         }
 
-        if (_state == State.Dead) return;
+        StateTimer += Time.deltaTime;
 
-        _stateTimer += Time.deltaTime;
-
-        // Vision Check
+        // Global Vision Logic
         Transform t = null;
-        bool seesPlayer = _vision && _vision.TryGetClosestTarget(out t);
+        bool seesPlayer = Vision && Vision.TryGetClosestTarget(out t);
         if (seesPlayer)
         {
-            _target = t;
-            _forgetTimer = _config.aggroForgetSeconds;
+            Target = t;
+            ForgetTimer = Config.aggroForgetSeconds;
         }
         else
         {
-            _forgetTimer -= Time.deltaTime;
+            ForgetTimer -= Time.deltaTime;
         }
 
-        // Logic FSM
-        switch (_state)
-        {
-            case State.Patrol:
-                TickPatrol(seesPlayer);
-                break;
-            case State.Trigger:
-                TickTrigger();
-                break;
-            case State.Spinning:
-                TickSpinning();
-                break;
-            case State.Stun:
-                TickStun(seesPlayer);
-                break;
-        }
+        // Run State Tick
+        base.Update();
     }
 
     void OnPlayerContact()
     {
-        if (_state == State.Patrol)
+        if (CurrentState == PatrolState)
         {
-            // If on a fixed path, we might need to detach or handle it, 
-            // but simply reversing direction is a good start.
-            // If path is active, this flip might be overridden next frame in TickPatrol 
-            // unless we clear the path or handle logic there.
-            // For now, let's assume "Wall Patrol" behavior (null path) or force it.
-            
-            if (_path != null)
-            {
-                // Abort path following to allow free movement/turn
-                _path = null; 
-            }
-
-            _patrolDir *= -1;
-            _motor.Face(_patrolDir);
+            if (CurrentPath != null) CurrentPath = null;
+            PatrolDir *= -1;
+            Motor.Face(PatrolDir);
         }
     }
 
-    void TickPatrol(bool seesPlayer)
+    void OnHealthChanged()
     {
-        // 1. Check Aggro
-        if (seesPlayer)
-        {
-            EnterTrigger();
-            return;
-        }
+        if (Health == null) return;
+        int current = Health.CurrentHP;
 
-        // 2. Move Patrol
-        if (_path != null && _path.Count > 0)
+        if (current < _lastHp)
         {
-            Vector2 targetPt = _path.GetPoint(_pathIndex);
-            float dx = targetPt.x - transform.position.x;
-            
-            // Reached waypoint?
-            if (Mathf.Abs(dx) < 0.2f) 
+            ForgetTimer = Config.aggroForgetSeconds;
+            if (CurrentState == PatrolState)
             {
-                AdvancePathIndex();
-                targetPt = _path.GetPoint(_pathIndex);
-                dx = targetPt.x - transform.position.x;
-            }
-
-            _patrolDir = dx >= 0 ? 1 : -1;
-            
-            // Check if blocked (Wall or Ledge)
-            if (_motor.IsWallAhead(_patrolDir) || _motor.IsLedgeAhead(_patrolDir))
-            {
-                _path = null;
-                _patrolDir *= -1;
+                PatrolDir *= -1;
+                Motor.Face(PatrolDir);
+                ChangeState(TriggerState);
             }
         }
-        else
-        {
-            // Wall Patrol
-            if (_motor.IsLedgeAhead(_patrolDir) || _motor.IsWallAhead(_patrolDir))
-            {
-                 _patrolDir *= -1;
-            }
-        }
-        
-        _motor.Move(_config.patrolSpeed, _config.patrolAcceleration, _patrolDir);
-    }
-
-    void TickTrigger()
-    {
-        // Waiting for Animator to finish "Trigger" anim and enter "Spinning" state
-        _motor.SetFrozen(true);
-        
-        // Safety timeout in case animator gets stuck (e.g. no transition)
-        if (_stateTimer > 3.0f)
-        {
-            Debug.LogWarning("[Worm] Trigger state timed out. Forcing Spin.");
-            EnterSpinningLogic(); 
-            return;
-        }
-
-        if (_anim && _anim.IsInSpinning())
-        {
-            EnterSpinningLogic();
-        }
-    }
-
-    void TickSpinning()
-    {
-        _motor.SetFrozen(false);
-        
-        // Check for player jump over
-        if (_motor.CheckPlayerAbove(_config.jumpOverRayHeight))
-        {
-             Debug.Log("[Worm] Player jumped over! Triggering wall hit behavior.");
-             _lastHitWasWall = true;
-             EnterStun();
-             return;
-        }
-
-        float currentSpeed = _config.chargeSpeed;
-
-        // Movement
-        _motor.Move(currentSpeed, _config.chargeAcceleration, (int)Mathf.Sign(_spinDirection.x));
-
-        // Check Hit (Wall or Player)
-        // Add small delay to avoid hitting self/floor immediately if weird collision
-        if (_stateTimer > 0.05f) 
-        {
-            if (_motor.CheckWallHit(out Vector2 wallNormal))
-            {
-                Debug.Log($"[Worm] Hit Wall! Normal: {wallNormal}");
-                _lastHitWasWall = true;
-                EnterStun();
-                return;
-            }
-
-            if (CheckPlayerHit(out Vector2 away))
-            {
-                Debug.Log($"[Worm] Hit Player! Away: {away}");
-                _lastHitWasWall = false;
-                EnterStun();
-                return;
-            }
-        }
-    }
-
-    void TickStun(bool seesPlayer)
-    {
-        _motor.ApplyDrag(_config.stunDrag);
-        
-        bool animFinished = _anim == null || _anim.IsStunFinished();
-        bool timeout = _stateTimer > 5.0f;
-
-        if (animFinished || timeout)
-        {
-            _motor.ResetDrag();
-            
-            // Decision: Attack again or Patrol?
-            if (_forgetTimer > 0f)
-            {
-                // Attack Again
-                if (_lastHitWasWall)
-                {
-                    // Bounce/Roll back: invert direction
-                    _spinDirection = new Vector2(-Mathf.Sign(_spinDirection.x), 0f);
-                    EnterTrigger(true); 
-                }
-                else
-                {
-                    // Hit player: chase player
-                    EnterTrigger(false); 
-                }
-            }
-            else
-            {
-                // Back to patrol
-                EnterPatrol();
-            }
-        }
-    }
-
-    // --- Transitions ---
-
-    void EnterPatrol()
-    {
-        Debug.Log("[Worm] Enter Patrol");
-        _state = State.Patrol;
-        _stateTimer = 0;
-        
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerPatrol();
-        
-        _motor.SetFrozen(false);
-        
-        // Resume path?
-        if (_patrolPath != null) _path = _patrolPath;
-    }
-
-    void EnterTrigger(bool preserveDirection = false)
-    {
-        Debug.Log("[Worm] Enter Trigger (Windup)");
-        _state = State.Trigger;
-        _stateTimer = 0;
-        
-        // 1. Setup direction
-        if (!preserveDirection)
-        {
-            if (_target)
-            {
-                float dx = _target.position.x - transform.position.x;
-                if (Mathf.Abs(dx) > 0.1f)
-                    _spinDirection = new Vector2(Mathf.Sign(dx), 0);
-                else
-                    _spinDirection = new Vector2(transform.localScale.x, 0);
-            }
-            else
-            {
-                _spinDirection = new Vector2(transform.localScale.x, 0);
-            }
-        }
-        _motor.Face((int)_spinDirection.x);
-
-        // 2. Setup Animator Triggers
-        // We set BOTH TriggerAttack (to enter Trigger state) 
-        // AND SpinningTrigger (to automatically exit Trigger -> Spinning after ExitTime)
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerAttack();
-        _anim?.TriggerSpinning();
-        
-        // 3. Freeze until animation finishes
-        _motor.SetFrozen(true);
-    }
-    
-    // Called ONLY when we detect Animator has actually entered Spinning state
-    void EnterSpinningLogic()
-    {
-        Debug.Log("[Worm] Enter Spinning (Logic)");
-        _state = State.Spinning;
-        _stateTimer = 0;
-        _motor.SetFrozen(false);
-        // Note: No need to set triggers here, we are already in the state
-    }
-
-    void EnterStun()
-    {
-        Debug.Log("[Worm] Enter Stun");
-        _state = State.Stun;
-        _stateTimer = 0;
-        
-        _anim?.ResetAllTriggers();
-        _anim?.TriggerStun();
-        
-        _motor.SetFrozen(false);
-    }
-
-    void EnterDead()
-    {
-        Debug.Log("[Worm] Dead");
-        var prevState = _state;
-        _state = State.Dead;
-        _motor.SetFrozen(true);
-        _motor.StopAllCoroutines(); 
-        
-        if (prevState == State.Spinning)
-            _anim?.TriggerSpinningDeath();
-        else
-            _anim?.TriggerPatrolDeath();
-            
-        enabled = false;
+        _lastHp = current;
     }
 
     // --- Helpers ---
-    
-    bool CheckPlayerHit(out Vector2 away)
+
+    public void AdvancePathIndex()
+    {
+        if (CurrentPath == null || CurrentPath.Count <= 1) return;
+        PathIndex++;
+        if (PathIndex >= CurrentPath.Count) PathIndex = 0;
+    }
+
+    public int FindNearestWaypointIndex(Vector2 pos)
+    {
+        if (CurrentPath == null || CurrentPath.Count == 0) return 0;
+        int best = 0;
+        float minDst = float.MaxValue;
+        for (int i = 0; i < CurrentPath.Count; i++)
+        {
+            float d = Vector2.Distance(pos, CurrentPath.GetPoint(i));
+            if (d < minDst) { minDst = d; best = i; }
+        }
+        return best;
+    }
+
+    EnemyPatrolPath FindNearestPatrolPath()
+    {
+        var all = FindObjectsOfType<EnemyPatrolPath>(true);
+        if (all == null || all.Length == 0) return null;
+
+        EnemyPatrolPath best = null;
+        float minDist = float.MaxValue;
+
+        foreach (var p in all)
+        {
+            float d = Vector2.Distance(transform.position, p.transform.position);
+            if (d < minDist) { minDist = d; best = p; }
+        }
+        return best;
+    }
+
+    public bool CheckPlayerHit(out Vector2 away)
     {
         away = Vector2.zero;
-        if (_config.playerLayer.value == 0) return false;
-        
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, 0.8f, _config.playerLayer);
+        if (Config.playerLayer.value == 0) return false;
+
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, 0.8f, Config.playerLayer);
         if (hit)
         {
             away = (transform.position - hit.transform.position).normalized;
@@ -404,58 +198,265 @@ public class WormBrain : MonoBehaviour
         }
         return false;
     }
+}
 
-    void OnHealthChanged()
+// --- States ---
+
+public class WormPatrolState : IEnemyState
+{
+    WormBrain _brain;
+    public WormPatrolState(WormBrain brain) { _brain = brain; }
+
+    public void Enter()
     {
-        if (_health == null) return;
-        int current = _health.CurrentHP;
+        Debug.Log("[Worm] Enter Patrol");
+        _brain.StateTimer = 0;
+        _brain.Anim?.ResetAllTriggers();
+        _brain.Anim?.TriggerPatrol();
+        _brain.Motor.SetFrozen(false);
+        if (_brain.PatrolPath != null) _brain.CurrentPath = _brain.PatrolPath;
+    }
+
+    public void Tick()
+    {
+        bool seesPlayer = _brain.ForgetTimer > 0 && _brain.Target != null; 
+        // Note: The original used 'seesPlayer' bool passed from Update, which was strictly Vision check.
+        // But logic also checked Aggro: "if (seesPlayer) EnterTrigger".
+        // Here we use ForgetTimer which is updated by vision.
+        // Original: "if (seesPlayer) EnterTrigger". seesPlayer was local var from vision check.
         
-        if (current < _lastHp)
+        // Wait, original:
+        // bool seesPlayer = _vision.TryGetClosestTarget...
+        // TickPatrol(seesPlayer) -> if (seesPlayer) EnterTrigger.
+        // It didn't use ForgetTimer for entering trigger from patrol, only direct sight?
+        // Let's check original... 
+        // Yes: "if (seesPlayer) EnterTrigger();"
+        // And ForgetTimer was updated but not used for STARTING aggro in patrol?
+        
+        // Re-reading original Update:
+        // bool seesPlayer = ...
+        // if (seesPlayer) { ... _forgetTimer = ... } else { ... }
+        // case Patrol: TickPatrol(seesPlayer);
+        // void TickPatrol(bool seesPlayer) { if (seesPlayer) EnterTrigger(); ... }
+        
+        // So strict vision required to start aggro.
+        
+        // However, OnHealthChanged also calls EnterTrigger.
+        
+        // I will access vision check directly if possible or rely on Brain's update.
+        // Brain updates Target and ForgetTimer.
+        // But Brain doesn't expose "IsSeesPlayerThisFrame".
+        // I can check Vision again or check ForgetTimer == Max?
+        // Or I can change Brain to expose "SeesPlayer".
+        
+        if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var t))
         {
-            _forgetTimer = _config.aggroForgetSeconds;
-            if (_state == State.Patrol)
+            _brain.ChangeState(_brain.TriggerState);
+            return;
+        }
+
+        // Patrol Move
+        if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0)
+        {
+            Vector2 targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+            float dx = targetPt.x - _brain.transform.position.x;
+
+            if (Mathf.Abs(dx) < 0.2f)
             {
-                 _patrolDir *= -1;
-                 _motor.Face(_patrolDir);
-                 EnterTrigger();
+                _brain.AdvancePathIndex();
+                targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+                dx = targetPt.x - _brain.transform.position.x;
+            }
+
+            _brain.PatrolDir = dx >= 0 ? 1 : -1;
+
+            if (_brain.Motor.IsWallAhead(_brain.PatrolDir) || _brain.Motor.IsLedgeAhead(_brain.PatrolDir))
+            {
+                _brain.CurrentPath = null;
+                _brain.PatrolDir *= -1;
             }
         }
-        _lastHp = current;
-    }
-    
-    void AdvancePathIndex()
-    {
-        if (_path == null || _path.Count <= 1) return;
-        _pathIndex++;
-        if (_pathIndex >= _path.Count) _pathIndex = 0;
+        else
+        {
+            if (_brain.Motor.IsLedgeAhead(_brain.PatrolDir) || _brain.Motor.IsWallAhead(_brain.PatrolDir))
+            {
+                _brain.PatrolDir *= -1;
+            }
+        }
+
+        _brain.Motor.Move(_brain.Config.patrolSpeed, _brain.Config.patrolAcceleration, _brain.PatrolDir);
     }
 
-    int FindNearestWaypointIndex(Vector2 pos)
+    public void Exit() { }
+}
+
+public class WormTriggerState : IEnemyState
+{
+    WormBrain _brain;
+    public bool PreserveDirection; 
+
+    public WormTriggerState(WormBrain brain) { _brain = brain; }
+
+    public void Enter()
     {
-        if (_path == null || _path.Count == 0) return 0;
-        int best = 0;
-        float minDst = float.MaxValue;
-        for (int i=0; i<_path.Count; i++)
+        Debug.Log("[Worm] Enter Trigger (Windup)");
+        _brain.StateTimer = 0;
+
+        if (!PreserveDirection)
         {
-            float d = Vector2.Distance(pos, _path.GetPoint(i));
-            if (d < minDst) { minDst = d; best = i; }
+            if (_brain.Target)
+            {
+                float dx = _brain.Target.position.x - _brain.transform.position.x;
+                if (Mathf.Abs(dx) > 0.1f)
+                    _brain.SpinDirection = new Vector2(Mathf.Sign(dx), 0);
+                else
+                    _brain.SpinDirection = new Vector2(_brain.transform.localScale.x, 0);
+            }
+            else
+            {
+                _brain.SpinDirection = new Vector2(_brain.transform.localScale.x, 0);
+            }
         }
-        return best;
+        _brain.Motor.Face((int)_brain.SpinDirection.x);
+
+        _brain.Anim?.ResetAllTriggers();
+        _brain.Anim?.TriggerAttack();
+        _brain.Anim?.TriggerSpinning();
+
+        _brain.Motor.SetFrozen(true);
+        PreserveDirection = false; // Reset flag
     }
-    
-    EnemyPatrolPath FindNearestPatrolPath()
+
+    public void Tick()
     {
-        var all = FindObjectsOfType<EnemyPatrolPath>(true);
-        if (all == null || all.Length == 0) return null;
-        
-        EnemyPatrolPath best = null;
-        float minDist = float.MaxValue;
-        
-        foreach(var p in all)
+        // Safety timeout
+        if (_brain.StateTimer > 3.0f)
         {
-            float d = Vector2.Distance(transform.position, p.transform.position);
-            if (d < minDist) { minDist = d; best = p; }
+            _brain.ChangeState(_brain.SpinState);
+            return;
         }
-        return best;
+
+        if (_brain.Anim && _brain.Anim.IsInSpinning())
+        {
+            _brain.ChangeState(_brain.SpinState);
+        }
     }
+
+    public void Exit() { }
+}
+
+public class WormSpinState : IEnemyState
+{
+    WormBrain _brain;
+    public WormSpinState(WormBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        Debug.Log("[Worm] Enter Spinning (Logic)");
+        _brain.StateTimer = 0;
+        _brain.Motor.SetFrozen(false);
+    }
+
+    public void Tick()
+    {
+        if (_brain.Motor.CheckPlayerAbove(_brain.Config.jumpOverRayHeight))
+        {
+            _brain.LastHitWasWall = true;
+            _brain.ChangeState(_brain.StunState);
+            return;
+        }
+
+        _brain.Motor.Move(_brain.Config.chargeSpeed, _brain.Config.chargeAcceleration, (int)Mathf.Sign(_brain.SpinDirection.x));
+
+        if (_brain.StateTimer > 0.05f)
+        {
+            if (_brain.Motor.CheckWallHit(out Vector2 wallNormal))
+            {
+                _brain.LastHitWasWall = true;
+                _brain.ChangeState(_brain.StunState);
+                return;
+            }
+
+            if (_brain.CheckPlayerHit(out Vector2 away))
+            {
+                _brain.LastHitWasWall = false;
+                _brain.ChangeState(_brain.StunState);
+                return;
+            }
+        }
+    }
+
+    public void Exit() { }
+}
+
+public class WormStunState : IEnemyState
+{
+    WormBrain _brain;
+    public WormStunState(WormBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        Debug.Log("[Worm] Enter Stun");
+        _brain.StateTimer = 0;
+        _brain.Anim?.ResetAllTriggers();
+        _brain.Anim?.TriggerStun();
+        _brain.Motor.SetFrozen(false);
+        _brain.Motor.ApplyDrag(_brain.Config.stunDrag);
+    }
+
+    public void Tick()
+    {
+        bool animFinished = _brain.Anim == null || _brain.Anim.IsStunFinished();
+        bool timeout = _brain.StateTimer > 5.0f;
+
+        if (animFinished || timeout)
+        {
+            if (_brain.ForgetTimer > 0f)
+            {
+                if (_brain.LastHitWasWall)
+                {
+                    _brain.SpinDirection = new Vector2(-Mathf.Sign(_brain.SpinDirection.x), 0f);
+                    _brain.TriggerState.PreserveDirection = true;
+                    _brain.ChangeState(_brain.TriggerState);
+                }
+                else
+                {
+                    _brain.ChangeState(_brain.TriggerState);
+                }
+            }
+            else
+            {
+                _brain.ChangeState(_brain.PatrolState);
+            }
+        }
+    }
+
+    public void Exit()
+    {
+        _brain.Motor.ResetDrag();
+    }
+}
+
+public class WormDeadState : IEnemyState
+{
+    WormBrain _brain;
+    public WormDeadState(WormBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        Debug.Log("[Worm] Dead");
+        _brain.Motor.SetFrozen(true);
+        _brain.Motor.StopAllCoroutines();
+
+        var prev = _brain.PreviousState;
+        if (prev == _brain.SpinState)
+            _brain.Anim?.TriggerSpinningDeath();
+        else
+            _brain.Anim?.TriggerPatrolDeath();
+
+        _brain.enabled = false;
+    }
+
+    public void Tick() { }
+    public void Exit() { }
 }

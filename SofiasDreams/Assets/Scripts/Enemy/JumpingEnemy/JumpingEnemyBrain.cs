@@ -1,17 +1,8 @@
 using UnityEngine;
 using Zenject;
 
-public class JumpingEnemyBrain : MonoBehaviour
+public class JumpingEnemyBrain : BaseEnemyBrain
 {
-    enum State
-    {
-        Patrol,
-        AggroTrigger,
-        Aggro,
-        ReturnToPatrol,
-        Dead
-    }
-
     [Header("Refs")]
     [SerializeField] JumpingEnemyMotor2D _motor;
     [SerializeField] JumpingEnemyAnimatorAdapter _anim;
@@ -20,76 +11,75 @@ public class JumpingEnemyBrain : MonoBehaviour
     [SerializeField] EnemyContactDamage _contactDamage;
     [SerializeField] EnemyPatrolPath _patrolPath;
 
-    public void SetPatrolPath(EnemyPatrolPath path)
-    {
-        _patrolPath = path;
-        _path = _patrolPath;
-        if (_path != null && _path.Count > 0)
-        {
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-        }
-    }
+    public JumpingEnemyMotor2D Motor => _motor;
+    public JumpingEnemyAnimatorAdapter Anim => _anim;
+    public VisionCone2D Vision => _vision;
+    public Health Health => _health;
+    public EnemyContactDamage ContactDamage => _contactDamage;
+    public EnemyPatrolPath PatrolPath { get => _patrolPath; set => _patrolPath = value; }
 
-    JumpingEnemyConfigSO _config;
-    IHealth _iHealth;
-    SignalBus _bus;
-    Transform _player;
-    bool _hasSeenPlayerAtLeastOnce;
+    public JumpingEnemyConfigSO Config { get; private set; }
+    public IHealth IHealth { get; private set; }
+    public SignalBus SignalBus { get; private set; }
 
-    State _state;
-    Vector2 _spawnPos;
+    // States
+    public JumpingPatrolState PatrolState { get; private set; }
+    public JumpingAggroTriggerState AggroTriggerState { get; private set; }
+    public JumpingAggroState AggroState { get; private set; }
+    public JumpingReturnState ReturnState { get; private set; }
+    public JumpingDeadState DeadState { get; private set; }
 
-    // Patrol path runtime
-    EnemyPatrolPath _path;
-    int _pathIndex;
-    int _pathDir = 1;
-    bool _patrolJumpHasTarget;
-    Vector2 _patrolJumpTarget;
-    int _patrolDxSignAtJump;
-    bool _returningToRoute;
-    int _returnTargetIndex;
-    bool _returnJumpHasTarget;
-    Vector2 _returnJumpTarget;
-    int _returnDxSignAtJump;
+    // Runtime Data
+    public Transform Player { get; set; }
+    public bool HasSeenPlayerAtLeastOnce { get; set; }
+    public Vector2 SpawnPos { get; set; }
+    
+    // Patrol Runtime
+    public EnemyPatrolPath CurrentPath;
+    public int PathIndex;
+    public int PathDir = 1;
+    public bool PatrolJumpHasTarget;
+    public Vector2 PatrolJumpTarget;
+    public int PatrolDxSignAtJump;
+    
+    // Return Runtime
+    public bool ReturningToRoute;
+    public int ReturnTargetIndex;
+    public bool ReturnJumpHasTarget;
+    public Vector2 ReturnJumpTarget;
+    public int ReturnDxSignAtJump;
 
-    // Aggro runtime
-    float _forgetLeft;
-    bool _lostSightTimerRunning;
-    Vector2 _lastSeenPos;
-    bool _hasLastSeen;
-    int _lastChaseDirSign = +1;
-    bool _hasChaseDir;
+    // Aggro Runtime
+    public float ForgetLeft;
+    public bool LostSightTimerRunning;
+    public Vector2 LastSeenPos;
+    public bool HasLastSeen;
+    public int LastChaseDirSign = +1;
+    public bool HasChaseDir;
 
-    // Jump loop runtime
-    bool _jumpBool;
-    float _nextJumpAt;
-    bool _prevGrounded;
-    float _prevY;
-    float _landingStunUntil;
-    float _lastJumpStartedAt;
-    bool _pendingAggroTrigger;
-    bool _pendingPatrolTrigger;
+    // Jump Physics
+    public bool JumpBool;
+    public float NextJumpAt;
+    public bool PrevGrounded;
+    public float PrevY;
+    public float LandingStunUntil;
+    public float LastJumpStartedAt;
+    
+    // Pending Triggers
+    public bool PendingAggroTrigger;
+    public bool PendingPatrolTrigger;
 
-    // Damage watch
-    int _lastHp = int.MinValue;
-    bool _armedHpWatch;
+    // Damage Watch
+    public int LastHp = int.MinValue;
+    public bool ArmedHpWatch;
 
     [Inject]
     public void Construct(JumpingEnemyConfigSO config, IHealth health, SignalBus bus)
     {
-        _config = config;
-        _iHealth = health;
-        _bus = bus;
-    }
-
-    void Reset()
-    {
-        _motor = GetComponent<JumpingEnemyMotor2D>();
-        _health = GetComponent<Health>();
-        _vision = GetComponentInChildren<VisionCone2D>(true);
-        _anim = GetComponentInChildren<JumpingEnemyAnimatorAdapter>(true);
-        _contactDamage = GetComponentInChildren<EnemyContactDamage>(true);
-        _patrolPath = GetComponentInChildren<EnemyPatrolPath>(true);
+        Config = config;
+        IHealth = health;
+        SignalBus = bus;
+        ConstructBase(bus);
     }
 
     void Awake()
@@ -100,643 +90,338 @@ public class JumpingEnemyBrain : MonoBehaviour
         if (!_anim) _anim = GetComponentInChildren<JumpingEnemyAnimatorAdapter>(true);
         if (!_contactDamage) _contactDamage = GetComponentInChildren<EnemyContactDamage>(true);
         if (!_patrolPath) _patrolPath = GetComponentInChildren<EnemyPatrolPath>(true);
-        if (_iHealth == null) _iHealth = _health as IHealth;
+        if (IHealth == null && _health) IHealth = _health as IHealth;
 
-        _spawnPos = transform.position;
+        SpawnPos = transform.position;
 
-        if (_patrolPath == null)
-            _patrolPath = FindNearestPatrolPath();
+        PatrolState = new JumpingPatrolState(this);
+        AggroTriggerState = new JumpingAggroTriggerState(this);
+        AggroState = new JumpingAggroState(this);
+        ReturnState = new JumpingReturnState(this);
+        DeadState = new JumpingDeadState(this);
+    }
+    
+    void Start()
+    {
+        if (Player == null)
+        {
+            var pf = FindObjectOfType<PlayerFacade>();
+            if (pf != null) Player = pf.transform;
+        }
+        
+        if (PatrolPath == null)
+            PatrolPath = FindNearestPatrolPath();
 
-        _path = _patrolPath;
-        if (_path != null && _path.Count > 0)
-            _pathIndex = FindNearestWaypointIndex(_spawnPos);
+        CurrentPath = PatrolPath;
+        if (CurrentPath != null && CurrentPath.Count > 0)
+            PathIndex = FindNearestWaypointIndex(SpawnPos);
 
-        _state = State.Patrol;
-        _prevGrounded = _motor != null && _motor.IsGrounded;
-        _prevY = _motor != null ? _motor.Velocity.y : 0f;
+        PrevGrounded = Motor != null && Motor.IsGrounded;
+        PrevY = Motor != null ? Motor.Velocity.y : 0f;
+        
+        ChangeState(PatrolState);
     }
 
     void OnEnable()
     {
-        if (_health != null)
-            _health.OnHealthChanged += OnHealthChanged;
-
-        if (_contactDamage != null)
-            _contactDamage.OnPlayerContact += OnPlayerContact;
-
-        if (_bus != null)
-            _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
-
+        if (Health != null) Health.OnHealthChanged += OnHealthChanged;
+        if (ContactDamage != null) ContactDamage.OnPlayerContact += OnPlayerContact;
+        if (SignalBus != null) SignalBus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
         ArmHpWatch();
     }
 
     void OnDisable()
     {
-        if (_health != null)
-            _health.OnHealthChanged -= OnHealthChanged;
-
-        if (_contactDamage != null)
-            _contactDamage.OnPlayerContact -= OnPlayerContact;
-
-        if (_bus != null)
-            _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
+        if (Health != null) Health.OnHealthChanged -= OnHealthChanged;
+        if (ContactDamage != null) ContactDamage.OnPlayerContact -= OnPlayerContact;
+        if (SignalBus != null) SignalBus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
     }
 
-    void Start()
+    protected override void Update()
     {
-        // Bootstrapper spawns player before enemies, but if this enemy enabled earlier, it can miss the signal.
-        // Fallback: try to grab existing player once.
-        if (_player == null)
-        {
-            var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) _player = pf.transform;
-        }
-    }
+        if (Config == null || IHealth == null) return;
 
-    void Update()
-    {
-        if (_config == null || _iHealth == null) return;
-
-        if (!_iHealth.IsAlive)
+        if (!IHealth.IsAlive)
         {
-            // If dead but in air, keep updating logic until grounded so we can play death animation on ground.
-            // EnemyDeathHandler keeps physics simulated until then.
-            if (_motor != null && !_motor.IsGrounded)
+            if (Motor != null && !Motor.IsGrounded)
             {
-                // Disable horizontal self-propulsion
-                _motor.StopHorizontal();
-                _jumpBool = false; 
-                _anim.SetJump(false); // Can trigger falling anim if any
-                
-                // Allow Animator Params to update (so falling anim plays)
+                Motor.StopHorizontal();
+                JumpBool = false; 
+                Anim.SetJump(false); 
                 TickAnimatorParams();
                 return;
             }
-
-            EnterDead();
+            if (CurrentState != DeadState) ChangeState(DeadState);
             return;
         }
 
-        // While trigger-clips play, enemy must not move at all.
-        // But NEVER freeze in mid-air (otherwise it hangs). Only freeze when stably grounded.
-        if (_anim != null && _motor != null)
+        if (Anim != null && Motor != null)
         {
-            bool inTrigger = _anim.IsInAgroTrigger() || _anim.IsInPatrolTrigger();
+            bool inTrigger = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
             bool stableGround = IsStableOnGround();
-            // Hard safety: never freeze while our jump cycle is active (prevents hanging in air).
-            _motor.SetFrozen(inTrigger && stableGround && !_jumpBool);
+            Motor.SetFrozen(inTrigger && stableGround && !JumpBool);
         }
 
         TickAnimatorParams();
 
-        // Sensing / aggro extension
         bool sees = TrySense(out var target);
         if (sees)
         {
-            _lastSeenPos = target.position;
-            _hasLastSeen = true;
-            float dx = _lastSeenPos.x - transform.position.x;
+            LastSeenPos = target.position;
+            HasLastSeen = true;
+            float dx = LastSeenPos.x - transform.position.x;
             if (Mathf.Abs(dx) > 0.01f)
             {
-                _lastChaseDirSign = dx >= 0f ? +1 : -1;
-                _hasChaseDir = true;
+                LastChaseDirSign = dx >= 0f ? +1 : -1;
+                HasChaseDir = true;
             }
 
-            _hasSeenPlayerAtLeastOnce = true;
-            if (_player == null)
-                _player = target;
+            HasSeenPlayerAtLeastOnce = true;
+            if (Player == null)
+                Player = target;
         }
 
-        // Global Aggro Timer Logic (active if we have Pending Aggro or are in Aggro states)
-        bool aggroTimerActive = _pendingAggroTrigger || _state == State.Aggro || _state == State.AggroTrigger;
+        bool aggroTimerActive = PendingAggroTrigger || CurrentState == AggroState || CurrentState == AggroTriggerState;
         if (aggroTimerActive)
         {
-            TickGlobalAggroTimer(sees);
+             TickGlobalAggroTimer(sees);
         }
 
-        // RETRY Logic: If we have a pending trigger (e.g. from mid-air sight) and we are now stable on ground,
-        // force the transition. This catches cases where TickAnimatorParams() failed to transition due to velocity jitter.
-        if (_pendingAggroTrigger && IsStableOnGround())
+        if (PendingAggroTrigger && IsStableOnGround())
         {
-            _pendingAggroTrigger = false;
-            _pendingPatrolTrigger = false;
-            EnterAggroTrigger();
+            PendingAggroTrigger = false;
+            PendingPatrolTrigger = false;
+            ChangeState(AggroTriggerState);
         }
 
-        switch (_state)
-        {
-            case State.Patrol:
-                if (sees) { RequestAggroTrigger(); break; }
-                TickPatrol();
-                break;
-
-            case State.AggroTrigger:
-                TickAggroTrigger(sees);
-                break;
-
-            case State.Aggro:
-                TickAggro(sees);
-                break;
-
-            case State.ReturnToPatrol:
-                if (sees) { RequestAggroTrigger(); break; }
-                TickReturnToPatrol();
-                break;
-        }
+        base.Update();
     }
 
     void TickAnimatorParams()
     {
-        if (_anim == null || _motor == null) return;
+        if (Anim == null || Motor == null) return;
 
-        bool grounded = _motor.IsGrounded;
-        float y = _motor.Velocity.y;
+        bool grounded = Motor.IsGrounded;
+        float y = Motor.Velocity.y;
 
-        // We only drive Jump during our own jump cycles:
-        // jumping => Jump=true and yVelocity*>0
-        // landed  => Jump=false and yVelocity*=0
-        bool landedByGround = _jumpBool && !_prevGrounded && grounded;
-
-        // Fallback landing detection (helps if groundMask is misconfigured):
-        // detect "settled after falling": was going down, now almost stopped.
-        bool landedByVelocity = _jumpBool
-            && (Time.time - _lastJumpStartedAt) > 0.05f
-            && _prevY < -0.10f
+        bool landedByGround = JumpBool && !PrevGrounded && grounded;
+        bool landedByVelocity = JumpBool
+            && (Time.time - LastJumpStartedAt) > 0.05f
+            && PrevY < -0.10f
             && Mathf.Abs(y) < 0.02f;
 
         if (landedByGround || landedByVelocity)
         {
-            _jumpBool = false;
-            _anim.SetJump(false);
+            JumpBool = false;
+            Anim.SetJump(false);
 
-            // Patrol waypoint progression should happen on landing (prevents "circling" around a point).
-            if (_state == State.Patrol)
-                TryAdvancePatrolWaypointOnLanding();
-            else if (_state == State.ReturnToPatrol)
-                TryCompleteReturnToRouteOnLanding();
+            if (CurrentState is IJumpingState js) js.OnLanded();
 
-            // Queue triggers if they were requested mid-air (never enter trigger states in-flight)
-            if (_pendingAggroTrigger)
+            if (PendingAggroTrigger)
             {
-                _pendingAggroTrigger = false;
-                _pendingPatrolTrigger = false; // aggro has priority
-                EnterAggroTrigger();
+                PendingAggroTrigger = false;
+                PendingPatrolTrigger = false; 
+                ChangeState(AggroTriggerState);
             }
-            else if (_pendingPatrolTrigger)
+            else if (PendingPatrolTrigger)
             {
-                _pendingPatrolTrigger = false;
+                PendingPatrolTrigger = false;
                 BeginReturnToPatrol();
             }
 
-            float stun = _config != null ? Mathf.Max(0f, _config.landingStunSeconds) : 0.10f;
-            _landingStunUntil = Mathf.Max(_landingStunUntil, Time.time + stun);
-            _nextJumpAt = Mathf.Max(_nextJumpAt, _landingStunUntil);
+            float stun = Config != null ? Mathf.Max(0f, Config.landingStunSeconds) : 0.10f;
+            LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
+            NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        float yParam = _jumpBool ? (Mathf.Abs(y) + 0.01f) : 0f;
+        float yParam = JumpBool ? (Mathf.Abs(y) + 0.01f) : 0f;
 
-        if (_state == State.Aggro || _state == State.AggroTrigger)
-            _anim.SetAttackYVelocity(yParam);
+        if (CurrentState == AggroState || CurrentState == AggroTriggerState)
+            Anim.SetAttackYVelocity(yParam);
         else
-            _anim.SetPatrolYVelocity(yParam);
+            Anim.SetPatrolYVelocity(yParam);
 
-        _prevGrounded = grounded;
-        _prevY = y;
+        PrevGrounded = grounded;
+        PrevY = y;
     }
 
-    void TickPatrol()
-    {
-        if (_config == null || _motor == null) return;
-        
-        // If aggro is pending (waiting for landing), do NOT jump again or continue patrol logic.
-        if (_pendingAggroTrigger) return;
-        
-        if (!_motor.IsGrounded) return;
-        if (Time.time < _landingStunUntil) return;
-        if (Time.time < _nextJumpAt) return;
+    // --- Logic & Helpers ---
 
-        // If we are already at current waypoint (common after returning from aggro),
-        // advance index now so we continue along the route instead of hopping around the same point.
-        AdvancePatrolIndexIfAtWaypoint();
-
-        // Check if next jump would cross the boundary (target point)
-        if (_path != null && _path.Count > 0)
-        {
-            Vector2 targetPt = _path.GetPoint(_pathIndex);
-            float checkH = _config.patrolJumpHeight;
-            float checkS = _config.patrolJumpHorizontalSpeed;
-            float jumpDist = CalculateJumpDistance(checkH, checkS);
-
-            float distX = Mathf.Abs(targetPt.x - transform.position.x);
-
-            // If less than one jump remains to the boundary, turn around.
-            if (distX < jumpDist)
-            {
-                AdvancePathIndex();
-                return;
-            }
-        }
-
-        int dir = GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
-        float h = _config.patrolJumpHeight;
-        float s = _config.patrolJumpHorizontalSpeed;
-
-        if (hasTarget)
-        {
-            _patrolJumpHasTarget = true;
-            _patrolJumpTarget = patrolTarget;
-            float dx = patrolTarget.x - transform.position.x;
-            _patrolDxSignAtJump = Mathf.Abs(dx) < 0.001f ? (transform.localScale.x >= 0f ? +1 : -1) : (dx >= 0f ? +1 : -1);
-        }
-        else
-        {
-            _patrolJumpHasTarget = false;
-        }
-
-        if (StartJump(dir, h, s))
-            _nextJumpAt = Time.time + _config.patrolJumpCooldown;
-    }
+    public interface IJumpingState { void OnLanded(); }
 
     void TickGlobalAggroTimer(bool sees)
     {
         if (sees)
         {
-            _forgetLeft = _config != null ? _config.aggroForgetSeconds : 0f;
-            _lostSightTimerRunning = false;
+            ForgetLeft = Config != null ? Config.aggroForgetSeconds : 0f;
+            LostSightTimerRunning = false;
         }
         else
         {
-            if (!_lostSightTimerRunning)
-            {
-                _lostSightTimerRunning = true;
-            }
-            else
-            {
-                _forgetLeft = Mathf.Max(0f, _forgetLeft - Time.deltaTime);
-            }
-        }
-        
-        // If timer expired, cancel pending aggro.
-        // Removed: logic changed, we want to at least enter Aggro state (trigger) even if timer expired in air.
-        // if (_forgetLeft <= 0f && _pendingAggroTrigger)
-        // {
-        //     _pendingAggroTrigger = false;
-        // }
-    }
-
-    void TickAggroTrigger(bool sees)
-    {
-        // Timer logic is handled globally now (TickGlobalAggroTimer)
-        
-        if (_anim == null) { _state = State.Aggro; return; }
-
-        // Wait until animator leaves AgroTrigger and reaches Attack-loop (Attack / Blend Tree Agro)
-        if (_anim.IsInAttackLoop())
-        {
-            _state = State.Aggro;
-            _nextJumpAt = Time.time; // allow immediate first jump if grounded
-            
-            // Refill timer when entering Aggro state to ensure we at least start chasing
-            if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
-            _lostSightTimerRunning = false;
+            if (!LostSightTimerRunning) LostSightTimerRunning = true;
+            else ForgetLeft = Mathf.Max(0f, ForgetLeft - Time.deltaTime);
         }
     }
 
-    void TickAggro(bool sees)
+    public void RequestAggroTrigger()
     {
-        if (_config == null || _motor == null) return;
+        if (CurrentState == DeadState) return;
 
-        // Timer logic is handled globally now (TickGlobalAggroTimer)
-
-        if (_forgetLeft <= 0f)
+        bool wasAggro = PendingAggroTrigger || CurrentState == AggroState || CurrentState == AggroTriggerState;
+        if (!wasAggro)
         {
-            // Do not start PatrolTrigger mid-air (would freeze in air). Queue it until landing.
-            if (_motor.IsGrounded) BeginReturnToPatrol();
-            else _pendingPatrolTrigger = true;
+             if (Config != null) ForgetLeft = Config.aggroForgetSeconds;
+        }
+
+        if (JumpBool || !IsStableOnGround())
+        {
+            PendingAggroTrigger = true;
+            PendingPatrolTrigger = false;
             return;
         }
 
-        if (!_motor.IsGrounded) return;
-        if (Time.time < _landingStunUntil) return;
-        if (Time.time < _nextJumpAt) return;
-
-        int dir = GetAggroDirectionSign();
-        float h = _config.aggroJumpHeight;
-        float s = _config.aggroJumpHorizontalSpeed;
-
-        if (StartJump(dir, h, s))
-            _nextJumpAt = Time.time + _config.aggroJumpCooldown;
+        ChangeState(AggroTriggerState);
     }
-
-    void TickReturnToPatrol()
+    
+    public void BeginReturnToPatrol()
     {
-        if (_config == null || _motor == null) return;
-        
-        // If aggro is pending (waiting for landing), do NOT jump again or continue logic.
-        if (_pendingAggroTrigger) return;
-
-        // Animator can be in PatrolTrigger after Attack->PatrolTrigger transition: stay locked until it ends.
-        if (_anim != null && _anim.IsInPatrolTrigger())
-            return;
-
-        // Check if we are inside boundaries - if so, resume patrol immediately
-        if (_path != null && _path.Count > 0 && _motor.IsGrounded)
+        if (CurrentState == DeadState) return;
+        if (JumpBool || !IsStableOnGround())
         {
-            float minX = float.MaxValue;
-            float maxX = float.MinValue;
-            for (int i = 0; i < _path.Count; i++)
-            {
-                float px = _path.GetPoint(i).x;
-                if (px < minX) minX = px;
-                if (px > maxX) maxX = px;
-            }
-
-            if (transform.position.x >= minX && transform.position.x <= maxX)
-            {
-                _returningToRoute = false;
-                _pathIndex = FindNearestWaypointIndex(transform.position);
-                _state = State.Patrol;
-                return;
-            }
-        }
-
-        // Return back onto patrol route: go to a chosen rejoin waypoint, then continue route normally.
-        if (_path != null && _path.Count > 0 && _returningToRoute)
-        {
-            Vector2 dst = _path.GetPoint(_returnTargetIndex);
-
-            // While in air, keep aiming at waypoint (helps after wall cancels X at takeoff)
-            if (!_motor.IsGrounded && !_motor.IsFrozen)
-            {
-                int dirAir = dst.x >= transform.position.x ? +1 : -1;
-                _motor.SetAirDesiredVX(dirAir * Mathf.Max(0f, _config.patrolJumpHorizontalSpeed));
-            }
-
-            // If we are already at the rejoin point, finish return immediately.
-            float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-            if (_motor.IsGrounded && Vector2.Distance(transform.position, dst) <= arrive)
-            {
-                _returningToRoute = false;
-                // Next patrol jump should go to the NEXT waypoint.
-                AdvancePathIndex();
-                _state = State.Patrol;
-                return;
-            }
-
-            if (!_motor.IsGrounded) return;
-            if (Time.time < _landingStunUntil) return;
-            if (Time.time < _nextJumpAt) return;
-
-            int dir = (dst.x >= transform.position.x) ? +1 : -1;
-            float h = _config.patrolJumpHeight;
-            float s = _config.patrolJumpHorizontalSpeed;
-
-            // Track return target for "passed waypoint" detection on landing.
-            _returnJumpHasTarget = true;
-            _returnJumpTarget = dst;
-            float dx = dst.x - transform.position.x;
-            _returnDxSignAtJump = Mathf.Abs(dx) < 0.001f
-                ? (transform.localScale.x >= 0f ? +1 : -1)
-                : (dx >= 0f ? +1 : -1);
-
-            if (StartJump(dir, h, s))
-                _nextJumpAt = Time.time + _config.patrolJumpCooldown;
-
+            PendingPatrolTrigger = true;
             return;
         }
+
+        ChangeState(ReturnState);
     }
-
-    float CalculateJumpDistance(float height, float speed)
+    
+    public bool StartJump(int dirSign, float height, float speed)
     {
-        if (_motor == null || _motor.Rigidbody == null) return 0f;
-        float g = Mathf.Abs(Physics2D.gravity.y * _motor.Rigidbody.gravityScale);
-        if (g <= 0.0001f) return 0f;
-        // Time to apex = sqrt(2h/g). Total air time = 2 * time to apex.
-        float t = 2f * Mathf.Sqrt(2f * height / g);
-        return speed * t;
-    }
+        if (Config == null || Motor == null || Anim == null) return false;
+        if (Time.time < LandingStunUntil) return false;
 
-    bool StartJump(int dirSign, float height, float speed)
-    {
-        if (_config == null || _motor == null || _anim == null) return false;
-        if (Time.time < _landingStunUntil) return false;
-
-        bool ok = _motor.TryJump(dirSign, height, speed);
+        bool ok = Motor.TryJump(dirSign, height, speed);
         if (!ok) return false;
 
-        _jumpBool = true;
-        _lastJumpStartedAt = Time.time;
-        _anim.SetJump(true);
+        JumpBool = true;
+        LastJumpStartedAt = Time.time;
+        Anim.SetJump(true);
         return true;
     }
 
-    void EnterAggroTrigger()
+    public bool IsStableOnGround()
     {
-        if (_state == State.Dead) return;
-        if (_config == null) return;
-        if (!IsStableOnGround())
-        {
-            _pendingAggroTrigger = true;
-            // Removed forced timer reset here
-            // _forgetLeft = _config.aggroForgetSeconds;
-            return;
-        }
-
-        // already aggro: only refresh timer
-        if (_state == State.Aggro || _state == State.AggroTrigger)
-        {
-            // Removed forced timer reset here - handled by GlobalTimer and RequestAggroTrigger
-            // _forgetLeft = _config.aggroForgetSeconds;
-            return;
-        }
-
-        _state = State.AggroTrigger;
-        // _forgetLeft = _config.aggroForgetSeconds; // handled by Request/Global
-        _lostSightTimerRunning = false;
-
-        _motor?.StopAll();
-
-        if (_hasLastSeen && _motor != null)
-        {
-             float dx = _lastSeenPos.x - transform.position.x;
-             if (Mathf.Abs(dx) > 0.01f)
-                 _motor.Face(dx >= 0 ? 1 : -1);
-        }
-
-        _jumpBool = false;
-        _anim?.SetJump(false);
-        _anim?.TriggerAgro();
+        if (Motor == null || Config == null) return false;
+        if (!Motor.IsGrounded) return false;
+        if (JumpBool) return false;
+        return Mathf.Abs(Motor.Velocity.y) <= Mathf.Max(0f, Config.groundedVelocityEpsilon);
     }
-
-    void BeginReturnToPatrol()
-    {
-        if (_state == State.Dead) return;
-        // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
-        if (_jumpBool || !IsStableOnGround())
-        {
-            _pendingPatrolTrigger = true;
-            return;
-        }
-
-        _state = State.ReturnToPatrol;
-        _hasLastSeen = false;
-        _hasChaseDir = false;
-        _hasSeenPlayerAtLeastOnce = false;
-        _lostSightTimerRunning = false;
-        _jumpBool = false;
-
-        // Pick route rejoin once, then follow route normally.
-        if (_path == null || _path.Count == 0)
-        {
-            if (_patrolPath == null)
-                _patrolPath = FindNearestPatrolPath();
-            _path = _patrolPath;
-        }
-
-        if (_path != null && _path.Count > 0)
-        {
-            _returningToRoute = true;
-            _returnTargetIndex = FindNearestWaypointIndex(transform.position);
-            _pathIndex = _returnTargetIndex;
-        }
-        else
-        {
-            _returningToRoute = false;
-        }
-
-        _anim?.SetJump(false);
-        _anim?.TriggerPatrol();
-        _nextJumpAt = Time.time + 0.05f;
-    }
-
-    void AdvancePatrolIndexIfAtWaypoint()
-    {
-        if (_path == null || _path.Count == 0 || _config == null) return;
-        Vector2 cur = _path.GetPoint(_pathIndex);
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        if (Vector2.Distance(transform.position, cur) <= arrive)
-            AdvancePathIndex();
-    }
-
-    void RequestAggroTrigger()
-    {
-        if (_state == State.Dead) return;
-
-        // If not already tracking aggro, init timer
-        bool wasAggro = _pendingAggroTrigger || _state == State.Aggro || _state == State.AggroTrigger;
-        if (!wasAggro)
-        {
-             if (_config != null) _forgetLeft = _config.aggroForgetSeconds;
-        }
-
-        // If we're in a jump cycle, NEVER trigger mid-air; queue until landing.
-        if (_jumpBool || !IsStableOnGround())
-        {
-            _pendingAggroTrigger = true;
-            _pendingPatrolTrigger = false;
-            // Removed forced timer reset here to respect global timer flow
-            // if (_config != null) _forgetLeft = _config.aggroForgetSeconds; 
-            return;
-        }
-
-        EnterAggroTrigger();
-    }
-
-    bool IsStableOnGround()
-    {
-        if (_motor == null || _config == null) return false;
-        if (!_motor.IsGrounded) return false;
-        if (_jumpBool) return false;
-        return Mathf.Abs(_motor.Velocity.y) <= Mathf.Max(0f, _config.groundedVelocityEpsilon);
-    }
-
-    void EnterDead()
-    {
-        if (_state == State.Dead) return;
-        var prev = _state;
-        _state = State.Dead;
-
-        _motor?.StopHorizontal();
-        if (_anim != null)
-        {
-            _anim.SetJump(false);
-
-            // If we died while aggro/attack logic was active - play DeathFromAttack
-            bool fromAttack = prev == State.Aggro || prev == State.AggroTrigger || _anim.IsInAttackLoop();
-            if (fromAttack) _anim.TriggerDeathFromAttack();
-            else _anim.TriggerDeathFromPatrol();
-        }
-
-        enabled = false;
-    }
-
+    
+    // --- Sensing ---
+    
     bool TrySense(out Transform target)
     {
         target = null;
-        if (_vision == null) return false;
-        return _vision.TryGetClosestTarget(out target);
-    }
-
-    int GetAggroDirectionSign()
-    {
-        // Requirement: once enemy has seen player at least once, it keeps chasing him
-        // until timer ends or enemy dies (even if player is out of vision).
-        if (_hasSeenPlayerAtLeastOnce && _player != null)
-        {
-            float dx = _player.position.x - transform.position.x;
-            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
-            int sign = dx >= 0f ? +1 : -1;
-            _lastChaseDirSign = sign;
-            _hasChaseDir = true;
-            return sign;
-        }
-
-        // Before first visual contact: use last seen (if any) or keep moving in facing direction.
-        if (_hasLastSeen)
-        {
-            float dx = _lastSeenPos.x - transform.position.x;
-            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
-            int sign = dx >= 0f ? +1 : -1;
-            _lastChaseDirSign = sign;
-            _hasChaseDir = true;
-            return sign;
-        }
-
-        return _hasChaseDir ? _lastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
+        if (Vision == null) return false;
+        return Vision.TryGetClosestTarget(out target);
     }
 
     void OnPlayerContact()
     {
-        if (_state == State.Dead) return;
-
-        if (_player == null)
+        if (CurrentState == DeadState) return;
+        if (Player == null)
         {
             var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) _player = pf.transform;
+            if (pf != null) Player = pf.transform;
         }
 
-        if (_player != null)
+        if (Player != null)
         {
-            _lastSeenPos = _player.position;
-            _hasLastSeen = true;
-            _hasChaseDir = true;
+            LastSeenPos = Player.position;
+            HasLastSeen = true;
+            HasChaseDir = true;
             
-            float dx = _lastSeenPos.x - transform.position.x;
+            float dx = LastSeenPos.x - transform.position.x;
             if (Mathf.Abs(dx) > 0.01f)
             {
-                _lastChaseDirSign = dx >= 0f ? +1 : -1;
+                LastChaseDirSign = dx >= 0f ? +1 : -1;
             }
         }
-        
         RequestAggroTrigger();
+    }
+    
+    void OnHealthChanged()
+    {
+        if (Health == null || IHealth == null) return;
+        if (!IHealth.IsAlive) return;
+
+        if (ArmedHpWatch)
+        {
+            int hp = Health.CurrentHP;
+            if (LastHp != int.MinValue && hp < LastHp)
+            {
+                if (Health.LastHit != null && Health.LastHit.source != null)
+                {
+                    LastSeenPos = Health.LastHit.source.position;
+                    HasLastSeen = true;
+                    HasChaseDir = true;
+                    float dx = LastSeenPos.x - transform.position.x;
+                    if (Mathf.Abs(dx) > 0.01f)
+                    {
+                         LastChaseDirSign = dx >= 0f ? +1 : -1;
+                    }
+                }
+                RequestAggroTrigger();
+            }
+            LastHp = hp;
+        }
+    }
+    
+    void ArmHpWatch()
+    {
+        if (Health == null) return;
+        LastHp = Health.CurrentHP;
+        ArmedHpWatch = true;
     }
 
     void OnPlayerSpawned(PlayerSpawned s)
     {
-        if (s.facade != null)
-            _player = s.facade.transform;
+        if (s.facade != null) Player = s.facade.transform;
+    }
+    
+    // --- Path ---
+    
+    public void AdvancePathIndex()
+    {
+        if (CurrentPath == null || CurrentPath.Count <= 1) return;
+        if (Config != null && Config.loopPath)
+        {
+            PathIndex = (PathIndex + 1) % CurrentPath.Count;
+            return;
+        }
+        int next = PathIndex + PathDir;
+        if (next >= CurrentPath.Count || next < 0)
+        {
+            PathDir *= -1;
+            next = Mathf.Clamp(PathIndex + PathDir, 0, CurrentPath.Count - 1);
+        }
+        PathIndex = next;
     }
 
+    public int FindNearestWaypointIndex(Vector2 pos)
+    {
+        if (CurrentPath == null || CurrentPath.Count == 0) return 0;
+        int bestIndex = 0;
+        float best = float.PositiveInfinity;
+        for (int i = 0; i < CurrentPath.Count; i++)
+        {
+            Vector2 p = CurrentPath.GetPoint(i);
+            float d = (p - pos).sqrMagnitude;
+            if (d < best) { best = d; bestIndex = i; }
+        }
+        return bestIndex;
+    }
+    
     EnemyPatrolPath FindNearestPatrolPath()
     {
         var all = FindObjectsOfType<EnemyPatrolPath>(true);
@@ -745,7 +430,7 @@ public class JumpingEnemyBrain : MonoBehaviour
         float best = float.PositiveInfinity;
         EnemyPatrolPath bestPath = null;
         Vector2 pos = transform.position;
-        float radius = _config != null ? Mathf.Max(0f, _config.patrolPathSearchRadius) : 100f;
+        float radius = Config != null ? Mathf.Max(0f, Config.patrolPathSearchRadius) : 100f;
 
         for (int i = 0; i < all.Length; i++)
         {
@@ -758,142 +443,359 @@ public class JumpingEnemyBrain : MonoBehaviour
                 bestPath = p;
             }
         }
-
         return bestPath;
     }
-
-    int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
+    
+    public float CalculateJumpDistance(float height, float speed)
     {
-        if (_path == null || _path.Count == 0)
+        if (Motor == null || Motor.Rigidbody == null) return 0f;
+        float g = Mathf.Abs(Physics2D.gravity.y * Motor.Rigidbody.gravityScale);
+        if (g <= 0.0001f) return 0f;
+        float t = 2f * Mathf.Sqrt(2f * height / g);
+        return speed * t;
+    }
+    
+    public int GetPatrolDirectionSign(out Vector2 target, out bool hasTarget)
+    {
+        if (CurrentPath == null || CurrentPath.Count == 0)
         {
-            target = _spawnPos;
+            target = SpawnPos;
             hasTarget = false;
             return transform.localScale.x >= 0f ? +1 : -1;
         }
 
-        Vector3 t = _path.GetPoint(_pathIndex);
+        Vector3 t = CurrentPath.GetPoint(PathIndex);
         float dx = t.x - transform.position.x;
-
-        if (Mathf.Abs(dx) < 0.01f)
-            dx = transform.localScale.x;
+        if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
 
         target = t;
         hasTarget = true;
         return dx >= 0f ? +1 : -1;
     }
 
-    void TryAdvancePatrolWaypointOnLanding()
+    public int GetAggroDirectionSign()
     {
-        if (!_patrolJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
-            return;
-
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        float dist = Vector2.Distance((Vector2)transform.position, _patrolJumpTarget);
-
-        float dxNow = _patrolJumpTarget.x - transform.position.x;
-        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _patrolDxSignAtJump : (dxNow >= 0f ? +1 : -1);
-
-        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
-        if (dist <= arrive || dxSignNow != _patrolDxSignAtJump)
-            AdvancePathIndex();
-
-        _patrolJumpHasTarget = false;
-    }
-
-    void TryCompleteReturnToRouteOnLanding()
-    {
-        if (!_returningToRoute || !_returnJumpHasTarget || _path == null || _path.Count == 0 || _config == null)
-            return;
-
-        float arrive = Mathf.Max(0.01f, _config.waypointArriveDistance);
-        float dist = Vector2.Distance((Vector2)transform.position, _returnJumpTarget);
-
-        float dxNow = _returnJumpTarget.x - transform.position.x;
-        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _returnDxSignAtJump : (dxNow >= 0f ? +1 : -1);
-
-        // Arrived (close enough) OR passed the waypoint (dx sign flipped since jump started)
-        bool reached = dist <= arrive || dxSignNow != _returnDxSignAtJump;
-        _returnJumpHasTarget = false;
-
-        if (!reached)
-            return;
-
-        // We are back on route: continue to next waypoint.
-        _returningToRoute = false;
-        _pathIndex = _returnTargetIndex;
-        AdvancePathIndex();
-        _state = State.Patrol;
-    }
-
-    void AdvancePathIndex()
-    {
-        if (_path == null || _path.Count <= 1) return;
-        if (_config != null && _config.loopPath)
+        if (HasSeenPlayerAtLeastOnce && Player != null)
         {
-            _pathIndex = (_pathIndex + 1) % _path.Count;
+            float dx = Player.position.x - transform.position.x;
+            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
+            int sign = dx >= 0f ? +1 : -1;
+            LastChaseDirSign = sign;
+            HasChaseDir = true;
+            return sign;
+        }
+        if (HasLastSeen)
+        {
+            float dx = LastSeenPos.x - transform.position.x;
+            if (Mathf.Abs(dx) < 0.01f) dx = transform.localScale.x;
+            int sign = dx >= 0f ? +1 : -1;
+            LastChaseDirSign = sign;
+            HasChaseDir = true;
+            return sign;
+        }
+        return HasChaseDir ? LastChaseDirSign : (transform.localScale.x >= 0f ? +1 : -1);
+    }
+}
+
+// --- States ---
+
+public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
+{
+    JumpingEnemyBrain _brain;
+    public JumpingPatrolState(JumpingEnemyBrain brain) { _brain = brain; }
+
+    public void Enter() { }
+
+    public void Tick()
+    {
+        if (_brain.Config == null || _brain.Motor == null) return;
+        
+        // Check Aggro
+        if (_brain.TrySense(out var t)) { _brain.RequestAggroTrigger(); return; } // Actually Brain.Update calls logic too, but we need to break
+        // Actually Brain checks `sees` and updates timers. RequestAggroTrigger is triggered by events.
+        // But in original TickPatrol: if (sees) { RequestAggroTrigger(); break; }
+        // So we should check here too or rely on Brain?
+        // Brain's Update: "bool sees = TrySense... if(sees)..."
+        // But Brain DOES NOT automatically switch to Aggro unless PendingAggroTrigger.
+        // We need to request it here.
+        if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var _))
+        {
+            _brain.RequestAggroTrigger();
             return;
         }
 
-        int next = _pathIndex + _pathDir;
-        if (next >= _path.Count || next < 0)
+        if (_brain.PendingAggroTrigger) return;
+        if (!_brain.Motor.IsGrounded) return;
+        if (Time.time < _brain.LandingStunUntil) return;
+        if (Time.time < _brain.NextJumpAt) return;
+
+        // If at waypoint
+        Vector2 cur = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+        float arrive = Mathf.Max(0.01f, _brain.Config.waypointArriveDistance);
+        if (Vector2.Distance(_brain.transform.position, cur) <= arrive)
+            _brain.AdvancePathIndex();
+
+        // Check Jump Distance
+        if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0)
         {
-            _pathDir *= -1;
-            next = Mathf.Clamp(_pathIndex + _pathDir, 0, _path.Count - 1);
-        }
+            Vector2 targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+            float checkH = _brain.Config.patrolJumpHeight;
+            float checkS = _brain.Config.patrolJumpHorizontalSpeed;
+            float jumpDist = _brain.CalculateJumpDistance(checkH, checkS);
+            float distX = Mathf.Abs(targetPt.x - _brain.transform.position.x);
 
-        _pathIndex = next;
-    }
-
-    int FindNearestWaypointIndex(Vector2 pos)
-    {
-        if (_path == null || _path.Count == 0) return 0;
-
-        int bestIndex = 0;
-        float best = float.PositiveInfinity;
-        for (int i = 0; i < _path.Count; i++)
-        {
-            Vector2 p = _path.GetPoint(i);
-            float d = (p - pos).sqrMagnitude;
-            if (d < best) { best = d; bestIndex = i; }
-        }
-
-        return bestIndex;
-    }
-
-    void OnHealthChanged()
-    {
-        if (_health == null || _iHealth == null) return;
-        if (!_iHealth.IsAlive) return;
-
-        // Trigger aggro when HP decreased (player attacked enemy)
-        if (_armedHpWatch)
-        {
-            int hp = _health.CurrentHP;
-            if (_lastHp != int.MinValue && hp < _lastHp)
+            if (distX < jumpDist)
             {
-                if (_health.LastHit != null && _health.LastHit.source != null)
-                {
-                    _lastSeenPos = _health.LastHit.source.position;
-                    _hasLastSeen = true;
-                    _hasChaseDir = true;
-                    
-                    float dx = _lastSeenPos.x - transform.position.x;
-                    if (Mathf.Abs(dx) > 0.01f)
-                    {
-                        _lastChaseDirSign = dx >= 0f ? +1 : -1;
-                    }
-                }
-
-                RequestAggroTrigger();
+                _brain.AdvancePathIndex();
+                return;
             }
-            _lastHp = hp;
+        }
+
+        int dir = _brain.GetPatrolDirectionSign(out var patrolTarget, out bool hasTarget);
+        float h = _brain.Config.patrolJumpHeight;
+        float s = _brain.Config.patrolJumpHorizontalSpeed;
+
+        if (hasTarget)
+        {
+            _brain.PatrolJumpHasTarget = true;
+            _brain.PatrolJumpTarget = patrolTarget;
+            float dx = patrolTarget.x - _brain.transform.position.x;
+            _brain.PatrolDxSignAtJump = Mathf.Abs(dx) < 0.001f ? (_brain.transform.localScale.x >= 0f ? +1 : -1) : (dx >= 0f ? +1 : -1);
+        }
+        else
+        {
+            _brain.PatrolJumpHasTarget = false;
+        }
+
+        if (_brain.StartJump(dir, h, s))
+            _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
+    }
+
+    public void OnLanded()
+    {
+        if (!_brain.PatrolJumpHasTarget || _brain.CurrentPath == null || _brain.CurrentPath.Count == 0 || _brain.Config == null) return;
+        
+        float arrive = Mathf.Max(0.01f, _brain.Config.waypointArriveDistance);
+        float dist = Vector2.Distance((Vector2)_brain.transform.position, _brain.PatrolJumpTarget);
+        float dxNow = _brain.PatrolJumpTarget.x - _brain.transform.position.x;
+        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _brain.PatrolDxSignAtJump : (dxNow >= 0f ? +1 : -1);
+
+        if (dist <= arrive || dxSignNow != _brain.PatrolDxSignAtJump)
+            _brain.AdvancePathIndex();
+
+        _brain.PatrolJumpHasTarget = false;
+    }
+    
+    public void Exit() { }
+}
+
+public class JumpingAggroTriggerState : IEnemyState
+{
+    JumpingEnemyBrain _brain;
+    public JumpingAggroTriggerState(JumpingEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.LostSightTimerRunning = false;
+        _brain.Motor?.StopAll();
+        
+        if (_brain.HasLastSeen && _brain.Motor != null)
+        {
+             float dx = _brain.LastSeenPos.x - _brain.transform.position.x;
+             if (Mathf.Abs(dx) > 0.01f)
+                 _brain.Motor.Face(dx >= 0 ? 1 : -1);
+        }
+
+        _brain.JumpBool = false;
+        _brain.Anim?.SetJump(false);
+        _brain.Anim?.TriggerAgro();
+    }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInAttackLoop())
+        {
+            _brain.ChangeState(_brain.AggroState);
+        }
+    }
+    public void Exit() 
+    {
+        // When entering Aggro state, allow immediate jump
+        _brain.NextJumpAt = Time.time;
+        if (_brain.Config != null) _brain.ForgetLeft = _brain.Config.aggroForgetSeconds;
+        _brain.LostSightTimerRunning = false;
+    }
+}
+
+public class JumpingAggroState : IEnemyState
+{
+    JumpingEnemyBrain _brain;
+    public JumpingAggroState(JumpingEnemyBrain brain) { _brain = brain; }
+
+    public void Enter() { }
+
+    public void Tick()
+    {
+        if (_brain.ForgetLeft <= 0f)
+        {
+            if (_brain.Motor.IsGrounded) _brain.BeginReturnToPatrol();
+            else _brain.PendingPatrolTrigger = true;
+            return;
+        }
+
+        if (!_brain.Motor.IsGrounded) return;
+        if (Time.time < _brain.LandingStunUntil) return;
+        if (Time.time < _brain.NextJumpAt) return;
+
+        int dir = _brain.GetAggroDirectionSign();
+        float h = _brain.Config.aggroJumpHeight;
+        float s = _brain.Config.aggroJumpHorizontalSpeed;
+
+        if (_brain.StartJump(dir, h, s))
+            _brain.NextJumpAt = Time.time + _brain.Config.aggroJumpCooldown;
+    }
+    public void Exit() { }
+}
+
+public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
+{
+    JumpingEnemyBrain _brain;
+    public JumpingReturnState(JumpingEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.HasLastSeen = false;
+        _brain.HasChaseDir = false;
+        _brain.HasSeenPlayerAtLeastOnce = false;
+        _brain.LostSightTimerRunning = false;
+        _brain.JumpBool = false;
+
+        if (_brain.CurrentPath == null || _brain.CurrentPath.Count == 0)
+        {
+            _brain.ReturningToRoute = false;
+        }
+        else
+        {
+            _brain.ReturningToRoute = true;
+            _brain.ReturnTargetIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
+            _brain.PathIndex = _brain.ReturnTargetIndex;
+        }
+
+        _brain.Anim?.SetJump(false);
+        _brain.Anim?.TriggerPatrol();
+        _brain.NextJumpAt = Time.time + 0.05f;
+    }
+
+    public void Tick()
+    {
+        if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var _)) { _brain.RequestAggroTrigger(); return; }
+
+        if (_brain.Anim != null && _brain.Anim.IsInPatrolTrigger()) return;
+
+        // Check if back on route
+        if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0 && _brain.Motor.IsGrounded)
+        {
+            float minX = float.MaxValue;
+            float maxX = float.MinValue;
+            for (int i = 0; i < _brain.CurrentPath.Count; i++)
+            {
+                float px = _brain.CurrentPath.GetPoint(i).x;
+                if (px < minX) minX = px;
+                if (px > maxX) maxX = px;
+            }
+
+            if (_brain.transform.position.x >= minX && _brain.transform.position.x <= maxX)
+            {
+                _brain.ReturningToRoute = false;
+                _brain.PathIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
+                _brain.ChangeState(_brain.PatrolState);
+                return;
+            }
+        }
+
+        // Return logic
+        if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0 && _brain.ReturningToRoute)
+        {
+            Vector2 dst = _brain.CurrentPath.GetPoint(_brain.ReturnTargetIndex);
+
+            if (!_brain.Motor.IsGrounded && !_brain.Motor.IsFrozen)
+            {
+                int dirAir = dst.x >= _brain.transform.position.x ? +1 : -1;
+                _brain.Motor.SetAirDesiredVX(dirAir * Mathf.Max(0f, _brain.Config.patrolJumpHorizontalSpeed));
+            }
+
+            float arrive = Mathf.Max(0.01f, _brain.Config.waypointArriveDistance);
+            if (_brain.Motor.IsGrounded && Vector2.Distance(_brain.transform.position, dst) <= arrive)
+            {
+                _brain.ReturningToRoute = false;
+                _brain.AdvancePathIndex();
+                _brain.ChangeState(_brain.PatrolState);
+                return;
+            }
+
+            if (!_brain.Motor.IsGrounded) return;
+            if (Time.time < _brain.LandingStunUntil) return;
+            if (Time.time < _brain.NextJumpAt) return;
+
+            int dir = (dst.x >= _brain.transform.position.x) ? +1 : -1;
+            float h = _brain.Config.patrolJumpHeight;
+            float s = _brain.Config.patrolJumpHorizontalSpeed;
+
+            _brain.ReturnJumpHasTarget = true;
+            _brain.ReturnJumpTarget = dst;
+            float dx = dst.x - _brain.transform.position.x;
+            _brain.ReturnDxSignAtJump = Mathf.Abs(dx) < 0.001f
+                ? (_brain.transform.localScale.x >= 0f ? +1 : -1)
+                : (dx >= 0f ? +1 : -1);
+
+            if (_brain.StartJump(dir, h, s))
+                _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
         }
     }
 
-    void ArmHpWatch()
+    public void OnLanded()
     {
-        if (_health == null) return;
-        _lastHp = _health.CurrentHP;
-        _armedHpWatch = true;
+        if (!_brain.ReturningToRoute || !_brain.ReturnJumpHasTarget || _brain.CurrentPath == null || _brain.CurrentPath.Count == 0 || _brain.Config == null)
+            return;
+
+        float arrive = Mathf.Max(0.01f, _brain.Config.waypointArriveDistance);
+        float dist = Vector2.Distance((Vector2)_brain.transform.position, _brain.ReturnJumpTarget);
+        float dxNow = _brain.ReturnJumpTarget.x - _brain.transform.position.x;
+        int dxSignNow = Mathf.Abs(dxNow) < 0.001f ? _brain.ReturnDxSignAtJump : (dxNow >= 0f ? +1 : -1);
+
+        bool reached = dist <= arrive || dxSignNow != _brain.ReturnDxSignAtJump;
+        _brain.ReturnJumpHasTarget = false;
+
+        if (reached)
+        {
+            _brain.ReturningToRoute = false;
+            _brain.PathIndex = _brain.ReturnTargetIndex;
+            _brain.AdvancePathIndex();
+            _brain.ChangeState(_brain.PatrolState);
+        }
     }
+    
+    public void Exit() { }
+}
+
+public class JumpingDeadState : IEnemyState
+{
+    JumpingEnemyBrain _brain;
+    public JumpingDeadState(JumpingEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        var prev = _brain.PreviousState;
+        _brain.Motor?.StopHorizontal();
+        if (_brain.Anim != null)
+        {
+            _brain.Anim.SetJump(false);
+            bool fromAttack = prev == _brain.AggroState || prev == _brain.AggroTriggerState || _brain.Anim.IsInAttackLoop();
+            if (fromAttack) _brain.Anim.TriggerDeathFromAttack();
+            else _brain.Anim.TriggerDeathFromPatrol();
+        }
+        _brain.enabled = false;
+    }
+    public void Tick() { }
+    public void Exit() { }
 }

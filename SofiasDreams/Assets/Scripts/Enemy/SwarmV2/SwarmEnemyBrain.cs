@@ -1,55 +1,49 @@
 using UnityEngine;
 using Zenject;
+using System.Collections.Generic;
 
-public class SwarmEnemyBrain : MonoBehaviour
+public class SwarmEnemyBrain : BaseEnemyBrain
 {
-    enum State
-    {
-        Patrol,
-        Aggro,
-        Evasion,
-        ReturnToPatrol,
-        Dead
-    }
-
-    [Header("Refs")] [SerializeField] SwarmEnemyMotor2D _motor;
+    [Header("Refs")] 
+    [SerializeField] SwarmEnemyMotor2D _motor;
     [SerializeField] SwarmMinionSpawner _spawner;
     [SerializeField] VisionCone2D _vision;
     [SerializeField] EnemyPatrolPath _patrolPath;
     [SerializeField] Animator _animator;
     [SerializeField] Health _health;
 
-    SwarmConfig _config;
-    Transform _player;
-    State _state;
+    public SwarmEnemyMotor2D Motor => _motor;
+    public SwarmMinionSpawner Spawner => _spawner;
+    public VisionCone2D Vision => _vision;
+    public EnemyPatrolPath PatrolPath { get => _patrolPath; set => _patrolPath = value; }
+    public Animator Animator => _animator;
+    public Health Health => _health;
 
-    // Patrol
-    int _pathIndex;
-    int _pathDir = 1;
+    public SwarmConfig Config { get; private set; }
+    
+    // States
+    public SwarmPatrolState PatrolState { get; private set; }
+    public SwarmAggroState AggroState { get; private set; }
+    public SwarmEvasionState EvasionState { get; private set; }
+    public SwarmReturnState ReturnState { get; private set; }
+    public SwarmDeadState DeadState { get; private set; }
 
-    // Aggro
-    float _forgetTimer;
-    bool _hasSeenPlayer;
-    Vector2 _lastSeenPos;
-
-    // Evasion
-    Vector2 _fleeTarget;
+    // Runtime Data
+    public Transform Player { get; set; }
+    public Vector2 LastSeenPos { get; set; }
+    public bool HasSeenPlayer { get; set; }
+    public float ForgetTimer { get; set; }
+    
+    // Patrol Runtime
+    public int PathIndex;
+    public int PathDir = 1;
 
     [Inject]
     public void Construct(SwarmConfig config)
     {
-        _config = config;
+        Config = config;
     }
     
-    public void SetPatrolPath(EnemyPatrolPath path)
-    {
-        _patrolPath = path;
-        if (_patrolPath != null && _patrolPath.Count > 0)
-        {
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-        }
-    }
-
     void Awake()
     {
         if (!_motor) _motor = GetComponent<SwarmEnemyMotor2D>();
@@ -59,213 +53,108 @@ public class SwarmEnemyBrain : MonoBehaviour
         if (!_health) _health = GetComponent<Health>();
         if (!_patrolPath) _patrolPath = GetComponentInChildren<EnemyPatrolPath>(); // Try local first
 
-        if (_patrolPath == null)
-            _patrolPath = FindNearestPatrolPath();
-
-        _state = State.Patrol;
+        PatrolState = new SwarmPatrolState(this);
+        AggroState = new SwarmAggroState(this);
+        EvasionState = new SwarmEvasionState(this);
+        ReturnState = new SwarmReturnState(this);
+        DeadState = new SwarmDeadState(this);
     }
 
     void Start()
     {
-        // Try to find player if not set
-        if (_player == null)
+        if (PatrolPath == null)
+            PatrolPath = FindNearestPatrolPath();
+
+        if (Player == null)
         {
             var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) _player = pf.transform;
+            if (pf != null) Player = pf.transform;
         }
 
-        if (_patrolPath != null && _patrolPath.Count > 0)
+        if (PatrolPath != null && PatrolPath.Count > 0)
         {
-            _pathIndex = FindNearestWaypointIndex(transform.position);
+            PathIndex = FindNearestWaypointIndex(transform.position);
         }
+        
+        ChangeState(PatrolState);
     }
 
     void OnEnable()
     {
-        if (_health) _health.OnHealthChanged += OnHealthChanged;
+        if (Health) Health.OnHealthChanged += OnHealthChanged;
     }
 
     void OnDisable()
     {
-        if (_health) _health.OnHealthChanged -= OnHealthChanged;
+        if (Health) Health.OnHealthChanged -= OnHealthChanged;
     }
 
     void OnHealthChanged()
     {
-        if (_health == null) return;
-        if (!_health.IsAlive)
+        if (Health == null) return;
+        if (!Health.IsAlive)
         {
-            OnDeath();
+            ChangeState(DeadState);
             return;
         }
 
-        if (_health.LastHit != null && _health.LastHit.source != null)
+        if (Health.LastHit != null && Health.LastHit.source != null)
         {
-            // If attacked by player (or anything), treat as seeing player
-            if (_player == null || _player != _health.LastHit.source)
+            if (Player == null || Player != Health.LastHit.source)
             {
-                _player = _health.LastHit.source;
+                Player = Health.LastHit.source;
             }
             
-            _forgetTimer = _config.aggroForgetSeconds;
-            // Trigger Evasion immediately
+            ForgetTimer = Config.aggroForgetSeconds;
+            // Trigger Evasion immediately or Aggro? Original says "Trigger Evasion immediately" comment, 
+            // but logic was just setting forget timer and OnDamageTaken calls EnterAggro.
+            
+            OnDamageTaken();
         }
-
-        OnDamageTaken();
+    }
+    
+    public void OnDamageTaken()
+    {
+        if (CurrentState != DeadState)
+        {
+            if (CurrentState == PatrolState || CurrentState == ReturnState)
+                ChangeState(AggroState);
+        }
     }
 
-    void Update()
+    protected override void Update()
     {
-        if (_state == State.Dead) return;
+        if (CurrentState == DeadState) return;
 
         bool seesPlayer = TrySense(out var target);
         if (seesPlayer)
         {
-            _player = target;
-            _lastSeenPos = target.position;
-            _hasSeenPlayer = true;
-            _forgetTimer = _config.aggroForgetSeconds;
+            Player = target;
+            LastSeenPos = target.position;
+            HasSeenPlayer = true;
+            ForgetTimer = Config.aggroForgetSeconds;
 
-            if (_state != State.Aggro && _state != State.Evasion)
+            if (CurrentState != AggroState && CurrentState != EvasionState)
             {
-                EnterAggro();
+                ChangeState(AggroState);
             }
         }
-        else if (_state == State.Aggro || _state == State.Evasion)
+        else if (CurrentState == AggroState || CurrentState == EvasionState)
         {
-            _forgetTimer -= Time.deltaTime;
-            if (_forgetTimer <= 0f)
+            ForgetTimer -= Time.deltaTime;
+            if (ForgetTimer <= 0f)
             {
-                EnterReturnToPatrol();
+                ChangeState(ReturnState);
             }
         }
 
-        switch (_state)
-        {
-            case State.Patrol:
-                TickPatrol();
-                break;
-            case State.Aggro:
-                TickAggroBehavior();
-                break;
-            case State.Evasion:
-                TickAggroBehavior();
-                break;
-            case State.ReturnToPatrol:
-                TickReturnToPatrol();
-                break;
-        }
-
-        UpdateAnimator();
+        base.Update();
     }
 
-    void TickPatrol()
-    {
-        if (_patrolPath == null || _patrolPath.Count == 0) return;
-
-        Vector2 target = _patrolPath.GetPoint(_pathIndex);
-        _motor.MoveTo(target, _config.patrolSpeed);
-
-        if (Vector2.Distance(transform.position, target) <= _config.waypointArriveDistance)
-        {
-            AdvancePathIndex();
-        }
-    }
-
-    // Old separate ticks removed in favor of combined TickAggroBehavior
-
-    void TickReturnToPatrol()
-    {
-        if (_patrolPath == null)
-        {
-            _state = State.Patrol; // Just switch state and idle
-            return;
-        }
-
-        Vector2 target = _patrolPath.GetPoint(_pathIndex);
-        _motor.MoveTo(target, _config.patrolSpeed);
-
-        if (Vector2.Distance(transform.position, target) <= _config.waypointArriveDistance)
-        {
-            _state = State.Patrol;
-        }
-    }
-
-    void EnterAggro()
-    {
-        _state = State.Aggro;
-        if (_animator) _animator.SetTrigger("Angry");
-        if (_spawner) _spawner.EnableSpawning(true);
-    }
-
-    // Combined Aggro/Evasion behavior
-    void TickAggroBehavior()
-    {
-        if (_player == null) return;
-
-        float dist = Vector2.Distance(transform.position, _player.position);
-
-        // Flee/Maintain Distance Logic
-        // User wants enemy to move away if it sees the player.
-        // We use maintainDistance as the threshold.
-        if (dist < _config.maintainDistance)
-        {
-            _state = State.Evasion;
-
-            // Flee away
-            Vector2 dir = (transform.position - _player.position).normalized;
-            // Calculate a point further away
-            Vector2 fleePos = (Vector2)transform.position + dir * 5.0f;
-            _motor.MoveTo(fleePos, _config.fleeSpeed);
-        }
-        else
-        {
-            _state = State.Aggro;
-            // Stop and chill, let minions work
-            _motor.Stop();
-        }
-
-        // Spawning Logic (Always active in Aggro/Evasion)
-        if (_spawner) _spawner.SetAggroTarget(_player);
-    }
-
-    void EnterReturnToPatrol()
-    {
-        _state = State.ReturnToPatrol;
-        if (_animator) _animator.SetTrigger("Idle");
-        if (_spawner) _spawner.EnableSpawning(false);
-
-        // Find nearest waypoint to resume
-        if (_patrolPath != null)
-            _pathIndex = FindNearestWaypointIndex(transform.position);
-    }
-
-    public void OnDamageTaken()
-    {
-        if (_state != State.Dead)
-        {
-            // If attacked, we are likely close or hit by ranged. 
-            // We ensure we are in Aggro mode so TickAggroBehavior runs and decides to flee if close.
-            if (_state == State.Patrol || _state == State.ReturnToPatrol)
-                EnterAggro();
-        }
-    }
-
-    public void OnDeath()
-    {
-        _state = State.Dead;
-        _motor.Stop();
-        if (_animator) _animator.SetTrigger("Death");
-        if (_spawner) _spawner.EnableSpawning(false);
-        if (_spawner) _spawner.KillAllMinionsAnimated();
-
-        enabled = false;
-    }
-
-    bool TrySense(out Transform target)
+    public bool TrySense(out Transform target)
     {
         target = null;
-        return _vision != null && _vision.TryGetClosestTarget(out target);
+        return Vision != null && Vision.TryGetClosestTarget(out target);
     }
 
     EnemyPatrolPath FindNearestPatrolPath()
@@ -277,72 +166,208 @@ public class SwarmEnemyBrain : MonoBehaviour
         foreach (var p in all)
         {
             float d = Vector2.Distance(transform.position, p.transform.position);
-            if (d < minDist && d < _config.patrolPathSearchRadius)
+            if (d < minDist && d < Config.patrolPathSearchRadius)
             {
                 minDist = d;
                 best = p;
             }
         }
-
         return best;
     }
 
-    int FindNearestWaypointIndex(Vector2 pos)
+    public int FindNearestWaypointIndex(Vector2 pos)
     {
-        if (_patrolPath == null) return 0;
+        if (PatrolPath == null) return 0;
         int best = 0;
         float minDist = float.MaxValue;
-        for (int i = 0; i < _patrolPath.Count; i++)
+        for (int i = 0; i < PatrolPath.Count; i++)
         {
-            float d = Vector2.Distance(pos, _patrolPath.GetPoint(i));
-            if (d < minDist)
-            {
-                minDist = d;
-                best = i;
-            }
+            float d = Vector2.Distance(pos, PatrolPath.GetPoint(i));
+            if (d < minDist) { minDist = d; best = i; }
         }
-
         return best;
     }
 
-    void AdvancePathIndex()
+    public void AdvancePathIndex()
     {
-        if (_patrolPath == null) return;
-        _pathIndex += _pathDir;
-        if (_pathIndex >= _patrolPath.Count || _pathIndex < 0)
+        if (PatrolPath == null) return;
+        PathIndex += PathDir;
+        if (PathIndex >= PatrolPath.Count || PathIndex < 0)
         {
-            _pathDir *= -1;
-            _pathIndex = Mathf.Clamp(_pathIndex, 0, _patrolPath.Count - 1);
+            PathDir *= -1;
+            PathIndex = Mathf.Clamp(PathIndex, 0, PatrolPath.Count - 1);
         }
     }
-
-    void UpdateAnimator()
+    
+    public void SetPatrolPath(EnemyPatrolPath path)
     {
-        // Add any parameter updates if needed (e.g. Speed)
+        PatrolPath = path;
+        if (PatrolPath != null && PatrolPath.Count > 0)
+        {
+            PathIndex = FindNearestWaypointIndex(transform.position);
+        }
     }
 
     void OnDrawGizmosSelected()
     {
-        if (_config != null)
+        if (Config != null)
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, _config.visionRadius);
+            Gizmos.DrawWireSphere(transform.position, Config.visionRadius);
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, _config.fleeDistance);
-            
-            // Draw Minion Orbit Radius
+            Gizmos.DrawWireSphere(transform.position, Config.fleeDistance);
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, _config.minionOrbitRadius);
+            Gizmos.DrawWireSphere(transform.position, Config.minionOrbitRadius);
         }
-
-        if (_state == State.Evasion)
+        
+        if (CurrentState == EvasionState && Motor != null && Motor.Velocity.sqrMagnitude > 0.1f)
         {
-            // Visualize flee destination
-            if (_motor != null && _motor.Velocity.sqrMagnitude > 0.1f)
-            {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawLine(transform.position, transform.position + (Vector3)_motor.Velocity);
-            }
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3)Motor.Velocity);
         }
     }
+}
+
+// --- States ---
+
+public class SwarmPatrolState : IEnemyState
+{
+    SwarmEnemyBrain _brain;
+    public SwarmPatrolState(SwarmEnemyBrain brain) { _brain = brain; }
+
+    public void Enter() { }
+
+    public void Tick()
+    {
+        if (_brain.PatrolPath == null || _brain.PatrolPath.Count == 0) return;
+
+        Vector2 target = _brain.PatrolPath.GetPoint(_brain.PathIndex);
+        _brain.Motor.MoveTo(target, _brain.Config.patrolSpeed);
+
+        if (Vector2.Distance(_brain.transform.position, target) <= _brain.Config.waypointArriveDistance)
+        {
+            _brain.AdvancePathIndex();
+        }
+    }
+
+    public void Exit() { }
+}
+
+public class SwarmAggroState : IEnemyState
+{
+    SwarmEnemyBrain _brain;
+    public SwarmAggroState(SwarmEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        if (_brain.Animator) _brain.Animator.SetTrigger("Angry");
+        if (_brain.Spawner) _brain.Spawner.EnableSpawning(true);
+    }
+
+    public void Tick()
+    {
+        if (_brain.Player == null) return;
+
+        float dist = Vector2.Distance(_brain.transform.position, _brain.Player.position);
+        
+        if (dist < _brain.Config.maintainDistance)
+        {
+            _brain.ChangeState(_brain.EvasionState);
+            return;
+        }
+
+        // Stop and chill
+        _brain.Motor.Stop();
+        
+        // Spawning Logic
+        if (_brain.Spawner) _brain.Spawner.SetAggroTarget(_brain.Player);
+    }
+
+    public void Exit() { }
+}
+
+public class SwarmEvasionState : IEnemyState
+{
+    SwarmEnemyBrain _brain;
+    public SwarmEvasionState(SwarmEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        if (_brain.Spawner) _brain.Spawner.EnableSpawning(true);
+    }
+
+    public void Tick()
+    {
+        if (_brain.Player == null) return;
+
+        float dist = Vector2.Distance(_brain.transform.position, _brain.Player.position);
+
+        if (dist >= _brain.Config.maintainDistance)
+        {
+            _brain.ChangeState(_brain.AggroState);
+            return;
+        }
+
+        // Flee away
+        Vector2 dir = (_brain.transform.position - _brain.Player.position).normalized;
+        Vector2 fleePos = (Vector2)_brain.transform.position + dir * 5.0f;
+        _brain.Motor.MoveTo(fleePos, _brain.Config.fleeSpeed);
+        
+        if (_brain.Spawner) _brain.Spawner.SetAggroTarget(_brain.Player);
+    }
+
+    public void Exit() { }
+}
+
+public class SwarmReturnState : IEnemyState
+{
+    SwarmEnemyBrain _brain;
+    public SwarmReturnState(SwarmEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        if (_brain.Animator) _brain.Animator.SetTrigger("Idle");
+        if (_brain.Spawner) _brain.Spawner.EnableSpawning(false);
+
+        if (_brain.PatrolPath != null)
+            _brain.PathIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
+    }
+
+    public void Tick()
+    {
+        if (_brain.PatrolPath == null)
+        {
+            _brain.ChangeState(_brain.PatrolState);
+            return;
+        }
+
+        Vector2 target = _brain.PatrolPath.GetPoint(_brain.PathIndex);
+        _brain.Motor.MoveTo(target, _brain.Config.patrolSpeed);
+
+        if (Vector2.Distance(_brain.transform.position, target) <= _brain.Config.waypointArriveDistance)
+        {
+            _brain.ChangeState(_brain.PatrolState);
+        }
+    }
+
+    public void Exit() { }
+}
+
+public class SwarmDeadState : IEnemyState
+{
+    SwarmEnemyBrain _brain;
+    public SwarmDeadState(SwarmEnemyBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+        if (_brain.Animator) _brain.Animator.SetTrigger("Death");
+        if (_brain.Spawner) _brain.Spawner.EnableSpawning(false);
+        if (_brain.Spawner) _brain.Spawner.KillAllMinionsAnimated();
+        
+        _brain.enabled = false;
+    }
+
+    public void Tick() { }
+    public void Exit() { }
 }
