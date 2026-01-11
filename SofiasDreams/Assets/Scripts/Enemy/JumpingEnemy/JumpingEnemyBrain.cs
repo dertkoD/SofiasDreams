@@ -319,7 +319,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     
     // --- Sensing ---
     
-    bool TrySense(out Transform target)
+    public bool TrySense(out Transform target)
     {
         target = null;
         if (Vision == null) return false;
