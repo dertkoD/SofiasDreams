@@ -38,9 +38,9 @@ public class LazyMiniBossBrain : BaseEnemyBrain
     public bool HasSeenPlayer { get; set; }
     public float ForgetTimer { get; set; }
     
-    public EnemyPatrolPath CurrentPath;
-    public int PathIndex;
-    public int PathDir = 1;
+    [HideInInspector] public EnemyPatrolPath CurrentPath;
+    [HideInInspector] public int PathIndex;
+    [HideInInspector] public int PathDir = 1;
 
     // Zone
     public float ZoneMinX { get; set; }

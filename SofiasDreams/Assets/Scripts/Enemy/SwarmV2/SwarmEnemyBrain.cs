@@ -35,8 +35,8 @@ public class SwarmEnemyBrain : BaseEnemyBrain
     public float ForgetTimer { get; set; }
     
     // Patrol Runtime
-    public int PathIndex;
-    public int PathDir = 1;
+    [HideInInspector] public int PathIndex;
+    [HideInInspector] public int PathDir = 1;
 
     [Inject]
     public void Construct(SwarmConfig config)

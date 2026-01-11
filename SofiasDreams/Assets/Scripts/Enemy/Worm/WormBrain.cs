@@ -36,9 +36,9 @@ public class WormBrain : BaseEnemyBrain
     public float ForgetTimer { get; set; }
 
     // Patrol Runtime
-    public EnemyPatrolPath CurrentPath;
-    public int PathIndex;
-    public int PatrolDir = 1;
+    [HideInInspector] public EnemyPatrolPath CurrentPath;
+    [HideInInspector] public int PathIndex;
+    [HideInInspector] public int PatrolDir = 1;
 
     int _lastHp;
 

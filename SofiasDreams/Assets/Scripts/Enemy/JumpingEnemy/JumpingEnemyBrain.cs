@@ -35,43 +35,43 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     public Vector2 SpawnPos { get; set; }
     
     // Patrol Runtime
-    public EnemyPatrolPath CurrentPath;
-    public int PathIndex;
-    public int PathDir = 1;
-    public bool PatrolJumpHasTarget;
-    public Vector2 PatrolJumpTarget;
-    public int PatrolDxSignAtJump;
+    [HideInInspector] public EnemyPatrolPath CurrentPath;
+    [HideInInspector] public int PathIndex;
+    [HideInInspector] public int PathDir = 1;
+    [HideInInspector] public bool PatrolJumpHasTarget;
+    [HideInInspector] public Vector2 PatrolJumpTarget;
+    [HideInInspector] public int PatrolDxSignAtJump;
     
     // Return Runtime
-    public bool ReturningToRoute;
-    public int ReturnTargetIndex;
-    public bool ReturnJumpHasTarget;
-    public Vector2 ReturnJumpTarget;
-    public int ReturnDxSignAtJump;
+    [HideInInspector] public bool ReturningToRoute;
+    [HideInInspector] public int ReturnTargetIndex;
+    [HideInInspector] public bool ReturnJumpHasTarget;
+    [HideInInspector] public Vector2 ReturnJumpTarget;
+    [HideInInspector] public int ReturnDxSignAtJump;
 
     // Aggro Runtime
-    public float ForgetLeft;
-    public bool LostSightTimerRunning;
-    public Vector2 LastSeenPos;
-    public bool HasLastSeen;
-    public int LastChaseDirSign = +1;
-    public bool HasChaseDir;
+    [HideInInspector] public float ForgetLeft;
+    [HideInInspector] public bool LostSightTimerRunning;
+    [HideInInspector] public Vector2 LastSeenPos;
+    [HideInInspector] public bool HasLastSeen;
+    [HideInInspector] public int LastChaseDirSign = +1;
+    [HideInInspector] public bool HasChaseDir;
 
     // Jump Physics
-    public bool JumpBool;
-    public float NextJumpAt;
-    public bool PrevGrounded;
-    public float PrevY;
-    public float LandingStunUntil;
-    public float LastJumpStartedAt;
+    [HideInInspector] public bool JumpBool;
+    [HideInInspector] public float NextJumpAt;
+    [HideInInspector] public bool PrevGrounded;
+    [HideInInspector] public float PrevY;
+    [HideInInspector] public float LandingStunUntil;
+    [HideInInspector] public float LastJumpStartedAt;
     
     // Pending Triggers
-    public bool PendingAggroTrigger;
-    public bool PendingPatrolTrigger;
+    [HideInInspector] public bool PendingAggroTrigger;
+    [HideInInspector] public bool PendingPatrolTrigger;
 
     // Damage Watch
-    public int LastHp = int.MinValue;
-    public bool ArmedHpWatch;
+    [HideInInspector] public int LastHp = int.MinValue;
+    [HideInInspector] public bool ArmedHpWatch;
 
     [Inject]
     public void Construct(JumpingEnemyConfigSO config, IHealth health, SignalBus bus)
