@@ -104,9 +104,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     
     void Start()
     {
-        // Player is injected via Construct or handled via Signal. 
-        // Removed FindObjectOfType fallback to adhere to DI pattern.
-        
         if (PatrolPath == null)
             PatrolPath = FindNearestPatrolPath();
 
@@ -327,11 +324,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     void OnPlayerContact()
     {
         if (CurrentState == DeadState) return;
-        if (Player == null)
-        {
-            var pf = FindObjectOfType<PlayerFacade>();
-            if (pf != null) Player = pf.transform;
-        }
 
         if (Player != null)
         {

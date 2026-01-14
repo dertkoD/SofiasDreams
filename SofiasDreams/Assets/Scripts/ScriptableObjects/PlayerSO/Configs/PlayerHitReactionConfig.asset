@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45b0d4fe88164714b87fea82c2b89871, type: 3}
   m_Name: PlayerHitReactionConfig
   m_EditorClassIdentifier: 
-  hitStun: 0.5
+  hitStun: 0.3
   knockbackForce: 30
   dragDuringStun: 2
   knockbackX: 30

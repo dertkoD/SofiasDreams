@@ -55291,7 +55291,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -20.606548, y: -8.117712}
+  m_Offset: {x: -20.213957, y: -6.6107607}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -55301,7 +55301,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 48.10444, y: 24.00821}
+  m_Size: {x: 48.88962, y: 27.022112}
   m_EdgeRadius: 0
 --- !u!4 &150295850
 Transform:
@@ -59308,7 +59308,7 @@ EdgeCollider2D:
   m_EdgeRadius: 0
   m_Points:
   - {x: -5.0326366, y: -6.9641724}
-  - {x: -5.0332794, y: 9.090954}
+  - {x: -5.0332794, y: 13.469475}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
@@ -73921,7 +73921,7 @@ Camera:
   far clip plane: 5000
   field of view: 40
   orthographic: 1
-  orthographic size: 14
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -73946,7 +73946,7 @@ Transform:
   m_GameObject: {fileID: 1237394688}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 91.6517, y: -18.517956, z: -20}
+  m_LocalPosition: {x: 95.20729, y: -18.516808, z: -20}
   m_LocalScale: {x: 0.89285725, y: 0.89285725, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -82365,7 +82365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d5579472a33444cbcc2791b02b903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: 11.2, y: -20, z: 0}
+  startPos: {x: 1.53, y: 5.39, z: 0}
   _enemySpawnPoints:
   - {fileID: 783268736}
   - {fileID: 767699206}
@@ -86068,7 +86068,7 @@ EdgeCollider2D:
   m_EdgeRadius: 0
   m_Points:
   - {x: -5.032637, y: 12.182404}
-  - {x: -5.0332794, y: 13.091686}
+  - {x: -5.0343313, y: 16.499184}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
@@ -86244,10 +86244,17 @@ PolygonCollider2D:
     m_Paths:
     - - {x: 14.745838, y: 36.23533}
       - {x: 14.7574215, y: 60.23073}
-      - {x: -84.4024, y: 60.212505}
-      - {x: -84.51582, y: -10.052573}
-      - {x: -36.174007, y: -9.962748}
-      - {x: -36.195343, y: -35.851173}
+      - {x: -84.31719, y: 60.212505}
+      - {x: -84.29861, y: -12.074338}
+      - {x: -41.64698, y: -11.7596655}
+      - {x: -40.202953, y: -11.732898}
+      - {x: -39.697933, y: -12.280867}
+      - {x: -39.274857, y: -12.8985815}
+      - {x: -39.36484, y: -13.672666}
+      - {x: -39.436325, y: -14.396716}
+      - {x: -39.41467, y: -15.20857}
+      - {x: -39.457382, y: -16.140728}
+      - {x: -39.56534, y: -34.86128}
       - {x: 99.474304, y: -35.835197}
       - {x: 99.40083, y: 36.186085}
   m_UseDelaunayMesh: 0
@@ -88172,7 +88179,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 40
-    OrthographicSize: 14
+    OrthographicSize: 12
     NearClipPlane: 0.1
     FarClipPlane: 5000
     Dutch: 0

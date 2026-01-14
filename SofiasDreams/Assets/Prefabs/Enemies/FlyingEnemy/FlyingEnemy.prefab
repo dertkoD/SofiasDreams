@@ -307,7 +307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rb: {fileID: 144452895185385874}
-  _movementMode: 0
+  _movementMode: 1
 --- !u!114 &6222623665920495925
 MonoBehaviour:
   m_ObjectHideFlags: 0
