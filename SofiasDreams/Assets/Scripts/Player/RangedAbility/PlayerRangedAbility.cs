@@ -16,8 +16,8 @@ public class PlayerRangedAbility : MonoBehaviour
 
     [Header("Player Physics")]
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private PlayerMovement movement;
-    [SerializeField] private PlayerJump jump;
+    /*[SerializeField] private PlayerMovement movement;
+    [SerializeField] private PlayerJump jump;*/
 
     [Header("Air Freeze")]
     [SerializeField] private bool freezeYWhenAirborne = true;
@@ -48,8 +48,8 @@ public class PlayerRangedAbility : MonoBehaviour
         if (!_anim)       _anim    = GetComponent<Animator>();
         if (!rb)          rb       = GetComponent<Rigidbody2D>();
         if (!flipRoot)    flipRoot = transform;
-        if (!movement)    movement = GetComponentInParent<PlayerMovement>();
-        if (!jump)        jump     = GetComponentInParent<PlayerJump>();
+        /*if (!movement)    movement = GetComponentInParent<PlayerMovement>();
+        if (!jump)        jump     = GetComponentInParent<PlayerJump>();*/
     }
 
     void Update()
@@ -118,7 +118,7 @@ public class PlayerRangedAbility : MonoBehaviour
 
                 if (zeroGravityWhileFrozen) rb.gravityScale = 0f;
             }
-            if (movement) movement.SetMovementLocked(true);
+            //if (movement) movement.SetMovementLocked(true);
         }
         else
         {
@@ -127,7 +127,7 @@ public class PlayerRangedAbility : MonoBehaviour
                 rb.constraints  = _preConstraints;
                 rb.gravityScale = _preGravity;
             }
-            if (movement) movement.SetMovementLocked(false);
+            //if (movement) movement.SetMovementLocked(false);
         }
     }
 

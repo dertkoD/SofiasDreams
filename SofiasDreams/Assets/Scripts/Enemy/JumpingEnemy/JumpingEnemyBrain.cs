@@ -345,26 +345,24 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (Health == null || IHealth == null) return;
         if (!IHealth.IsAlive) return;
 
-        if (ArmedHpWatch)
+        if (!ArmedHpWatch) return;
+        int hp = Health.CurrentHP;
+        if (LastHp != int.MinValue && hp < LastHp)
         {
-            int hp = Health.CurrentHP;
-            if (LastHp != int.MinValue && hp < LastHp)
+            if (Health.LastHit != null && Health.LastHit.source != null)
             {
-                if (Health.LastHit != null && Health.LastHit.source != null)
+                LastSeenPos = Health.LastHit.source.position;
+                HasLastSeen = true;
+                HasChaseDir = true;
+                float dx = LastSeenPos.x - transform.position.x;
+                if (Mathf.Abs(dx) > 0.01f)
                 {
-                    LastSeenPos = Health.LastHit.source.position;
-                    HasLastSeen = true;
-                    HasChaseDir = true;
-                    float dx = LastSeenPos.x - transform.position.x;
-                    if (Mathf.Abs(dx) > 0.01f)
-                    {
-                         LastChaseDirSign = dx >= 0f ? +1 : -1;
-                    }
+                    LastChaseDirSign = dx >= 0f ? +1 : -1;
                 }
-                RequestAggroTrigger();
             }
-            LastHp = hp;
+            RequestAggroTrigger();
         }
+        LastHp = hp;
     }
     
     void ArmHpWatch()

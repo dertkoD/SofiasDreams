@@ -172,12 +172,12 @@ public class GrappleSystem : MonoBehaviour
             _rb.linearVelocity = startVel;
 
             // Tell the movement script to protect X during blend + hard lock, then soft-carry
-            if (TryGetComponent<PlayerMovement>(out var mover))
+            /*if (TryGetComponent<PlayerMovement>(out var mover))
             {
                 float hard = Mathf.Max(hardLockDuration, exitBlendTime); // ensure blend is protected
                 float soft = Mathf.Max(hard, softCarryMaxDuration);
                 mover.SetExternalVelocity(targetExitVel, hard, soft, overrideX: true, overrideY: false);
-            }
+            }*/
 
             // Blend to targetExitVel over exitBlendTime
             float dur = Mathf.Max(0f, exitBlendTime);

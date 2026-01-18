@@ -3,7 +3,7 @@ using UnityEngine;
 public class LedgeGuard2D : MonoBehaviour
 {
     [Header("Probe")]
-    public LayerMask groundLayers;                // если 0 — возьмём fallback из вызова
+    public LayerMask groundLayers;                
     public Vector2 probeOffset = new Vector2(0f, 0.1f);
     [Min(0f)] public float probeForward = 0.35f;
     [Min(0f)] public float probeDown = 0.6f;
@@ -16,7 +16,6 @@ public class LedgeGuard2D : MonoBehaviour
     public bool drawGizmos = true;
     public Color gizmoColor = Color.magenta;
 
-    // Рантайм-знак, который может проставлять мозг (для гизмосов во время Play)
     int _runtimeFacingSign = +1;
 
     public void SetFacingSign(int sign)
@@ -44,9 +43,9 @@ public class LedgeGuard2D : MonoBehaviour
         if (!drawGizmos) return;
 
         int sign = Application.isPlaying
-            ? _runtimeFacingSign                              // В Play используем знак от мозга
+            ? _runtimeFacingSign                              
             : (facingTransform ? SignFromScale(facingTransform)
-                : SignFromScale(transform));    // В редакторе — по трансформу
+                : SignFromScale(transform));    
 
         Vector3 o = transform.position + (Vector3)probeOffset + Vector3.right * sign * probeForward;
 
