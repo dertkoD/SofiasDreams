@@ -319,6 +319,7 @@ GameObject:
   - component: {fileID: 6957148836746755398}
   - component: {fileID: 1957813915052056473}
   - component: {fileID: 3737029513936843539}
+  - component: {fileID: 1428301372792124242}
   m_Layer: 9
   m_Name: SwarmV2
   m_TagString: Swarm
@@ -571,6 +572,8 @@ MonoBehaviour:
   _patrolPath: {fileID: 0}
   _animator: {fileID: 8370503063402537993}
   _health: {fileID: 691431285117865586}
+  PathIndex: 0
+  PathDir: 1
 --- !u!114 &6585708754461644385
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -706,3 +709,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
   dissolveController: {fileID: 1957813915052056473}
   dissolveSettings: {fileID: 11400000, guid: 3be79cc28ff86c1418b33f43c0cb032c, type: 2}
+--- !u!114 &1428301372792124242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7851447040320294286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92653fc795ed78d4788edfdf716d76b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlinkingDamage
+  spriteRenderer: {fileID: 1182162107477552078}
+  settings: {fileID: 11400000, guid: 836588c678bc0b145b6f529ca1aa604b, type: 2}
