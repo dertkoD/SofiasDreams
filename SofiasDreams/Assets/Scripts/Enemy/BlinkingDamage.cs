@@ -45,6 +45,7 @@ public class BlinkingDamage : MonoBehaviour
     {
         if (_health)
         {
+            // Debug.Log($"[BlinkingDamage] Health changed: {_health.CurrentHP} (prev: {_lastHealth})");
             if (_health.CurrentHP < _lastHealth)
             {
                 Blink();
@@ -55,7 +56,13 @@ public class BlinkingDamage : MonoBehaviour
 
     public void Blink()
     {
-        if (!settings || !spriteRenderer) return;
+        if (!settings || !spriteRenderer) 
+        {
+            Debug.LogWarning("[BlinkingDamage] Missing settings or spriteRenderer!");
+            return;
+        }
+
+        // Debug.Log($"[BlinkingDamage] Blinking! Outline: {settings.outlineThickness}, Dissolve: {settings.dissolveAmount}");
 
         if (_blinkRoutine != null) StopCoroutine(_blinkRoutine);
         _blinkRoutine = StartCoroutine(BlinkRoutine());

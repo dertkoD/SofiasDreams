@@ -28,6 +28,7 @@ GameObject:
   - component: {fileID: 473972346914180220}
   - component: {fileID: 4855201240133605699}
   - component: {fileID: 7529869201300518910}
+  - component: {fileID: 1234567890123456789}
   m_Layer: 9
   m_Name: Worm
   m_TagString: Enemy
@@ -730,3 +731,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerComponent: {fileID: 0}
+--- !u!114 &1234567890123456789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532011633854459779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92653fc795ed78d4788edfdf716d76b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 5510042618105225475}
+  settings: {fileID: 11400000, guid: f7344917960341589138676645396656, type: 2}
