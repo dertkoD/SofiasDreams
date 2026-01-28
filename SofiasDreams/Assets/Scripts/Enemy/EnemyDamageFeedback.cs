@@ -157,8 +157,8 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 
     void SetEnabled(bool on)
     {
-        for (int i = 0; i < sprites.Length; i++)
-            if (sprites[i])
-                sprites[i].enabled = on;
+        // for (int i = 0; i < sprites.Length; i++)
+        //     if (sprites[i])
+        //         sprites[i].enabled = on;
     }
 }
