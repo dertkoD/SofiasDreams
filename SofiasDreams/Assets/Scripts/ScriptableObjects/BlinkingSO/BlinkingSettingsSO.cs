@@ -8,5 +8,6 @@ public class BlinkingSettingsSO : ScriptableObject
     public float outlineThickness = 1f;
     public float dissolveAmount = 1.1f;
     public float outlineIntensity = 1f;
+    public float verticalDissolve = 1.1f;
     public Color outlineColor = Color.white;
 }

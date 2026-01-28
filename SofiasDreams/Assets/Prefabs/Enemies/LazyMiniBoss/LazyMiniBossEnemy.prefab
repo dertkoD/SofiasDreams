@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 6167449203077373188}
   - component: {fileID: 6890998192043064175}
   - component: {fileID: 3657415328223587105}
+  - component: {fileID: 1461742586438924010}
   m_Layer: 9
   m_Name: LazyMiniBossEnemy
   m_TagString: Untagged
@@ -224,6 +225,9 @@ MonoBehaviour:
   _patrolPath: {fileID: 0}
   _projectileSpawnPoint: {fileID: 5458077606868776040}
   _config: {fileID: 11400000, guid: d45976f68c9ec2c4084ee1fa2682c185, type: 2}
+  CurrentPath: {fileID: 0}
+  PathIndex: 0
+  PathDir: 1
 --- !u!114 &1824828091787262381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,6 +378,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
   SpawnId: 
   RespawnMode: 0
+--- !u!114 &1461742586438924010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690921728680708970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92653fc795ed78d4788edfdf716d76b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlinkingDamage
+  spriteRenderer: {fileID: 3182692422168544452}
+  settings: {fileID: 11400000, guid: 373b9f2972af7304ab06fa2ed5b571bc, type: 2}
 --- !u!1 &3207133190380383240
 GameObject:
   m_ObjectHideFlags: 0

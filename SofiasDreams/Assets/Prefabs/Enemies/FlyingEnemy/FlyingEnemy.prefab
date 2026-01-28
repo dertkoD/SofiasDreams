@@ -118,6 +118,7 @@ GameObject:
   - component: {fileID: 2042417011476068454}
   - component: {fileID: -6154622815944501037}
   - component: {fileID: 3648165089791449687}
+  - component: {fileID: 8558020621023232663}
   m_Layer: 9
   m_Name: FlyingEnemy
   m_TagString: Untagged
@@ -463,6 +464,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnMeta
   SpawnId: 
   RespawnMode: 0
+--- !u!114 &8558020621023232663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5001793755108328482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92653fc795ed78d4788edfdf716d76b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlinkingDamage
+  spriteRenderer: {fileID: 4353169174539410497}
+  settings: {fileID: 11400000, guid: ce915c6572ce8d0418253a1841a40789, type: 2}
 --- !u!1 &5782868299914000527
 GameObject:
   m_ObjectHideFlags: 0

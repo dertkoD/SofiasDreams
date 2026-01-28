@@ -14,6 +14,7 @@ public class BlinkingDamage : MonoBehaviour
     private static readonly int OutlineThicknessId  = Shader.PropertyToID("_OutlineThickness");
     private static readonly int OutlineColorId      = Shader.PropertyToID("_OutlineColor");
     private static readonly int DisolveAmountId     = Shader.PropertyToID("_DisolveAmount");
+    private static readonly int VerticalDisolveId   = Shader.PropertyToID("_VerticalDisolve");
 
     private void Awake()
     {
@@ -73,6 +74,7 @@ public class BlinkingDamage : MonoBehaviour
         spriteRenderer.GetPropertyBlock(_mpb);
         _mpb.SetFloat(OutlineThicknessId, settings.outlineThickness);
         _mpb.SetFloat(DisolveAmountId, settings.dissolveAmount);
+        _mpb.SetFloat(VerticalDisolveId, settings.verticalDissolve);
         _mpb.SetColor(OutlineColorId, settings.outlineColor * settings.outlineIntensity);
         spriteRenderer.SetPropertyBlock(_mpb);
 
@@ -87,6 +89,7 @@ public class BlinkingDamage : MonoBehaviour
         spriteRenderer.GetPropertyBlock(_mpb);
         _mpb.SetFloat(OutlineThicknessId, 0f);
         _mpb.SetFloat(DisolveAmountId, 0f);
+        _mpb.SetFloat(VerticalDisolveId, 0f);
         spriteRenderer.SetPropertyBlock(_mpb);
 
         _blinkRoutine = null;

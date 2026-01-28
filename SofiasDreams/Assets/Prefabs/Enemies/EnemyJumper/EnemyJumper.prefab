@@ -272,6 +272,7 @@ GameObject:
   - component: {fileID: 1702601706610800314}
   - component: {fileID: -9049302676928836541}
   - component: {fileID: -1074065922772761851}
+  - component: {fileID: 6658196053880397384}
   m_Layer: 9
   m_Name: EnemyJumper
   m_TagString: Untagged
@@ -555,6 +556,33 @@ MonoBehaviour:
   _health: {fileID: 6149265313361646971}
   _contactDamage: {fileID: 5329762459106579481}
   _patrolPath: {fileID: 0}
+  CurrentPath: {fileID: 0}
+  PathIndex: 0
+  PathDir: 1
+  PatrolJumpHasTarget: 0
+  PatrolJumpTarget: {x: 0, y: 0}
+  PatrolDxSignAtJump: 0
+  ReturningToRoute: 0
+  ReturnTargetIndex: 0
+  ReturnJumpHasTarget: 0
+  ReturnJumpTarget: {x: 0, y: 0}
+  ReturnDxSignAtJump: 0
+  ForgetLeft: 0
+  LostSightTimerRunning: 0
+  LastSeenPos: {x: 0, y: 0}
+  HasLastSeen: 0
+  LastChaseDirSign: 1
+  HasChaseDir: 0
+  JumpBool: 0
+  NextJumpAt: 0
+  PrevGrounded: 0
+  PrevY: 0
+  LandingStunUntil: 0
+  LastJumpStartedAt: 0
+  PendingAggroTrigger: 0
+  PendingPatrolTrigger: 0
+  LastHp: -2147483648
+  ArmedHpWatch: 0
 --- !u!114 &5742823276269154795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,6 +675,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDissolveBridge
   dissolveController: {fileID: -9049302676928836541}
   dissolveSettings: {fileID: 11400000, guid: 3a2338681d40943499aa07ccc80fc75b, type: 2}
+--- !u!114 &6658196053880397384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3823746511676703583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92653fc795ed78d4788edfdf716d76b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlinkingDamage
+  spriteRenderer: {fileID: 7425912216409085134}
+  settings: {fileID: 11400000, guid: fca6d6b053791854caebfede99b6c257, type: 2}
 --- !u!1 &9163621309807500896
 GameObject:
   m_ObjectHideFlags: 0
