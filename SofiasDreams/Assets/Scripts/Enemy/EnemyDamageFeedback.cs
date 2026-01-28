@@ -143,16 +143,16 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 
     void SetColor(Color c)
     {
-        for (int i = 0; i < sprites.Length; i++)
-            if (sprites[i])
-                sprites[i].color = c;
+        // for (int i = 0; i < sprites.Length; i++)
+        //     if (sprites[i])
+        //         sprites[i].color = c;
     }
 
     void RestoreColors()
     {
-        for (int i = 0; i < sprites.Length; i++)
-            if (sprites[i])
-                sprites[i].color = _origColors[i];
+        // for (int i = 0; i < sprites.Length; i++)
+        //     if (sprites[i])
+        //         sprites[i].color = _origColors[i];
     }
 
     void SetEnabled(bool on)

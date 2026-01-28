@@ -62,7 +62,7 @@ public class BlinkingDamage : MonoBehaviour
             return;
         }
 
-        // Debug.Log($"[BlinkingDamage] Blinking! Outline: {settings.outlineThickness}, Dissolve: {settings.dissolveAmount}");
+        if (_health != null && !_health.IsAlive) return;
 
         if (_blinkRoutine != null) StopCoroutine(_blinkRoutine);
         _blinkRoutine = StartCoroutine(BlinkRoutine());
@@ -78,6 +78,12 @@ public class BlinkingDamage : MonoBehaviour
 
         yield return new WaitForSeconds(settings.blinkDuration);
 
+        // Check if we are dead? Maybe better to not clear if another system takes over.
+        // But for blink we want to restore.
+        // If SpriteDissolveController is running, we might be fighting it?
+        
+        // Let's re-fetch the block to respect other changes if possible, 
+        // though MPB replaces values for the renderer.
         spriteRenderer.GetPropertyBlock(_mpb);
         _mpb.SetFloat(OutlineThicknessId, 0f);
         _mpb.SetFloat(DisolveAmountId, 0f);
