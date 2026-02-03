@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerFacade : MonoBehaviour
 {
     public Transform cameraTarget;
+    public Transform shockWaveSpawnPoint;
 
     public Health Health { get; private set; }
     public Healer Healer { get; private set; }   

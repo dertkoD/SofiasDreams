@@ -7,11 +7,8 @@ public class ShockWaveSpriteController : MonoBehaviour
 {
     [SerializeField] private float _shockWaveTime = 0.75f;
     [SerializeField] private float _waveDistanceEnd = 1f;
-    
-    [Tooltip("Use player's cameraTarget transform instead of root transform")]
-    [SerializeField] private bool _useCameraTarget = true;
 
-    private Transform _playerTransform;
+    private Transform _shockWaveSpawnPoint;
     private Coroutine _shockWaveCoroutine;
     private Material _material;
     private SignalBus _bus;
@@ -74,9 +71,9 @@ public class ShockWaveSpriteController : MonoBehaviour
     {
         if (signal.facade != null)
         {
-            // Use cameraTarget if available and enabled, otherwise use root transform
-            _playerTransform = (_useCameraTarget && signal.facade.cameraTarget != null) 
-                ? signal.facade.cameraTarget 
+            // Use shockWaveSpawnPoint from PlayerFacade
+            _shockWaveSpawnPoint = signal.facade.shockWaveSpawnPoint != null 
+                ? signal.facade.shockWaveSpawnPoint 
                 : signal.facade.transform;
         }
     }
@@ -131,10 +128,10 @@ public class ShockWaveSpriteController : MonoBehaviour
 
     private void UpdateRingSpawnPosition()
     {
-        if (_playerTransform == null || _cinemachineOutputCamera == null)
+        if (_shockWaveSpawnPoint == null || _cinemachineOutputCamera == null)
             return;
 
-        Vector3 viewportPos = _cinemachineOutputCamera.WorldToViewportPoint(_playerTransform.position);
+        Vector3 viewportPos = _cinemachineOutputCamera.WorldToViewportPoint(_shockWaveSpawnPoint.position);
         _material.SetVector(_ringSpawnPosition, new Vector2(viewportPos.x, viewportPos.y));
     }
 }
