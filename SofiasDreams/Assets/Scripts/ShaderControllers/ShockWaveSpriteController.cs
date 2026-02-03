@@ -15,17 +15,23 @@ public class ShockWaveSpriteController : MonoBehaviour
     [SerializeField] private Camera mainCamera;
 
     [Header("Animation Settings")]
-    [Tooltip("Starting value for WaveDistanceFromCenter")]
+    [Tooltip("Starting value for WaveDistanceFromCenter (hidden state)")]
     [SerializeField] private float waveDistanceStart = -0.1f;
     
-    [Tooltip("End value for WaveDistanceFromCenter")]
+    [Tooltip("End value for WaveDistanceFromCenter (fully expanded)")]
     [SerializeField] private float waveDistanceEnd = 1.0f;
     
-    [Tooltip("Duration of the shockwave animation in seconds")]
-    [SerializeField] private float animationDuration = 0.5f;
+    [Tooltip("Duration of the forward shockwave animation in seconds")]
+    [SerializeField] private float forwardAnimationDuration = 0.5f;
     
-    [Tooltip("Animation curve for the wave effect")]
-    [SerializeField] private AnimationCurve animationCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [Tooltip("Duration of the reverse shockwave animation in seconds")]
+    [SerializeField] private float reverseAnimationDuration = 0.3f;
+    
+    [Tooltip("Animation curve for the forward wave effect")]
+    [SerializeField] private AnimationCurve forwardAnimationCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    
+    [Tooltip("Animation curve for the reverse wave effect")]
+    [SerializeField] private AnimationCurve reverseAnimationCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     private SignalBus _bus;
     private MaterialPropertyBlock _mpb;
@@ -52,7 +58,7 @@ public class ShockWaveSpriteController : MonoBehaviour
     {
         if (_bus != null)
         {
-            _bus.Subscribe<HealFinished>(OnHealFinished);
+            _bus.Subscribe<HealStarted>(OnHealStarted);
         }
         
         // Initialize shader to hidden state
@@ -63,25 +69,22 @@ public class ShockWaveSpriteController : MonoBehaviour
     {
         if (_bus != null)
         {
-            _bus.TryUnsubscribe<HealFinished>(OnHealFinished);
+            _bus.TryUnsubscribe<HealStarted>(OnHealStarted);
         }
         
-        if (_animationCoroutine != null)
-        {
-            StopCoroutine(_animationCoroutine);
-            _animationCoroutine = null;
-        }
+        StopCurrentAnimation();
     }
 
-    private void OnHealFinished(HealFinished signal)
+    private void OnHealStarted(HealStarted signal)
     {
-        PlayShockWave();
+        PlayShockWaveForward();
     }
 
     /// <summary>
-    /// Plays the shockwave effect. Can be called externally for testing or other triggers.
+    /// Plays the forward shockwave effect (from start to end value).
+    /// Triggered automatically on HealStarted.
     /// </summary>
-    public void PlayShockWave()
+    public void PlayShockWaveForward()
     {
         if (shockWaveSpriteRenderer == null)
         {
@@ -89,49 +92,58 @@ public class ShockWaveSpriteController : MonoBehaviour
             return;
         }
 
-        if (_animationCoroutine != null)
-        {
-            StopCoroutine(_animationCoroutine);
-        }
-
-        _animationCoroutine = StartCoroutine(ShockWaveRoutine());
-    }
-
-    private IEnumerator ShockWaveRoutine()
-    {
-        // Update ring spawn position from transform
-        UpdateRingSpawnPosition();
-
-        float duration = Mathf.Max(0.01f, animationDuration);
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float normalizedTime = Mathf.Clamp01(elapsed / duration);
-            float curveValue = animationCurve.Evaluate(normalizedTime);
-
-            float waveDistance = Mathf.Lerp(waveDistanceStart, waveDistanceEnd, curveValue);
-
-            shockWaveSpriteRenderer.GetPropertyBlock(_mpb);
-            _mpb.SetFloat(WaveDistanceFromCenterId, waveDistance);
-            shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
-
-            yield return null;
-        }
-
-        // Ensure final value is set
-        shockWaveSpriteRenderer.GetPropertyBlock(_mpb);
-        _mpb.SetFloat(WaveDistanceFromCenterId, waveDistanceEnd);
-        shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
-
-        _animationCoroutine = null;
+        StopCurrentAnimation();
         
-        // Reset to initial state after animation completes
-        ResetShaderToInitialState();
+        // Update ring spawn position before starting animation
+        UpdateRingSpawnPosition();
+        
+        _animationCoroutine = StartCoroutine(AnimateWaveDistance(
+            waveDistanceStart, 
+            waveDistanceEnd, 
+            forwardAnimationDuration, 
+            forwardAnimationCurve));
     }
 
-    private void UpdateRingSpawnPosition()
+    /// <summary>
+    /// Plays the reverse shockwave effect (from end value back to start).
+    /// Call this method from animation clip/event to hide the wave.
+    /// </summary>
+    public void PlayShockWaveReverse()
+    {
+        if (shockWaveSpriteRenderer == null)
+        {
+            Debug.LogWarning("[ShockWaveSpriteController] SpriteRenderer is not assigned!");
+            return;
+        }
+
+        StopCurrentAnimation();
+        
+        _animationCoroutine = StartCoroutine(AnimateWaveDistance(
+            waveDistanceEnd, 
+            waveDistanceStart, 
+            reverseAnimationDuration, 
+            reverseAnimationCurve));
+    }
+
+    /// <summary>
+    /// Sets the WaveDistanceFromCenter value directly without animation.
+    /// Useful for animation clips that need direct control.
+    /// </summary>
+    public void SetWaveDistance(float value)
+    {
+        if (shockWaveSpriteRenderer == null)
+            return;
+
+        shockWaveSpriteRenderer.GetPropertyBlock(_mpb);
+        _mpb.SetFloat(WaveDistanceFromCenterId, value);
+        shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
+    }
+
+    /// <summary>
+    /// Updates the RingSpawnPosition from the assigned transform.
+    /// Call this if you need to update position during animation.
+    /// </summary>
+    public void UpdateRingSpawnPosition()
     {
         if (ringSpawnPositionTransform == null || mainCamera == null || shockWaveSpriteRenderer == null)
             return;
@@ -145,7 +157,10 @@ public class ShockWaveSpriteController : MonoBehaviour
         shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
     }
 
-    private void ResetShaderToInitialState()
+    /// <summary>
+    /// Resets the shader to its initial hidden state.
+    /// </summary>
+    public void ResetShaderToInitialState()
     {
         if (shockWaveSpriteRenderer == null)
             return;
@@ -155,18 +170,60 @@ public class ShockWaveSpriteController : MonoBehaviour
         shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
     }
 
+    private void StopCurrentAnimation()
+    {
+        if (_animationCoroutine != null)
+        {
+            StopCoroutine(_animationCoroutine);
+            _animationCoroutine = null;
+        }
+    }
+
+    private IEnumerator AnimateWaveDistance(float from, float to, float duration, AnimationCurve curve)
+    {
+        float safeDuration = Mathf.Max(0.01f, duration);
+        float elapsed = 0f;
+
+        while (elapsed < safeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float normalizedTime = Mathf.Clamp01(elapsed / safeDuration);
+            float curveValue = curve.Evaluate(normalizedTime);
+
+            float waveDistance = Mathf.Lerp(from, to, curveValue);
+
+            shockWaveSpriteRenderer.GetPropertyBlock(_mpb);
+            _mpb.SetFloat(WaveDistanceFromCenterId, waveDistance);
+            shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
+
+            yield return null;
+        }
+
+        // Ensure final value is set
+        shockWaveSpriteRenderer.GetPropertyBlock(_mpb);
+        _mpb.SetFloat(WaveDistanceFromCenterId, to);
+        shockWaveSpriteRenderer.SetPropertyBlock(_mpb);
+
+        _animationCoroutine = null;
+    }
+
 #if UNITY_EDITOR
-    [ContextMenu("Test Shockwave")]
-    private void TestShockwave()
+    [ContextMenu("Test Forward")]
+    private void TestForward()
     {
         if (Application.isPlaying)
-        {
-            PlayShockWave();
-        }
+            PlayShockWaveForward();
         else
-        {
             Debug.Log("[ShockWaveSpriteController] Test only works in Play mode.");
-        }
+    }
+
+    [ContextMenu("Test Reverse")]
+    private void TestReverse()
+    {
+        if (Application.isPlaying)
+            PlayShockWaveReverse();
+        else
+            Debug.Log("[ShockWaveSpriteController] Test only works in Play mode.");
     }
 #endif
 }
