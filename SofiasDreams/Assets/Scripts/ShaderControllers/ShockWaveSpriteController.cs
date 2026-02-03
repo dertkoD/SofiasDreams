@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 using Zenject;
+using Unity.Cinemachine;
 
 public class ShockWaveSpriteController : MonoBehaviour
 {
     [SerializeField] private float _shockWaveTime = 0.75f;
     [SerializeField] private float _waveDistanceEnd = 1f;
-    [SerializeField] private Camera _renderCamera;
     
     [Tooltip("Use player's cameraTarget transform instead of root transform")]
     [SerializeField] private bool _useCameraTarget = true;
@@ -15,6 +15,7 @@ public class ShockWaveSpriteController : MonoBehaviour
     private Coroutine _shockWaveCoroutine;
     private Material _material;
     private SignalBus _bus;
+    private Camera _cinemachineOutputCamera;
 
     private static readonly int _waveDistanceFromCenter = Shader.PropertyToID("_WaveDistanceFromCenter");
     private static readonly int _ringSpawnPosition = Shader.PropertyToID("_RingSpawnPosition");
@@ -29,8 +30,23 @@ public class ShockWaveSpriteController : MonoBehaviour
     {
         _material = GetComponent<SpriteRenderer>().material;
         
-        if (_renderCamera == null)
-            _renderCamera = Camera.main;
+        FindCinemachineCamera();
+    }
+
+    private void FindCinemachineCamera()
+    {
+        // Find camera with CinemachineBrain (the actual rendering camera controlled by Cinemachine)
+        var brain = FindFirstObjectByType<CinemachineBrain>();
+        if (brain != null)
+        {
+            _cinemachineOutputCamera = brain.GetComponent<Camera>();
+        }
+        
+        if (_cinemachineOutputCamera == null)
+        {
+            Debug.LogWarning("[ShockWaveSpriteController] CinemachineBrain not found, falling back to Camera.main");
+            _cinemachineOutputCamera = Camera.main;
+        }
     }
 
     private void OnEnable()
@@ -115,10 +131,10 @@ public class ShockWaveSpriteController : MonoBehaviour
 
     private void UpdateRingSpawnPosition()
     {
-        if (_playerTransform == null || _renderCamera == null)
+        if (_playerTransform == null || _cinemachineOutputCamera == null)
             return;
 
-        Vector3 viewportPos = _renderCamera.WorldToViewportPoint(_playerTransform.position);
+        Vector3 viewportPos = _cinemachineOutputCamera.WorldToViewportPoint(_playerTransform.position);
         _material.SetVector(_ringSpawnPosition, new Vector2(viewportPos.x, viewportPos.y));
     }
 }
