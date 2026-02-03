@@ -6,6 +6,7 @@ using Unity.Cinemachine;
 public class ShockWaveSpriteController : MonoBehaviour
 {
     [SerializeField] private float _shockWaveTime = 0.75f;
+    [SerializeField] private float _shockWaveTimeReverse = 0.5f;
     [SerializeField] private float _shockWaveTimeInterrupted = 0.15f;
     [SerializeField] private float _waveDistanceEnd = 1f;
 
@@ -121,7 +122,7 @@ public class ShockWaveSpriteController : MonoBehaviour
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEnd, -0.1f, _shockWaveTime));
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEnd, -0.1f, _shockWaveTimeReverse));
     }
 
     /// <summary>
