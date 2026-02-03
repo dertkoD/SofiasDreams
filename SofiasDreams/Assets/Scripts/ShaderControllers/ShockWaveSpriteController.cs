@@ -52,6 +52,7 @@ public class ShockWaveSpriteController : MonoBehaviour
         {
             _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.Subscribe<HealStarted>(OnHealStarted);
+            _bus.Subscribe<HealFinished>(OnHealFinished);
         }
         
         // Initialize to hidden state
@@ -64,6 +65,7 @@ public class ShockWaveSpriteController : MonoBehaviour
         {
             _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.TryUnsubscribe<HealStarted>(OnHealStarted);
+            _bus.TryUnsubscribe<HealFinished>(OnHealFinished);
         }
     }
 
@@ -81,6 +83,11 @@ public class ShockWaveSpriteController : MonoBehaviour
     private void OnHealStarted(HealStarted signal)
     {
         CallShockWaveForward();
+    }
+
+    private void OnHealFinished(HealFinished signal)
+    {
+        CallShockWaveReverse();
     }
 
     /// <summary>
