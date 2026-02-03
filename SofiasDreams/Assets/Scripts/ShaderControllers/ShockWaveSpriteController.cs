@@ -45,6 +45,11 @@ public class ShockWaveSpriteController : MonoBehaviour
             if (brain.ActiveVirtualCamera is CinemachineCamera vcam)
             {
                 _virtualCamera = vcam;
+                Debug.Log($"[ShockWaveSpriteController] Found VirtualCamera: {vcam.name}, Follow: {vcam.Follow?.name ?? "null"}");
+            }
+            else
+            {
+                Debug.LogWarning("[ShockWaveSpriteController] ActiveVirtualCamera not found or not CinemachineCamera");
             }
         }
         
@@ -52,6 +57,16 @@ public class ShockWaveSpriteController : MonoBehaviour
         {
             Debug.LogWarning("[ShockWaveSpriteController] CinemachineBrain not found, falling back to Camera.main");
             _cinemachineOutputCamera = Camera.main;
+        }
+    }
+
+    // Call this when player spawns to update virtual camera reference
+    private void RefreshVirtualCamera()
+    {
+        var brain = FindFirstObjectByType<CinemachineBrain>();
+        if (brain != null && brain.ActiveVirtualCamera is CinemachineCamera vcam)
+        {
+            _virtualCamera = vcam;
         }
     }
 
@@ -88,6 +103,9 @@ public class ShockWaveSpriteController : MonoBehaviour
             _shockWaveSpawnPoint = signal.facade.shockWaveSpawnPoint != null 
                 ? signal.facade.shockWaveSpawnPoint 
                 : signal.facade.transform;
+            
+            // Refresh virtual camera reference (might not be active at Awake)
+            RefreshVirtualCamera();
         }
     }
 
