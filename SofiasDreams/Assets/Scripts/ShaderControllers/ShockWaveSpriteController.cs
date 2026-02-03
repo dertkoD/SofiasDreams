@@ -6,9 +6,12 @@ public class ShockWaveSpriteController : MonoBehaviour
 {
     [SerializeField] private float _shockWaveTime = 0.75f;
     [SerializeField] private float _waveDistanceEnd = 1f;
-    [SerializeField] private Transform _ringSpawnPositionTransform;
     [SerializeField] private Camera _renderCamera;
+    
+    [Tooltip("Use player's cameraTarget transform instead of root transform")]
+    [SerializeField] private bool _useCameraTarget = true;
 
+    private Transform _playerTransform;
     private Coroutine _shockWaveCoroutine;
     private Material _material;
     private SignalBus _bus;
@@ -33,7 +36,10 @@ public class ShockWaveSpriteController : MonoBehaviour
     private void OnEnable()
     {
         if (_bus != null)
+        {
+            _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.Subscribe<HealStarted>(OnHealStarted);
+        }
         
         // Initialize to hidden state
         _material.SetFloat(_waveDistanceFromCenter, -0.1f);
@@ -42,7 +48,21 @@ public class ShockWaveSpriteController : MonoBehaviour
     private void OnDisable()
     {
         if (_bus != null)
+        {
+            _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.TryUnsubscribe<HealStarted>(OnHealStarted);
+        }
+    }
+
+    private void OnPlayerSpawned(PlayerSpawned signal)
+    {
+        if (signal.facade != null)
+        {
+            // Use cameraTarget if available and enabled, otherwise use root transform
+            _playerTransform = (_useCameraTarget && signal.facade.cameraTarget != null) 
+                ? signal.facade.cameraTarget 
+                : signal.facade.transform;
+        }
     }
 
     private void OnHealStarted(HealStarted signal)
@@ -95,10 +115,10 @@ public class ShockWaveSpriteController : MonoBehaviour
 
     private void UpdateRingSpawnPosition()
     {
-        if (_ringSpawnPositionTransform == null || _renderCamera == null)
+        if (_playerTransform == null || _renderCamera == null)
             return;
 
-        Vector3 viewportPos = _renderCamera.WorldToViewportPoint(_ringSpawnPositionTransform.position);
+        Vector3 viewportPos = _renderCamera.WorldToViewportPoint(_playerTransform.position);
         _material.SetVector(_ringSpawnPosition, new Vector2(viewportPos.x, viewportPos.y));
     }
 }
