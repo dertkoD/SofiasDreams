@@ -150,6 +150,9 @@ public class ShockWaveSpriteController : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
 
+            // Update position every frame to follow camera movement
+            UpdateRingSpawnPosition();
+
             float lerpedAmount = Mathf.Lerp(startPos, endPos, elapsedTime / duration);
             _material.SetFloat(_waveDistanceFromCenter, lerpedAmount);
 
