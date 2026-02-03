@@ -6,6 +6,7 @@ using Unity.Cinemachine;
 public class ShockWaveSpriteController : MonoBehaviour
 {
     [SerializeField] private float _shockWaveTime = 0.75f;
+    [SerializeField] private float _shockWaveTimeInterrupted = 0.15f;
     [SerializeField] private float _waveDistanceEnd = 1f;
 
     private Transform _shockWaveSpawnPoint;
@@ -53,6 +54,7 @@ public class ShockWaveSpriteController : MonoBehaviour
             _bus.Subscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.Subscribe<HealStarted>(OnHealStarted);
             _bus.Subscribe<HealFinished>(OnHealFinished);
+            _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
         }
         
         // Initialize to hidden state
@@ -66,6 +68,7 @@ public class ShockWaveSpriteController : MonoBehaviour
             _bus.TryUnsubscribe<PlayerSpawned>(OnPlayerSpawned);
             _bus.TryUnsubscribe<HealStarted>(OnHealStarted);
             _bus.TryUnsubscribe<HealFinished>(OnHealFinished);
+            _bus.TryUnsubscribe<HealInterrupted>(OnHealInterrupted);
         }
     }
 
@@ -90,6 +93,11 @@ public class ShockWaveSpriteController : MonoBehaviour
         CallShockWaveReverse();
     }
 
+    private void OnHealInterrupted(HealInterrupted signal)
+    {
+        CallShockWaveReverseQuick();
+    }
+
     /// <summary>
     /// Forward animation: -0.1 → end value. Called on HealStarted.
     /// </summary>
@@ -100,31 +108,44 @@ public class ShockWaveSpriteController : MonoBehaviour
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(-0.1f, _waveDistanceEnd));
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(-0.1f, _waveDistanceEnd, _shockWaveTime));
     }
 
     /// <summary>
-    /// Reverse animation: end value → -0.1. Call from animation clip.
+    /// Reverse animation: end value → -0.1. Called on HealFinished.
     /// </summary>
     public void CallShockWaveReverse()
     {
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEnd, -0.1f));
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEnd, -0.1f, _shockWaveTime));
     }
 
-    private IEnumerator ShockWaveAction(float startPos, float endPos)
+    /// <summary>
+    /// Quick reverse animation: current value → -0.1. Called on HealInterrupted.
+    /// </summary>
+    public void CallShockWaveReverseQuick()
+    {
+        if (_shockWaveCoroutine != null)
+            StopCoroutine(_shockWaveCoroutine);
+        
+        // Get current value and animate from there
+        float currentValue = _material.GetFloat(_waveDistanceFromCenter);
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(currentValue, -0.1f, _shockWaveTimeInterrupted));
+    }
+
+    private IEnumerator ShockWaveAction(float startPos, float endPos, float duration)
     {
         _material.SetFloat(_waveDistanceFromCenter, startPos);
 
         float elapsedTime = 0f;
 
-        while (elapsedTime < _shockWaveTime)
+        while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
 
-            float lerpedAmount = Mathf.Lerp(startPos, endPos, elapsedTime / _shockWaveTime);
+            float lerpedAmount = Mathf.Lerp(startPos, endPos, elapsedTime / duration);
             _material.SetFloat(_waveDistanceFromCenter, lerpedAmount);
 
             yield return null;
