@@ -15,6 +15,7 @@ public class ShockWaveSpriteController : MonoBehaviour
     private Material _material;
     private SignalBus _bus;
     private Camera _cinemachineOutputCamera;
+    private CinemachineCamera _virtualCamera;
 
     private static readonly int _waveDistanceFromCenter = Shader.PropertyToID("_WaveDistanceFromCenter");
     private static readonly int _ringSpawnPosition = Shader.PropertyToID("_RingSpawnPosition");
@@ -39,6 +40,12 @@ public class ShockWaveSpriteController : MonoBehaviour
         if (brain != null)
         {
             _cinemachineOutputCamera = brain.GetComponent<Camera>();
+            
+            // Get active virtual camera
+            if (brain.ActiveVirtualCamera is CinemachineCamera vcam)
+            {
+                _virtualCamera = vcam;
+            }
         }
         
         if (_cinemachineOutputCamera == null)
@@ -167,7 +174,45 @@ public class ShockWaveSpriteController : MonoBehaviour
         if (_shockWaveSpawnPoint == null || _cinemachineOutputCamera == null)
             return;
 
-        Vector3 viewportPos = _cinemachineOutputCamera.WorldToViewportPoint(_shockWaveSpawnPoint.position);
-        _material.SetVector(_ringSpawnPosition, new Vector2(viewportPos.x, viewportPos.y));
+        Vector2 viewportPos;
+
+        // If we have virtual camera with follow target, calculate position relative to where camera SHOULD be
+        if (_virtualCamera != null && _virtualCamera.Follow != null)
+        {
+            // Get the offset between spawn point and camera's follow target
+            Vector3 followTargetPos = _virtualCamera.Follow.position;
+            Vector3 spawnPointPos = _shockWaveSpawnPoint.position;
+            
+            // Calculate offset in world space
+            Vector3 offset = spawnPointPos - followTargetPos;
+            
+            // Convert offset to viewport space (assuming orthographic or known FOV)
+            // For orthographic camera:
+            if (_cinemachineOutputCamera.orthographic)
+            {
+                float orthoSize = _cinemachineOutputCamera.orthographicSize;
+                float aspect = _cinemachineOutputCamera.aspect;
+                
+                // Convert world offset to normalized viewport offset
+                float viewportOffsetX = offset.x / (orthoSize * 2f * aspect);
+                float viewportOffsetY = offset.y / (orthoSize * 2f);
+                
+                // Center (0.5, 0.5) + offset
+                viewportPos = new Vector2(0.5f + viewportOffsetX, 0.5f + viewportOffsetY);
+            }
+            else
+            {
+                // Fallback for perspective camera
+                viewportPos = _cinemachineOutputCamera.WorldToViewportPoint(spawnPointPos);
+            }
+        }
+        else
+        {
+            // Fallback to standard conversion
+            Vector3 vp = _cinemachineOutputCamera.WorldToViewportPoint(_shockWaveSpawnPoint.position);
+            viewportPos = new Vector2(vp.x, vp.y);
+        }
+
+        _material.SetVector(_ringSpawnPosition, viewportPos);
     }
 }
