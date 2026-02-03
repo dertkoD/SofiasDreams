@@ -116,6 +116,8 @@ public class ShockWaveSpriteController : MonoBehaviour
     /// </summary>
     public void CallShockWaveReverse()
     {
+        UpdateRingSpawnPosition();
+        
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
@@ -127,6 +129,8 @@ public class ShockWaveSpriteController : MonoBehaviour
     /// </summary>
     public void CallShockWaveReverseQuick()
     {
+        UpdateRingSpawnPosition();
+        
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
         
