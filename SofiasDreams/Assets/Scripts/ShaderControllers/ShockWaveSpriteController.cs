@@ -11,6 +11,10 @@ public class ShockWaveSpriteController : MonoBehaviour
     [SerializeField] private SpriteRenderer _shockWaveSpriteRenderer;
     [SerializeField] private Transform _spawnPointTransform;
     
+    [Header("Flip Compensation")]
+    [Tooltip("Transform that gets flipped (usually player root with scale.x = -1)")]
+    [SerializeField] private Transform _flipReference;
+    
     [Header("Timing")]
     [SerializeField] private float _shockWaveTime = 0.75f;
     [SerializeField] private float _shockWaveTimeReverse = 0.5f;
@@ -38,6 +42,28 @@ public class ShockWaveSpriteController : MonoBehaviour
             _shockWaveSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
         
         _material = _shockWaveSpriteRenderer.material;
+        
+        if (_flipReference == null)
+            _flipReference = transform;
+    }
+
+    private void LateUpdate()
+    {
+        // Compensate for parent flip to keep shader always facing the same way
+        if (_shockWaveSpriteRenderer != null && _flipReference != null)
+        {
+            Transform spriteTransform = _shockWaveSpriteRenderer.transform;
+            Vector3 localScale = spriteTransform.localScale;
+            
+            // If parent is flipped (scale.x < 0), counter it with negative local scale
+            float parentSign = Mathf.Sign(_flipReference.lossyScale.x);
+            float desiredLocalX = Mathf.Abs(localScale.x) * parentSign;
+            
+            if (!Mathf.Approximately(localScale.x, desiredLocalX))
+            {
+                spriteTransform.localScale = new Vector3(desiredLocalX, localScale.y, localScale.z);
+            }
+        }
     }
 
     private void OnEnable()
