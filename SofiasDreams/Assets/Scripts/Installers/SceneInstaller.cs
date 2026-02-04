@@ -50,10 +50,10 @@ public class SceneInstaller : MonoInstaller
             .UnderTransformGroup("Enemies_LazyMiniBoss");
 
         // Scene MonoBehaviours that need injection
-        Container.BindInterfacesAndSelfTo<CameraTargetBinder>()
+        Container.BindInterfacesAndSelfTo<ShockWaveSpriteController>()
             .FromComponentInHierarchy()
             .AsSingle();
-
+        
         Container.Bind<PlayerHUD>()
             .FromComponentInHierarchy()
             .AsSingle();
