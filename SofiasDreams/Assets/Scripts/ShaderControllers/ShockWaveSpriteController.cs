@@ -9,6 +9,7 @@ public class ShockWaveSpriteController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private SpriteRenderer _shockWaveSpriteRenderer;
+    [SerializeField] private Transform _spawnPointTransform;
     
     [Header("Timing")]
     [SerializeField] private float _shockWaveTime = 0.75f;
@@ -17,7 +18,6 @@ public class ShockWaveSpriteController : MonoBehaviour
     
     [Header("Wave Settings")]
     [SerializeField] private float _waveDistanceEnd = 1f;
-    [SerializeField] private Vector2 _ringSpawnPosition = new Vector2(0.5f, 0.5f);
 
     private Coroutine _shockWaveCoroutine;
     private Material _material;
@@ -51,7 +51,7 @@ public class ShockWaveSpriteController : MonoBehaviour
         
         // Initialize to hidden state
         _material.SetFloat(_waveDistanceFromCenter, -0.1f);
-        _material.SetVector(_ringSpawnPositionId, _ringSpawnPosition);
+        UpdateRingSpawnPosition();
     }
 
     private void OnDisable()
@@ -81,6 +81,8 @@ public class ShockWaveSpriteController : MonoBehaviour
 
     public void CallShockWaveForward()
     {
+        UpdateRingSpawnPosition();
+        
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
@@ -121,5 +123,25 @@ public class ShockWaveSpriteController : MonoBehaviour
         }
         
         _material.SetFloat(_waveDistanceFromCenter, endPos);
+    }
+
+    private void UpdateRingSpawnPosition()
+    {
+        if (_spawnPointTransform == null || _shockWaveSpriteRenderer == null)
+        {
+            // Default to center if no transform assigned
+            _material.SetVector(_ringSpawnPositionId, new Vector2(0.5f, 0.5f));
+            return;
+        }
+
+        // Convert spawn point world position to sprite's local UV coordinates
+        Bounds bounds = _shockWaveSpriteRenderer.bounds;
+        Vector3 spawnPos = _spawnPointTransform.position;
+
+        // Normalize position within sprite bounds (0-1)
+        float u = (spawnPos.x - bounds.min.x) / bounds.size.x;
+        float v = (spawnPos.y - bounds.min.y) / bounds.size.y;
+
+        _material.SetVector(_ringSpawnPositionId, new Vector2(u, v));
     }
 }
