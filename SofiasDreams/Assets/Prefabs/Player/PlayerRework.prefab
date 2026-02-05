@@ -1328,10 +1328,16 @@ MonoBehaviour:
   _shockWaveSpriteRenderer: {fileID: 6135130721675433347}
   _spawnPointTransform: {fileID: 2610042201446187723}
   _flipReference: {fileID: 4225169607234761225}
-  _shockWaveTime: 0.4
-  _shockWaveTimeReverse: 0.5
-  _shockWaveTimeInterrupted: 0.15
-  _waveDistanceEnd: 0.03
+  _shockWaveTimeHealing: 0.3
+  _shockWaveTimeReverseHealing: 0.4
+  _shockWaveTimeInterruptedHealing: 0.15
+  _shockWaveSizeHealing: 0.01
+  _shockWaveStrengthHealing: 0.15
+  _waveDistanceEndHealing: 0.03
+  _shockWaveTimeDashing: 0.65
+  _shockWaveSizeDashing: 0.03
+  _shockWaveStrengthDashing: 0.15
+  _waveDistanceEndDashing: 1
 --- !u!1 &5588803443986654724
 GameObject:
   m_ObjectHideFlags: 0

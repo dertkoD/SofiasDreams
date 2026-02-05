@@ -74,8 +74,8 @@ public class CameraShakeService : MonoBehaviour
         // _bus.Subscribe<HealFinished>(OnHealFinished);
         // _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
         //
-        // _bus.Subscribe<DashStarted>(OnDashStarted);
-        // _bus.Subscribe<DashFinished>(OnDashFinished);
+        _bus.Subscribe<DashStarted>(OnDashStarted);
+        _bus.Subscribe<DashFinished>(OnDashFinished);
     }
 
     void OnDisable()
@@ -89,9 +89,9 @@ public class CameraShakeService : MonoBehaviour
         // _bus.Unsubscribe<HealStarted>(OnHealStarted);
         // _bus.Unsubscribe<HealFinished>(OnHealFinished);
         // _bus.Unsubscribe<HealInterrupted>(OnHealInterrupted);
-        //
-        // _bus.Unsubscribe<DashStarted>(OnDashStarted);
-        // _bus.Unsubscribe<DashFinished>(OnDashFinished);
+        
+        _bus.Unsubscribe<DashStarted>(OnDashStarted);
+        _bus.Unsubscribe<DashFinished>(OnDashFinished);
     }
     
     void OnBossFloorBroken()
@@ -132,7 +132,7 @@ public class CameraShakeService : MonoBehaviour
             StopCoroutine(_healShakeCo);
             _healShakeCo = null;
         }
-    }
+    }*/
     
     void OnDashStarted(DashStarted signal)
     {
@@ -158,18 +158,14 @@ public class CameraShakeService : MonoBehaviour
             Shake(force);
             yield return new WaitForSeconds(_config.continuousShakeFrequency > 0 ? _config.continuousShakeFrequency : 0.05f);
         }
-    }*/
+    }
 
     void Shake(float force)
     {
         if (_impulseSource != null)
         {
-            // Генерируем случайный вектор направления для тряски (X, Y)
-            // Это создаст более живое ощущение "тряски", чем просто удар в одну сторону
             Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f).normalized;
             
-            // Передаем вектор скорости. Это переопределит Default Velocity в инспекторе,
-            // но сохранит форму кривой (Impulse Shape) и длительность.
             _impulseSource.GenerateImpulse(randomDirection * force);
         }
     }

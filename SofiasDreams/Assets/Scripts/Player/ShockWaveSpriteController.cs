@@ -12,13 +12,19 @@ public class ShockWaveSpriteController : MonoBehaviour
     [Tooltip("Transform that gets flipped (usually player root with scale.x = -1)")]
     [SerializeField] private Transform _flipReference;
     
-    [Header("Timing")]
-    [SerializeField] private float _shockWaveTime = 0.75f;
-    [SerializeField] private float _shockWaveTimeReverse = 0.5f;
-    [SerializeField] private float _shockWaveTimeInterrupted = 0.15f;
+    [Header("Healing parameters")]
+    [SerializeField] private float _shockWaveTimeHealing = 0.75f;
+    [SerializeField] private float _shockWaveTimeReverseHealing = 0.5f;
+    [SerializeField] private float _shockWaveTimeInterruptedHealing = 0.15f;
+    [SerializeField] private float _shockWaveSizeHealing = 0.01f;
+    [SerializeField] private float _shockWaveStrengthHealing = -0.13f;
+    [SerializeField] private float _waveDistanceEndHealing = 0.03f;
     
-    [Header("Wave Settings")]
-    [SerializeField] private float _waveDistanceEnd = 1f;
+    [Header("Dashing parameters")]
+    [SerializeField] private float _shockWaveTimeDashing = 0.75f;
+    [SerializeField] private float _shockWaveSizeDashing = 0.01f;
+    [SerializeField] private float _shockWaveStrengthDashing = -0.13f;
+    [SerializeField] private float _waveDistanceEndDashing = 1f;
 
     private Coroutine _shockWaveCoroutine;
     private Material _material;
@@ -26,6 +32,8 @@ public class ShockWaveSpriteController : MonoBehaviour
 
     private static readonly int _waveDistanceFromCenter = Shader.PropertyToID("_WaveDistanceFromCenter");
     private static readonly int _ringSpawnPositionId = Shader.PropertyToID("_RingSpawnPosition");
+    private static readonly int _shockWaveSize = Shader.PropertyToID("_Size");
+    private static readonly int _shockWaveStrength = Shader.PropertyToID("_ShockWaveStrength");
 
     [Inject]
     public void Inject(SignalBus bus)
@@ -70,8 +78,9 @@ public class ShockWaveSpriteController : MonoBehaviour
             _bus.Subscribe<HealStarted>(OnHealStarted);
             _bus.Subscribe<HealFinished>(OnHealFinished);
             _bus.Subscribe<HealInterrupted>(OnHealInterrupted);
+            //_bus.Subscribe<DashStarted>(OnDashStarted);
         }
-        
+
         // Initialize to hidden state
         _material.SetFloat(_waveDistanceFromCenter, -0.1f);
         UpdateRingSpawnPosition();
@@ -84,12 +93,13 @@ public class ShockWaveSpriteController : MonoBehaviour
             _bus.TryUnsubscribe<HealStarted>(OnHealStarted);
             _bus.TryUnsubscribe<HealFinished>(OnHealFinished);
             _bus.TryUnsubscribe<HealInterrupted>(OnHealInterrupted);
+            //_bus.TryUnsubscribe<DashStarted>(OnDashStarted);
         }
     }
 
     private void OnHealStarted(HealStarted signal)
     {
-        CallShockWaveForward();
+        CallShockWaveForward(true);
     }
 
     private void OnHealFinished(HealFinished signal)
@@ -101,15 +111,31 @@ public class ShockWaveSpriteController : MonoBehaviour
     {
         CallShockWaveReverseQuick();
     }
+    
+    private void OnDashStarted(DashStarted signal)
+    {
+        CallShockWaveForward(false);
+    }
 
-    public void CallShockWaveForward()
+    public void CallShockWaveForward(bool bHealing)
     {
         UpdateRingSpawnPosition();
         
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
-            
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(-0.1f, _waveDistanceEnd, _shockWaveTime));
+
+        if (bHealing)
+        {
+            _material.SetFloat(_shockWaveSize, _shockWaveSizeHealing);
+            _material.SetFloat(_shockWaveStrength, _shockWaveStrengthHealing);
+            _shockWaveCoroutine = StartCoroutine(ShockWaveAction(-0.1f, _waveDistanceEndHealing, _shockWaveTimeHealing));
+        }
+        else
+        {
+            _material.SetFloat(_shockWaveSize, _shockWaveSizeDashing);
+            _material.SetFloat(_shockWaveStrength, _shockWaveStrengthDashing);
+            _shockWaveCoroutine = StartCoroutine(ShockWaveAction(-0.1f, _waveDistanceEndDashing, _shockWaveTimeDashing));
+        }
     }
 
     public void CallShockWaveReverse()
@@ -117,7 +143,7 @@ public class ShockWaveSpriteController : MonoBehaviour
         if (_shockWaveCoroutine != null)
             StopCoroutine(_shockWaveCoroutine);
             
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEnd, -0.1f, _shockWaveTimeReverse));
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(_waveDistanceEndHealing, -0.1f, _shockWaveTimeReverseHealing));
     }
 
     public void CallShockWaveReverseQuick()
@@ -126,7 +152,7 @@ public class ShockWaveSpriteController : MonoBehaviour
             StopCoroutine(_shockWaveCoroutine);
         
         float currentValue = _material.GetFloat(_waveDistanceFromCenter);
-        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(currentValue, -0.1f, _shockWaveTimeInterrupted));
+        _shockWaveCoroutine = StartCoroutine(ShockWaveAction(currentValue, -0.1f, _shockWaveTimeInterruptedHealing));
     }
 
     private IEnumerator ShockWaveAction(float startPos, float endPos, float duration)

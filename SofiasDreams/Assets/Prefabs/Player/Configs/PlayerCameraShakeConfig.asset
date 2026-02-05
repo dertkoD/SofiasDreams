@@ -16,8 +16,9 @@ MonoBehaviour:
   attackWhitoutHit: 0
   enemyHitForce: 0.5
   damageTakenForce: 1
+  floorBreakForce: 1
   healShakeForce: 0.1
-  dashShakeForce: 0.1
+  dashShakeForce: 0.05
   continuousShakeFrequency: 0.05
   vignetteIntensity: 0.55
   vignetteDuration: 0.75
