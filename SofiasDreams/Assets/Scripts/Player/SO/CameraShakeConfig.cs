@@ -18,7 +18,10 @@ public class CameraShakeConfig : ScriptableObject
 
     [Header("Continuous Shakes")]
     public float healShakeForce = 0.1f;
-    public float dashShakeForce = 0.1f;
+    
+    [Header("Dash Shake")]
+    public float dashShakeForceX = 0.1f;
+    public float dashShakeForceY = 0.1f;
     public float continuousShakeFrequency = 0.05f;
 
     [Header("Damage Vignette")]
