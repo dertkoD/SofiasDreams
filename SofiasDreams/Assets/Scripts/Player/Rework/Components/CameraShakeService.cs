@@ -137,7 +137,7 @@ public class CameraShakeService : MonoBehaviour
     void OnDashStarted(DashStarted signal)
     {
         StopDashShake();
-        _dashShakeCo = StartCoroutine(ContinuousShakeRoutine(_config.dashShakeForce));
+        _dashShakeCo = StartCoroutine(DashShakeRoutine());
     }
     
     void OnDashFinished(DashFinished signal) => StopDashShake();
@@ -159,6 +159,15 @@ public class CameraShakeService : MonoBehaviour
             yield return new WaitForSeconds(_config.continuousShakeFrequency > 0 ? _config.continuousShakeFrequency : 0.05f);
         }
     }
+    
+    IEnumerator DashShakeRoutine()
+    {
+        while (true)
+        {
+            Shake(_config.dashShakeForceX, _config.dashShakeForceY);
+            yield return new WaitForSeconds(_config.continuousShakeFrequency > 0 ? _config.continuousShakeFrequency : 0.05f);
+        }
+    }
 
     void Shake(float force)
     {
@@ -167,6 +176,20 @@ public class CameraShakeService : MonoBehaviour
             Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f).normalized;
             
             _impulseSource.GenerateImpulse(randomDirection * force);
+        }
+    }
+    
+    void Shake(float forceX, float forceY)
+    {
+        if (_impulseSource != null)
+        {
+            Vector3 randomDirection = new Vector3(
+                Random.Range(-1f, 1f) * forceX, 
+                Random.Range(-1f, 1f) * forceY, 
+                0f
+            );
+            
+            _impulseSource.GenerateImpulse(randomDirection);
         }
     }
     
