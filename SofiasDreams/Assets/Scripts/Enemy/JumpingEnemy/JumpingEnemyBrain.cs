@@ -152,9 +152,10 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         if (Anim != null && Motor != null)
         {
-            bool inTrigger = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
-            bool stableGround = IsStableOnGround();
-            Motor.SetFrozen(inTrigger && stableGround && !JumpBool);
+            bool inTriggerAnim = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
+            bool inAggroTriggerState = CurrentState == AggroTriggerState;
+            bool grounded = Motor.IsGrounded && !JumpBool;
+            Motor.SetFrozen((inTriggerAnim || inAggroTriggerState) && grounded);
         }
 
         TickAnimatorParams();
