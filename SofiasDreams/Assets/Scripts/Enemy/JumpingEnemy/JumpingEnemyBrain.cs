@@ -64,6 +64,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float PrevY;
     [HideInInspector] public float LandingStunUntil;
     [HideInInspector] public float LastJumpStartedAt;
+    [HideInInspector] public float JumpStartVy;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -230,14 +231,11 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        // Compute normalized yVelocity for blend trees: 1 = going up, 0 = peak, -1 = falling
+        // Normalized yVelocity from rb: 1 = going up, 0 = peak, -1 = falling
         float yParam = 0f;
         if (JumpBool)
         {
-            bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
-            float jumpHeight = isAggro ? Config.aggroJumpHeight : Config.patrolJumpHeight;
-            float g = Mathf.Abs(Physics2D.gravity.y * (Motor.Rigidbody != null ? Motor.Rigidbody.gravityScale : 1f));
-            float maxVy = (g > 0f && jumpHeight > 0f) ? Mathf.Sqrt(2f * g * jumpHeight) : 1f;
+            float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
             yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
         }
 
@@ -310,6 +308,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         JumpBool = true;
         LastJumpStartedAt = Time.time;
+        JumpStartVy = Motor.Velocity.y;
         Anim.SetJump(true);
         return true;
     }
