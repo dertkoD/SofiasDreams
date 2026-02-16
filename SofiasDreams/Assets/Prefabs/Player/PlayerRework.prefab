@@ -326,6 +326,7 @@ GameObject:
   - component: {fileID: 8145989154712843356}
   - component: {fileID: 4575646902207013832}
   - component: {fileID: 8026534820593938046}
+  - component: {fileID: 1573057834305744189}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -350,6 +351,7 @@ Transform:
   - {fileID: 6148590750428317015}
   - {fileID: 6297661449941217374}
   - {fileID: 8712056195396883696}
+  - {fileID: 8812443002676130616}
   - {fileID: 5782165281123169340}
   - {fileID: 6787567438191937835}
   - {fileID: 2650796127034818553}
@@ -850,6 +852,83 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteDissolveController
   spriteRenderer: {fileID: 1582578690030096884}
+--- !u!114 &1573057834305744189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.ShadowCaster2D
+  m_ShadowGroup: 0
+  m_Priority: 0
+  m_ComponentVersion: 5
+  m_HasRenderer: 0
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_AlphaCutoff: 0.1
+  m_ApplyToSortingLayers: 6dc8c91f
+  m_ShapePath:
+  - {x: -0.37047336, y: -1.5830363, z: 0}
+  - {x: -0.33638823, y: -0.80791414, z: 0}
+  - {x: -0.19948594, y: -0.2668242, z: 0}
+  - {x: -0.4406947, y: 0.287304, z: 0}
+  - {x: -0.43417552, y: 1.2260624, z: 0}
+  - {x: -0.37550315, y: 1.8127865, z: 0}
+  - {x: -0.71449924, y: 2.177859, z: 0}
+  - {x: -0.71971154, y: 2.7298489, z: 0}
+  - {x: -0.65324163, y: 2.8736453, z: 0}
+  - {x: -0.58940274, y: 2.9872088, z: 0}
+  - {x: -0.42977446, y: 3.0621364, z: 0}
+  - {x: -0.22779578, y: 3.1012292, z: 0}
+  - {x: 0.0264586, y: 3.077402, z: 0}
+  - {x: 0.169079, y: 3.1149027, z: 0}
+  - {x: 0.34668505, y: 3.156368, z: 0}
+  - {x: 0.4814613, y: 3.0312188, z: 0}
+  - {x: 0.6646878, y: 2.624981, z: 0}
+  - {x: 0.5517751, y: 2.6929624, z: 0}
+  - {x: 0.56614643, y: 2.419906, z: 0}
+  - {x: 0.61405104, y: 2.4007442, z: 0}
+  - {x: 0.5853083, y: 1.950441, z: 0}
+  - {x: 0.18770002, y: 1.8833745, z: 0}
+  - {x: 0.50458264, y: 1.0565647, z: 0}
+  - {x: 0.42635307, y: 0.09824867, z: 0}
+  - {x: 0.17210591, y: -0.4167648, z: 0}
+  - {x: 0.17210592, y: -0.86658657, z: 0}
+  - {x: 0.23729746, y: -1.2186209, z: 0}
+  - {x: 0.5436978, y: -1.3359658, z: 0}
+  - {x: 0.59212464, y: -1.5374018, z: 0}
+  m_ShapePathHash: 592176440
+  m_InstanceId: 0
+  m_ShadowShape2DComponent: {fileID: 0}
+  m_ShadowShape2DProvider:
+    rid: -2
+  m_ShadowCastingSource: 0
+  m_ShadowMesh:
+    m_Mesh: {fileID: 0}
+    m_LocalBounds:
+      m_Center: {x: -0.027511835, y: 0.7866658, z: 0}
+      m_Extent: {x: 0.6921997, y: 2.369702, z: 0}
+    m_EdgeProcessing: 1
+    m_TrimEdge: 0
+    m_FlipX: 0
+    m_FlipY: 0
+    m_InitialTrim: 0
+  m_CastingOption: 1
+  m_PreviousTrimEdge: 0
+  m_PreviousEdgeProcessing: 1
+  m_PreviousShadowCastingSource: 0
+  m_PreviousShadowShape2DSource: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,7 +989,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bb93c89fa11476e47a9bc940ed1a641f, type: 2}
+  - {fileID: 2100000, guid: c1d655dc94c98ac4fab42dcd538027d0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -929,8 +1008,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1467800431
+  m_SortingLayer: 2
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: a9248ea569a598a42a87018d40a4862a, type: 3}
@@ -1460,6 +1539,90 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
+--- !u!1 &6955696926853698063
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8812443002676130616}
+  - component: {fileID: 2735072684452508870}
+  m_Layer: 6
+  m_Name: Spot Light 2D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8812443002676130616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955696926853698063}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.0120617105, w: 0.9999273}
+  m_LocalPosition: {x: 0, y: 1.59, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4225169607234761225}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2735072684452508870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6955696926853698063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
+  m_ComponentVersion: 2
+  m_LightType: 3
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 0.322
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_LightVolumeIntensity: 1
+  m_LightVolumeEnabled: 0
+  m_ApplyToSortingLayers: 912483a800000000
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 0
+  m_UseNormalMap: 0
+  m_ShadowsEnabled: 1
+  m_ShadowIntensity: 0.75
+  m_ShadowSoftness: 0.3
+  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0
+  m_PointLightOuterRadius: 6.34148
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.5
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: -0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: -0.5, z: 0}
+  - {x: 0.5, y: 0.5, z: 0}
+  - {x: -0.5, y: 0.5, z: 0}
 --- !u!1 &7899828774994949165
 GameObject:
   m_ObjectHideFlags: 0

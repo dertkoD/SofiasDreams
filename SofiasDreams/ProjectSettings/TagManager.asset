@@ -55,6 +55,9 @@ TagManager:
   - name: CameraSortingLayer
     uniqueID: 533317741
     locked: 0
+  - name: Player
+    uniqueID: 2827166865
+    locked: 0
   m_RenderingLayers:
   - Default
   - Light Layer 1
