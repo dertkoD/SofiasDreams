@@ -92,6 +92,19 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetTrigger(_deathAttackHash);
     }
 
+    /// <summary>
+    /// Restarts the active blend tree state from normalized time 0.
+    /// Call when the jump phase changes so the new dominant clip plays from its first frame.
+    /// </summary>
+    public void RestartBlendTree(bool isAggro)
+    {
+        if (!_animator) return;
+        string state = isAggro ? _agroBlendStateName : _patrolBlendStateName;
+        var info = _animator.GetCurrentAnimatorStateInfo(0);
+        if (info.IsName(state))
+            _animator.Play(state, 0, 0f);
+    }
+
     public bool IsInAttackLoop()
     {
         if (!_animator) return false;
