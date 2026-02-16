@@ -589,10 +589,12 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
 public class JumpingAggroTriggerState : IEnemyState
 {
     JumpingEnemyBrain _brain;
+    bool _triggerFired;
     public JumpingAggroTriggerState(JumpingEnemyBrain brain) { _brain = brain; }
 
     public void Enter()
     {
+        _triggerFired = false;
         _brain.LostSightTimerRunning = false;
         _brain.Motor?.StopAll();
         
@@ -605,12 +607,24 @@ public class JumpingAggroTriggerState : IEnemyState
 
         _brain.JumpBool = false;
         _brain.Anim?.SetJump(false);
-        _brain.Anim?.TriggerAgro();
+
+        if (_brain.IsStableOnGround())
+        {
+            _brain.Anim?.TriggerAgro();
+            _triggerFired = true;
+        }
     }
 
     public void Tick()
     {
-        if (_brain.Anim.IsInAttackLoop())
+        if (!_triggerFired && _brain.IsStableOnGround())
+        {
+            _brain.Motor?.StopAll();
+            _brain.Anim?.TriggerAgro();
+            _triggerFired = true;
+        }
+
+        if (_triggerFired && _brain.Anim.IsInAttackLoop())
         {
             _brain.ChangeState(_brain.AggroState);
         }
@@ -657,10 +671,12 @@ public class JumpingAggroState : IEnemyState
 public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
 {
     JumpingEnemyBrain _brain;
+    bool _triggerFired;
     public JumpingReturnState(JumpingEnemyBrain brain) { _brain = brain; }
 
     public void Enter()
     {
+        _triggerFired = false;
         _brain.HasLastSeen = false;
         _brain.HasChaseDir = false;
         _brain.HasSeenPlayerAtLeastOnce = false;
@@ -679,13 +695,26 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
         }
 
         _brain.Anim?.SetJump(false);
-        _brain.Anim?.TriggerPatrol();
+
+        if (_brain.IsStableOnGround())
+        {
+            _brain.Anim?.TriggerPatrol();
+            _triggerFired = true;
+        }
+
         _brain.NextJumpAt = Time.time + 0.05f;
     }
 
     public void Tick()
     {
         if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var _)) { _brain.RequestAggroTrigger(); return; }
+
+        if (!_triggerFired && _brain.IsStableOnGround())
+        {
+            _brain.Motor?.StopAll();
+            _brain.Anim?.TriggerPatrol();
+            _triggerFired = true;
+        }
 
         if (_brain.Anim != null && _brain.Anim.IsInPatrolTrigger()) return;
 
