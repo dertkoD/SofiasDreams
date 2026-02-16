@@ -54,14 +54,22 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetBool(_jumpHash, value);
     }
 
-    public void SetPatrolYVelocity(float positiveY)
+    /// <summary>
+    /// Sets the patrol blend tree parameter. Expected range [-1, 1]:
+    ///  1 = going up (windup), 0 = peak (high point), -1 = falling (landing).
+    /// </summary>
+    public void SetPatrolYVelocity(float normalizedY)
     {
-        if (_animator) _animator.SetFloat(_yPatrolHash, positiveY);
+        if (_animator) _animator.SetFloat(_yPatrolHash, normalizedY);
     }
 
-    public void SetAttackYVelocity(float positiveY)
+    /// <summary>
+    /// Sets the attack/agro blend tree parameter. Expected range [-1, 1]:
+    ///  1 = going up (windup), 0 = peak (high point), -1 = falling (landing).
+    /// </summary>
+    public void SetAttackYVelocity(float normalizedY)
     {
-        if (_animator) _animator.SetFloat(_yAttackHash, positiveY);
+        if (_animator) _animator.SetFloat(_yAttackHash, normalizedY);
     }
 
     public void TriggerAgro()

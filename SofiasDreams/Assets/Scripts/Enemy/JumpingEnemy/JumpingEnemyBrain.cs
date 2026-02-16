@@ -229,7 +229,16 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        float yParam = JumpBool ? (Mathf.Abs(y) + 0.01f) : 0f;
+        // Compute normalized yVelocity for blend trees: 1 = going up, 0 = peak, -1 = falling
+        float yParam = 0f;
+        if (JumpBool)
+        {
+            bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
+            float jumpHeight = isAggro ? Config.aggroJumpHeight : Config.patrolJumpHeight;
+            float g = Mathf.Abs(Physics2D.gravity.y * (Motor.Rigidbody != null ? Motor.Rigidbody.gravityScale : 1f));
+            float maxVy = (g > 0f && jumpHeight > 0f) ? Mathf.Sqrt(2f * g * jumpHeight) : 1f;
+            yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
+        }
 
         if (CurrentState == AggroState || CurrentState == AggroTriggerState)
             Anim.SetAttackYVelocity(yParam);
