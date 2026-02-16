@@ -7,8 +7,8 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
 
     [Header("Animator params (names must match controller)")]
     [SerializeField] string _jumpBool = "Jump";
-    [SerializeField] string _yVelocityPatrol = "yVelocityPatrol";
-    [SerializeField] string _yVelocityAttack = "yVelocityAttack";
+    [SerializeField] string _triggerPoint = "TriggerPoint";
+    [SerializeField] string _triggerLanding = "TriggerLanding";
     [SerializeField] string _agroTrigger = "Agro";
     [SerializeField] string _patrolTrigger = "Patrol";
     [SerializeField] string _deathFromPatrolTrigger = "DeathFromPatrol";
@@ -19,12 +19,16 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [SerializeField] string _patrolTriggerStateName = "PatrolTrigger";
     [SerializeField] string _agroTriggerStateName = "AgroTrigger";
     [SerializeField] string _attackStateName = "Attack";
-    [SerializeField] string _agroBlendStateName = "Blend Tree Agro";
-    [SerializeField] string _patrolBlendStateName = "Blend Tree Patrol";
+    [SerializeField] string _patrolWindupStateName = "PatrolWindup";
+    [SerializeField] string _hightPointPatrolStateName = "HightPointPatrol";
+    [SerializeField] string _patrolLandingStateName = "PatrolLanding";
+    [SerializeField] string _attackWindupStateName = "AttackWindup";
+    [SerializeField] string _hightPointAttackStateName = "HightPointAttack";
+    [SerializeField] string _attackLandingStateName = "AttackLanding";
 
     int _jumpHash;
-    int _yPatrolHash;
-    int _yAttackHash;
+    int _triggerPointHash;
+    int _triggerLandingHash;
     int _agroHash;
     int _patrolHash;
     int _deathPatrolHash;
@@ -41,8 +45,8 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
             _animator = GetComponentInChildren<Animator>(true);
 
         _jumpHash = Animator.StringToHash(_jumpBool);
-        _yPatrolHash = Animator.StringToHash(_yVelocityPatrol);
-        _yAttackHash = Animator.StringToHash(_yVelocityAttack);
+        _triggerPointHash = Animator.StringToHash(_triggerPoint);
+        _triggerLandingHash = Animator.StringToHash(_triggerLanding);
         _agroHash = Animator.StringToHash(_agroTrigger);
         _patrolHash = Animator.StringToHash(_patrolTrigger);
         _deathPatrolHash = Animator.StringToHash(_deathFromPatrolTrigger);
@@ -54,22 +58,14 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetBool(_jumpHash, value);
     }
 
-    /// <summary>
-    /// Sets the patrol blend tree parameter. Expected range [-1, 1]:
-    ///  1 = going up (windup), 0 = peak (high point), -1 = falling (landing).
-    /// </summary>
-    public void SetPatrolYVelocity(float normalizedY)
+    public void FireTriggerPoint()
     {
-        if (_animator) _animator.SetFloat(_yPatrolHash, normalizedY);
+        if (_animator) _animator.SetTrigger(_triggerPointHash);
     }
 
-    /// <summary>
-    /// Sets the attack/agro blend tree parameter. Expected range [-1, 1]:
-    ///  1 = going up (windup), 0 = peak (high point), -1 = falling (landing).
-    /// </summary>
-    public void SetAttackYVelocity(float normalizedY)
+    public void FireTriggerLanding()
     {
-        if (_animator) _animator.SetFloat(_yAttackHash, normalizedY);
+        if (_animator) _animator.SetTrigger(_triggerLandingHash);
     }
 
     public void TriggerAgro()
@@ -96,7 +92,10 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     {
         if (!_animator) return false;
         var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_attackStateName) || s.IsName(_agroBlendStateName);
+        return s.IsName(_attackStateName)
+            || s.IsName(_attackWindupStateName)
+            || s.IsName(_hightPointAttackStateName)
+            || s.IsName(_attackLandingStateName);
     }
 
     public bool IsInAgroTrigger()
@@ -115,7 +114,9 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     {
         if (!_animator) return false;
         var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_patrolStateName) || s.IsName(_patrolBlendStateName);
+        return s.IsName(_patrolStateName)
+            || s.IsName(_patrolWindupStateName)
+            || s.IsName(_hightPointPatrolStateName)
+            || s.IsName(_patrolLandingStateName);
     }
 }
-

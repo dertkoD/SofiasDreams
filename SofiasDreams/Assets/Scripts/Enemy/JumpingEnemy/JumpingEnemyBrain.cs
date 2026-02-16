@@ -64,7 +64,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float PrevY;
     [HideInInspector] public float LandingStunUntil;
     [HideInInspector] public float LastJumpStartedAt;
-    [HideInInspector] public float JumpStartVy;
+    [HideInInspector] public int JumpPhase; // 0=ground, 1=rising, 2=peak, 3=falling
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -210,6 +210,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
+            JumpPhase = 0;
             Anim.SetJump(false);
 
             if (CurrentState is IJumpingState js) js.OnLanded();
@@ -231,18 +232,21 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        // Normalized yVelocity from rb: 1 = going up, 0 = peak, -1 = falling
-        float yParam = 0f;
+        // Phase-based triggers: Windup → TriggerPoint → HighPoint → TriggerLanding → Landing
         if (JumpBool)
         {
-            float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
-            yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
-        }
+            if (JumpPhase == 1 && y <= 0f)
+            {
+                JumpPhase = 2;
+                Anim.FireTriggerPoint();
+            }
 
-        if (CurrentState == AggroState || CurrentState == AggroTriggerState)
-            Anim.SetAttackYVelocity(yParam);
-        else
-            Anim.SetPatrolYVelocity(yParam);
+            if (JumpPhase == 2 && y < 0f)
+            {
+                JumpPhase = 3;
+                Anim.FireTriggerLanding();
+            }
+        }
 
         PrevGrounded = grounded;
         PrevY = y;
@@ -307,8 +311,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (!ok) return false;
 
         JumpBool = true;
+        JumpPhase = 1;
         LastJumpStartedAt = Time.time;
-        JumpStartVy = Motor.Velocity.y;
         Anim.SetJump(true);
         return true;
     }
