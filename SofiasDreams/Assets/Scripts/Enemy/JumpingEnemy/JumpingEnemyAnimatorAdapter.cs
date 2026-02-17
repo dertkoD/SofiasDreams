@@ -27,6 +27,8 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     int _patrolHash;
     int _deathPatrolHash;
     int _deathAttackHash;
+    int _patrolBlendHash;
+    int _agroBlendHash;
 
     void Reset()
     {
@@ -44,6 +46,8 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         _patrolHash = Animator.StringToHash(_patrolTrigger);
         _deathPatrolHash = Animator.StringToHash(_deathFromPatrolTrigger);
         _deathAttackHash = Animator.StringToHash(_deathFromAttackTrigger);
+        _patrolBlendHash = Animator.StringToHash(_patrolBlendStateName);
+        _agroBlendHash = Animator.StringToHash(_agroBlendStateName);
     }
 
     public void SetJump(bool value)
@@ -54,6 +58,19 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public void SetYVelocity(float value)
     {
         if (_animator) _animator.SetFloat(_yVelocityHash, value);
+    }
+
+    /// <summary>
+    /// Restarts the active blend tree state from normalizedTime 0 so the
+    /// landing clip plays from its first frame when the jump phase changes.
+    /// </summary>
+    public void RestartBlendTree(bool isAggro)
+    {
+        if (!_animator) return;
+        int hash = isAggro ? _agroBlendHash : _patrolBlendHash;
+        var info = _animator.GetCurrentAnimatorStateInfo(0);
+        if (info.shortNameHash == hash)
+            _animator.Play(hash, 0, 0f);
     }
 
     public void TriggerAgro()

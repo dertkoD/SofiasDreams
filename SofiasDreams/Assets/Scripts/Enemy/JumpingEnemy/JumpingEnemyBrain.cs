@@ -237,6 +237,13 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         {
             float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
             yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
+
+            // Restart blend tree at the peak so the Landing clip plays from frame 0
+            if (PrevY > 0f && y <= 0f)
+            {
+                bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
+                Anim.RestartBlendTree(isAggro);
+            }
         }
         Anim.SetYVelocity(yParam);
 
