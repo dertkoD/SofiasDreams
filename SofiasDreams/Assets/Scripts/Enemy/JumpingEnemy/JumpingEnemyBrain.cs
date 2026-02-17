@@ -143,7 +143,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             {
                 Motor.StopHorizontal();
                 JumpBool = false; 
-                Anim.SetJump(false); 
                 TickAnimatorParams();
                 return;
             }
@@ -210,7 +209,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
-            Anim.SetJump(false);
 
             if (CurrentState is IJumpingState js) js.OnLanded();
 
@@ -312,7 +310,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         JumpBool = true;
         LastJumpStartedAt = Time.time;
         JumpStartVy = Motor.Velocity.y;
-        Anim.SetJump(true);
         return true;
     }
 
@@ -609,7 +606,6 @@ public class JumpingAggroTriggerState : IEnemyState
         }
 
         _brain.JumpBool = false;
-        _brain.Anim?.SetJump(false);
 
         if (_brain.IsStableOnGround())
         {
@@ -696,8 +692,6 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
             _brain.ReturnTargetIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
             _brain.PathIndex = _brain.ReturnTargetIndex;
         }
-
-        _brain.Anim?.SetJump(false);
 
         if (_brain.IsStableOnGround())
         {
@@ -818,7 +812,6 @@ public class JumpingDeadState : IEnemyState
         _brain.Motor?.StopHorizontal();
         if (_brain.Anim != null)
         {
-            _brain.Anim.SetJump(false);
             bool fromAttack = prev == _brain.AggroState || prev == _brain.AggroTriggerState || _brain.Anim.IsInAttackLoop();
             if (fromAttack) _brain.Anim.TriggerDeathFromAttack();
             else _brain.Anim.TriggerDeathFromPatrol();

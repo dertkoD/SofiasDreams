@@ -6,7 +6,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [SerializeField] Animator _animator;
 
     [Header("Animator params (names must match controller)")]
-    [SerializeField] string _jumpBool = "Jump";
     [SerializeField] string _yVelocity = "yVelocity";
     [SerializeField] string _agroTrigger = "Agro";
     [SerializeField] string _patrolTrigger = "Patrol";
@@ -14,14 +13,11 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [SerializeField] string _deathFromAttackTrigger = "DeathFromAttack";
 
     [Header("Animator states (names must match controller)")]
-    [SerializeField] string _patrolStateName = "Patrol";
     [SerializeField] string _patrolTriggerStateName = "PatrolTrigger";
     [SerializeField] string _agroTriggerStateName = "AgroTrigger";
-    [SerializeField] string _attackStateName = "Attack";
     [SerializeField] string _patrolBlendStateName = "PatrolBlendTree";
     [SerializeField] string _agroBlendStateName = "AgroBlendTree";
 
-    int _jumpHash;
     int _yVelocityHash;
     int _agroHash;
     int _patrolHash;
@@ -40,7 +36,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>(true);
 
-        _jumpHash = Animator.StringToHash(_jumpBool);
         _yVelocityHash = Animator.StringToHash(_yVelocity);
         _agroHash = Animator.StringToHash(_agroTrigger);
         _patrolHash = Animator.StringToHash(_patrolTrigger);
@@ -48,11 +43,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         _deathAttackHash = Animator.StringToHash(_deathFromAttackTrigger);
         _patrolBlendHash = Animator.StringToHash(_patrolBlendStateName);
         _agroBlendHash = Animator.StringToHash(_agroBlendStateName);
-    }
-
-    public void SetJump(bool value)
-    {
-        if (_animator) _animator.SetBool(_jumpHash, value);
     }
 
     public void SetYVelocity(float value)
@@ -96,8 +86,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public bool IsInAttackLoop()
     {
         if (!_animator) return false;
-        var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_attackStateName) || s.IsName(_agroBlendStateName);
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_agroBlendStateName);
     }
 
     public bool IsInAgroTrigger()
@@ -115,7 +104,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public bool IsInPatrolLoop()
     {
         if (!_animator) return false;
-        var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_patrolStateName) || s.IsName(_patrolBlendStateName);
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_patrolBlendStateName);
     }
 }
