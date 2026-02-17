@@ -526,6 +526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 6748778490685427738}
   _yVelocity: yVelocity
+  _landingTrigger: Landing
   _agroTrigger: Agro
   _patrolTrigger: Patrol
   _deathFromPatrolTrigger: DeathFromPatrol
@@ -534,6 +535,8 @@ MonoBehaviour:
   _agroTriggerStateName: AgroTrigger
   _patrolBlendStateName: PatrolBlendTree
   _agroBlendStateName: AgroBlendTree
+  _patrolLandingStateName: Patrol Landing
+  _agroLandingStateName: Agro Landing
 --- !u!114 &8677910553421361380
 MonoBehaviour:
   m_ObjectHideFlags: 0

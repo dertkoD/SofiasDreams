@@ -154,8 +154,9 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         {
             bool inTriggerAnim = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
             bool inAggroTriggerState = CurrentState == AggroTriggerState;
+            bool inLanding = Anim.IsInLanding();
             bool grounded = Motor.IsGrounded && !JumpBool;
-            Motor.SetFrozen((inTriggerAnim || inAggroTriggerState) && grounded);
+            Motor.SetFrozen(((inTriggerAnim || inAggroTriggerState) && grounded) || inLanding);
         }
 
         TickAnimatorParams();
@@ -209,6 +210,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
+            Anim.FireLanding();
 
             if (CurrentState is IJumpingState js) js.OnLanded();
 

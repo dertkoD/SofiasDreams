@@ -7,6 +7,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
 
     [Header("Animator params (names must match controller)")]
     [SerializeField] string _yVelocity = "yVelocity";
+    [SerializeField] string _landingTrigger = "Landing";
     [SerializeField] string _agroTrigger = "Agro";
     [SerializeField] string _patrolTrigger = "Patrol";
     [SerializeField] string _deathFromPatrolTrigger = "DeathFromPatrol";
@@ -17,8 +18,11 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [SerializeField] string _agroTriggerStateName = "AgroTrigger";
     [SerializeField] string _patrolBlendStateName = "PatrolBlendTree";
     [SerializeField] string _agroBlendStateName = "AgroBlendTree";
+    [SerializeField] string _patrolLandingStateName = "Patrol Landing";
+    [SerializeField] string _agroLandingStateName = "Agro Landing";
 
     int _yVelocityHash;
+    int _landingHash;
     int _agroHash;
     int _patrolHash;
     int _deathPatrolHash;
@@ -37,6 +41,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
             _animator = GetComponentInChildren<Animator>(true);
 
         _yVelocityHash = Animator.StringToHash(_yVelocity);
+        _landingHash = Animator.StringToHash(_landingTrigger);
         _agroHash = Animator.StringToHash(_agroTrigger);
         _patrolHash = Animator.StringToHash(_patrolTrigger);
         _deathPatrolHash = Animator.StringToHash(_deathFromPatrolTrigger);
@@ -50,10 +55,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetFloat(_yVelocityHash, value);
     }
 
-    /// <summary>
-    /// Restarts the active blend tree state from normalizedTime 0 so the
-    /// landing clip plays from its first frame when the jump phase changes.
-    /// </summary>
     public void RestartBlendTree(bool isAggro)
     {
         if (!_animator) return;
@@ -61,6 +62,11 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         var info = _animator.GetCurrentAnimatorStateInfo(0);
         if (info.shortNameHash == hash)
             _animator.Play(hash, 0, 0f);
+    }
+
+    public void FireLanding()
+    {
+        if (_animator) _animator.SetTrigger(_landingHash);
     }
 
     public void TriggerAgro()
@@ -81,6 +87,13 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public void TriggerDeathFromAttack()
     {
         if (_animator) _animator.SetTrigger(_deathAttackHash);
+    }
+
+    public bool IsInLanding()
+    {
+        if (!_animator) return false;
+        var s = _animator.GetCurrentAnimatorStateInfo(0);
+        return s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
     }
 
     public bool IsInAttackLoop()
