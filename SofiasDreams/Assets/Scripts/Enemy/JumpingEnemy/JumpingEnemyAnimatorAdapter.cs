@@ -29,6 +29,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     int _deathAttackHash;
     int _patrolBlendHash;
     int _agroBlendHash;
+    bool _hasYVelocity;
 
     void Reset()
     {
@@ -40,36 +41,45 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>(true);
 
-        _yVelocityHash = ResolveParamHash(_yVelocity, "yVelocity");
-        _landingHash = ResolveParamHash(_landingTrigger, "Landing");
-        _agroHash = ResolveParamHash(_agroTrigger, "Agro");
-        _patrolHash = ResolveParamHash(_patrolTrigger, "Patrol");
-        _deathPatrolHash = ResolveParamHash(_deathFromPatrolTrigger, "DeathFromPatrol");
-        _deathAttackHash = ResolveParamHash(_deathFromAttackTrigger, "DeathFromAttack");
+        _yVelocityHash = FindParam(_yVelocity, "yVelocity", out _hasYVelocity);
+        _landingHash = FindParam(_landingTrigger, "Landing", out _);
+        _agroHash = FindParam(_agroTrigger, "Agro", out _);
+        _patrolHash = FindParam(_patrolTrigger, "Patrol", out _);
+        _deathPatrolHash = FindParam(_deathFromPatrolTrigger, "DeathFromPatrol", out _);
+        _deathAttackHash = FindParam(_deathFromAttackTrigger, "DeathFromAttack", out _);
         _patrolBlendHash = Animator.StringToHash(_patrolBlendStateName);
         _agroBlendHash = Animator.StringToHash(_agroBlendStateName);
     }
 
-    int ResolveParamHash(string serialized, string fallback)
+    int FindParam(string serialized, string fallback, out bool found)
     {
-        if (!string.IsNullOrEmpty(serialized))
-        {
-            int hash = Animator.StringToHash(serialized);
-            if (_animator != null && HasParam(hash)) return hash;
-        }
-        return Animator.StringToHash(fallback);
-    }
+        found = false;
+        if (_animator == null) return Animator.StringToHash(fallback);
 
-    bool HasParam(int hash)
-    {
         foreach (var p in _animator.parameters)
-            if (p.nameHash == hash) return true;
-        return false;
+        {
+            if (p.name == serialized)
+            {
+                found = true;
+                return p.nameHash;
+            }
+        }
+
+        foreach (var p in _animator.parameters)
+        {
+            if (p.name == fallback)
+            {
+                found = true;
+                return p.nameHash;
+            }
+        }
+
+        return Animator.StringToHash(fallback);
     }
 
     public void SetYVelocity(float value)
     {
-        if (_animator) _animator.SetFloat(_yVelocityHash, value);
+        if (_animator && _hasYVelocity) _animator.SetFloat(_yVelocityHash, value);
     }
 
     public void RestartBlendTree(bool isAggro)

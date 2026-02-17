@@ -155,7 +155,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         {
             bool inTriggerAnim = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
             bool inAggroTriggerState = CurrentState == AggroTriggerState;
-            bool inLanding = Anim.IsInLanding();
+            bool inLanding = Anim.IsInLanding() && Motor.IsGrounded;
             bool grounded = Motor.IsGrounded && !JumpBool;
             Motor.SetFrozen(((inTriggerAnim || inAggroTriggerState) && grounded) || inLanding);
         }
