@@ -69736,6 +69736,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyJumperDear
       objectReference: {fileID: 0}
+    - target: {fileID: 3823746511676703583, guid: 6a6c1d8faf105de4d99923c4e9a8eb7a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4675706718262300930, guid: 6a6c1d8faf105de4d99923c4e9a8eb7a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 21.189392
