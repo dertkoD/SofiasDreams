@@ -185,15 +185,13 @@ public class JumpingEnemyBrain : BaseEnemyBrain
              TickGlobalAggroTimer(sees);
         }
 
-        bool landingDone = Anim == null || !Anim.IsInLanding();
-
-        if (PendingAggroTrigger && IsStableOnGround() && landingDone)
+        if (PendingAggroTrigger && IsStableOnGround())
         {
             PendingAggroTrigger = false;
             PendingPatrolTrigger = false;
             ChangeState(AggroTriggerState);
         }
-        else if (PendingPatrolTrigger && IsStableOnGround() && landingDone)
+        else if (PendingPatrolTrigger && IsStableOnGround())
         {
             PendingPatrolTrigger = false;
             BeginReturnToPatrol();
@@ -299,7 +297,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     public void BeginReturnToPatrol()
     {
         if (CurrentState == DeadState) return;
-        if (JumpBool || !IsStableOnGround() || (Anim != null && Anim.IsInLanding()))
+        if (JumpBool || !IsStableOnGround())
         {
             PendingPatrolTrigger = true;
             return;
@@ -328,6 +326,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (Motor == null || Config == null) return false;
         if (!Motor.IsGrounded) return false;
         if (JumpBool) return false;
+        if (Time.time < LandingStunUntil) return false;
+        if (Anim != null && Anim.IsInLanding()) return false;
         return Mathf.Abs(Motor.Velocity.y) <= Mathf.Max(0f, Config.groundedVelocityEpsilon);
     }
 
