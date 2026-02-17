@@ -51,7 +51,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
     // Aggro Runtime
     [HideInInspector] public float ForgetLeft;
-    [HideInInspector] public bool LostSightTimerRunning;
     [HideInInspector] public Vector2 LastSeenPos;
     [HideInInspector] public bool HasLastSeen;
     [HideInInspector] public int LastChaseDirSign = +1;
@@ -268,12 +267,10 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (sees)
         {
             ForgetLeft = Config != null ? Config.aggroForgetSeconds : 0f;
-            LostSightTimerRunning = false;
         }
         else
         {
-            if (!LostSightTimerRunning) LostSightTimerRunning = true;
-            else ForgetLeft = Mathf.Max(0f, ForgetLeft - Time.deltaTime);
+            ForgetLeft = Mathf.Max(0f, ForgetLeft - Time.deltaTime);
         }
     }
 
@@ -540,8 +537,7 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
         }
 
         if (_brain.PendingAggroTrigger) return;
-        if (!_brain.Motor.IsGrounded) return;
-        if (Time.time < _brain.LandingStunUntil) return;
+        if (!_brain.IsStableOnGround()) return;
         if (Time.time < _brain.NextJumpAt) return;
 
         // If at waypoint
@@ -613,7 +609,6 @@ public class JumpingAggroTriggerState : IEnemyState
     public void Enter()
     {
         _triggerFired = false;
-        _brain.LostSightTimerRunning = false;
         _brain.Motor?.StopAll();
         
         if (_brain.HasLastSeen && _brain.Motor != null)
@@ -651,7 +646,6 @@ public class JumpingAggroTriggerState : IEnemyState
         // When entering Aggro state, allow immediate jump
         _brain.NextJumpAt = Time.time;
         if (_brain.Config != null) _brain.ForgetLeft = _brain.Config.aggroForgetSeconds;
-        _brain.LostSightTimerRunning = false;
     }
 }
 
@@ -666,13 +660,11 @@ public class JumpingAggroState : IEnemyState
     {
         if (_brain.ForgetLeft <= 0f)
         {
-            if (_brain.Motor.IsGrounded) _brain.BeginReturnToPatrol();
-            else _brain.PendingPatrolTrigger = true;
+            _brain.BeginReturnToPatrol();
             return;
         }
 
-        if (!_brain.Motor.IsGrounded) return;
-        if (Time.time < _brain.LandingStunUntil) return;
+        if (!_brain.IsStableOnGround()) return;
         if (Time.time < _brain.NextJumpAt) return;
 
         int dir = _brain.GetAggroDirectionSign();
@@ -697,7 +689,6 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
         _brain.HasLastSeen = false;
         _brain.HasChaseDir = false;
         _brain.HasSeenPlayerAtLeastOnce = false;
-        _brain.LostSightTimerRunning = false;
         _brain.JumpBool = false;
 
         if (_brain.CurrentPath == null || _brain.CurrentPath.Count == 0)
