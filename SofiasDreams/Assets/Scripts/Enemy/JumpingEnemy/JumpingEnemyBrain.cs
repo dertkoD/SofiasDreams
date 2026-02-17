@@ -64,7 +64,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float PrevY;
     [HideInInspector] public float LandingStunUntil;
     [HideInInspector] public float LastJumpStartedAt;
-    [HideInInspector] public int JumpPhase; // 0=ground, 1=rising, 2=peak, 3=falling
+    [HideInInspector] public float JumpStartVy;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -210,7 +210,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
-            JumpPhase = 0;
             Anim.SetJump(false);
 
             if (CurrentState is IJumpingState js) js.OnLanded();
@@ -232,21 +231,14 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        // Phase-based triggers: Windup → TriggerPoint → HighPoint → TriggerLanding → Landing
+        // yVelocity from rb: 1 = going up (Windup), -1 = falling (Landing)
+        float yParam = 0f;
         if (JumpBool)
         {
-            if (JumpPhase == 1 && y <= 0f)
-            {
-                JumpPhase = 2;
-                Anim.FireTriggerPoint();
-            }
-
-            if (JumpPhase == 2 && y < 0f)
-            {
-                JumpPhase = 3;
-                Anim.FireTriggerLanding();
-            }
+            float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
+            yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
         }
+        Anim.SetYVelocity(yParam);
 
         PrevGrounded = grounded;
         PrevY = y;
@@ -311,8 +303,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (!ok) return false;
 
         JumpBool = true;
-        JumpPhase = 1;
         LastJumpStartedAt = Time.time;
+        JumpStartVy = Motor.Velocity.y;
         Anim.SetJump(true);
         return true;
     }
