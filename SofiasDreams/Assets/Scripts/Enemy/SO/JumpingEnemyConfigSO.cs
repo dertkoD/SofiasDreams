@@ -28,6 +28,8 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float patrolJumpHeight = 1.5f;
     [Min(0f)] public float patrolJumpHorizontalSpeed = 3.5f;
     [Min(0f)] public float landingStunSeconds = 0.10f;
+    [Tooltip("Height above ground at which the landing animation triggers (raycast down).")]
+    [Min(0f)] public float landingTriggerHeight = 1.0f;
 
     [Header("Aggro")]
     [Min(0f)] public float aggroForgetSeconds = 2.0f;

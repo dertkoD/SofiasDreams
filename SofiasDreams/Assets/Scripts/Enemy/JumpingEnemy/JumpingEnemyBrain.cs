@@ -65,6 +65,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float LandingStunUntil;
     [HideInInspector] public float LastJumpStartedAt;
     [HideInInspector] public float JumpStartVy;
+    [HideInInspector] public bool LandingTriggered;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -207,10 +208,24 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             && PrevY < -0.10f
             && Mathf.Abs(y) < 0.02f;
 
+        // Fire landing animation early based on height above ground
+        if (JumpBool && !LandingTriggered && y < 0f)
+        {
+            float triggerH = Config != null ? Config.landingTriggerHeight : 1f;
+            if (triggerH > 0f && IsNearGround(triggerH))
+            {
+                LandingTriggered = true;
+                Anim.FireLanding();
+            }
+        }
+
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
-            Anim.FireLanding();
+
+            if (!LandingTriggered)
+                Anim.FireLanding();
+            LandingTriggered = false;
 
             if (CurrentState is IJumpingState js) js.OnLanded();
 
@@ -233,12 +248,12 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         // yVelocity from rb: 1 = going up (Windup), -1 = falling (Landing)
         float yParam = 0f;
-        if (JumpBool)
+        if (JumpBool && !LandingTriggered)
         {
             float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
             yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
 
-            // Restart blend tree at the peak so the Landing clip plays from frame 0
+            // Restart blend tree at the peak so the falling blend clip plays from frame 0
             if (PrevY > 0f && y <= 0f)
             {
                 bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
@@ -310,6 +325,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (!ok) return false;
 
         JumpBool = true;
+        LandingTriggered = false;
         LastJumpStartedAt = Time.time;
         JumpStartVy = Motor.Velocity.y;
         return true;
@@ -321,6 +337,14 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (!Motor.IsGrounded) return false;
         if (JumpBool) return false;
         return Mathf.Abs(Motor.Velocity.y) <= Mathf.Max(0f, Config.groundedVelocityEpsilon);
+    }
+
+    public bool IsNearGround(float maxHeight)
+    {
+        if (Motor == null || Motor.Rigidbody == null || Config == null) return false;
+        LayerMask mask = Config.groundMask.value != 0 ? Config.groundMask : (LayerMask)~0;
+        var hit = Physics2D.Raycast(Motor.Rigidbody.position, Vector2.down, maxHeight, mask);
+        return hit.collider != null;
     }
     
     // --- Sensing ---

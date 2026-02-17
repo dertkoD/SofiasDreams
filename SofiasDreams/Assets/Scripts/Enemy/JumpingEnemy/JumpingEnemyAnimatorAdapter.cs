@@ -40,14 +40,31 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>(true);
 
-        _yVelocityHash = Animator.StringToHash(_yVelocity);
-        _landingHash = Animator.StringToHash(_landingTrigger);
-        _agroHash = Animator.StringToHash(_agroTrigger);
-        _patrolHash = Animator.StringToHash(_patrolTrigger);
-        _deathPatrolHash = Animator.StringToHash(_deathFromPatrolTrigger);
-        _deathAttackHash = Animator.StringToHash(_deathFromAttackTrigger);
+        _yVelocityHash = ResolveParamHash(_yVelocity, "yVelocity");
+        _landingHash = ResolveParamHash(_landingTrigger, "Landing");
+        _agroHash = ResolveParamHash(_agroTrigger, "Agro");
+        _patrolHash = ResolveParamHash(_patrolTrigger, "Patrol");
+        _deathPatrolHash = ResolveParamHash(_deathFromPatrolTrigger, "DeathFromPatrol");
+        _deathAttackHash = ResolveParamHash(_deathFromAttackTrigger, "DeathFromAttack");
         _patrolBlendHash = Animator.StringToHash(_patrolBlendStateName);
         _agroBlendHash = Animator.StringToHash(_agroBlendStateName);
+    }
+
+    int ResolveParamHash(string serialized, string fallback)
+    {
+        if (!string.IsNullOrEmpty(serialized))
+        {
+            int hash = Animator.StringToHash(serialized);
+            if (_animator != null && HasParam(hash)) return hash;
+        }
+        return Animator.StringToHash(fallback);
+    }
+
+    bool HasParam(int hash)
+    {
+        foreach (var p in _animator.parameters)
+            if (p.nameHash == hash) return true;
+        return false;
     }
 
     public void SetYVelocity(float value)
