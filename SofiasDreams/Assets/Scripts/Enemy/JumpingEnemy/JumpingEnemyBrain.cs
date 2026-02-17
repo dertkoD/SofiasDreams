@@ -185,11 +185,18 @@ public class JumpingEnemyBrain : BaseEnemyBrain
              TickGlobalAggroTimer(sees);
         }
 
-        if (PendingAggroTrigger && IsStableOnGround())
+        bool landingDone = Anim == null || !Anim.IsInLanding();
+
+        if (PendingAggroTrigger && IsStableOnGround() && landingDone)
         {
             PendingAggroTrigger = false;
             PendingPatrolTrigger = false;
             ChangeState(AggroTriggerState);
+        }
+        else if (PendingPatrolTrigger && IsStableOnGround() && landingDone)
+        {
+            PendingPatrolTrigger = false;
+            BeginReturnToPatrol();
         }
 
         base.Update();
@@ -228,18 +235,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             LandingTriggered = false;
 
             if (CurrentState is IJumpingState js) js.OnLanded();
-
-            if (PendingAggroTrigger)
-            {
-                PendingAggroTrigger = false;
-                PendingPatrolTrigger = false; 
-                ChangeState(AggroTriggerState);
-            }
-            else if (PendingPatrolTrigger)
-            {
-                PendingPatrolTrigger = false;
-                BeginReturnToPatrol();
-            }
 
             float stun = Config != null ? Mathf.Max(0f, Config.landingStunSeconds) : 0.10f;
             LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
@@ -287,12 +282,9 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     public void RequestAggroTrigger()
     {
         if (CurrentState == DeadState) return;
+        if (CurrentState == AggroState || CurrentState == AggroTriggerState) return;
 
-        bool wasAggro = PendingAggroTrigger || CurrentState == AggroState || CurrentState == AggroTriggerState;
-        if (!wasAggro)
-        {
-             if (Config != null) ForgetLeft = Config.aggroForgetSeconds;
-        }
+        if (Config != null) ForgetLeft = Config.aggroForgetSeconds;
 
         if (JumpBool || !IsStableOnGround())
         {
@@ -307,7 +299,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     public void BeginReturnToPatrol()
     {
         if (CurrentState == DeadState) return;
-        if (JumpBool || !IsStableOnGround())
+        if (JumpBool || !IsStableOnGround() || (Anim != null && Anim.IsInLanding()))
         {
             PendingPatrolTrigger = true;
             return;
