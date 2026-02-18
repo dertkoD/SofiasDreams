@@ -155,7 +155,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         _facingTransform.localScale = s;
     }
 
-    public bool TryJump(int horizontalSign, float jumpHeight, float horizontalSpeed)
+    public bool TryJump(int horizontalSign, float jumpHeight, float horizontalSpeed, float speed = 1f)
     {
         if (!_rb || _config == null) return false;
         if (_frozen) return false;
@@ -167,24 +167,21 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         horizontalSign = horizontalSign >= 0 ? +1 : -1;
         Face(horizontalSign);
 
+        float sp = Mathf.Max(0.01f, speed);
         float g = Mathf.Abs(Physics2D.gravity.y * Mathf.Max(0f, _rb.gravityScale));
         float H = Mathf.Max(0f, jumpHeight);
-        float vy0 = (g > 0f && H > 0f) ? Mathf.Sqrt(2f * g * H) : 0f;
+        float vy0 = (g > 0f && H > 0f) ? Mathf.Sqrt(2f * g * H) * sp : 0f;
 
-        // keep behaviour stable: reset downward speed before impulse
         float vy = _rb.linearVelocity.y;
         if (vy < 0f) vy = 0f;
 
-        // Set only Y at start. X is controlled continuously during the jump (air control),
-        // so if X gets cancelled by a wall at takeoff it can recover once we clear the wall.
         var v0 = _rb.linearVelocity;
         v0.y = vy0 + vy;
         _rb.linearVelocity = v0;
 
         _airControlActive = true;
-        _airDesiredVX = horizontalSign * Mathf.Max(0f, horizontalSpeed);
+        _airDesiredVX = horizontalSign * Mathf.Max(0f, horizontalSpeed) * sp;
 
-        // Important: immediately mark as not grounded (FixedUpdate will catch up next physics tick).
         _isGrounded = false;
         _groundChecker.NotifyJumpStarted();
         return true;

@@ -303,12 +303,12 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         ChangeState(ReturnState);
     }
     
-    public bool StartJump(int dirSign, float height, float speed)
+    public bool StartJump(int dirSign, float height, float horizontalSpeed, float speed = 1f)
     {
         if (Config == null || Motor == null || Anim == null) return false;
         if (Time.time < LandingStunUntil) return false;
 
-        bool ok = Motor.TryJump(dirSign, height, speed);
+        bool ok = Motor.TryJump(dirSign, height, horizontalSpeed, speed);
         if (!ok) return false;
 
         JumpBool = true;
@@ -578,7 +578,8 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
             _brain.PatrolJumpHasTarget = false;
         }
 
-        if (_brain.StartJump(dir, h, s))
+        float sp = _brain.Config.patrolJumpSpeed;
+        if (_brain.StartJump(dir, h, s, sp))
             _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
     }
 
@@ -670,8 +671,9 @@ public class JumpingAggroState : IEnemyState
         int dir = _brain.GetAggroDirectionSign();
         float h = _brain.Config.aggroJumpHeight;
         float s = _brain.Config.aggroJumpHorizontalSpeed;
+        float sp = _brain.Config.aggroJumpSpeed;
 
-        if (_brain.StartJump(dir, h, s))
+        if (_brain.StartJump(dir, h, s, sp))
             _brain.NextJumpAt = Time.time + _brain.Config.aggroJumpCooldown;
     }
     public void Exit() { }
@@ -780,7 +782,8 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
                 ? (_brain.transform.localScale.x >= 0f ? +1 : -1)
                 : (dx >= 0f ? +1 : -1);
 
-            if (_brain.StartJump(dir, h, s))
+            float sp = _brain.Config.patrolJumpSpeed;
+            if (_brain.StartJump(dir, h, s, sp))
                 _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
         }
     }
