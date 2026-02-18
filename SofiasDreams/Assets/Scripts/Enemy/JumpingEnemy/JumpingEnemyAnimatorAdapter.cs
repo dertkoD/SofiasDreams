@@ -6,29 +6,30 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [SerializeField] Animator _animator;
 
     [Header("Animator params (names must match controller)")]
-    [SerializeField] string _jumpBool = "Jump";
-    [SerializeField] string _yVelocityPatrol = "yVelocityPatrol";
-    [SerializeField] string _yVelocityAttack = "yVelocityAttack";
+    [SerializeField] string _yVelocity = "yVelocity";
+    [SerializeField] string _landingTrigger = "Landing";
     [SerializeField] string _agroTrigger = "Agro";
     [SerializeField] string _patrolTrigger = "Patrol";
     [SerializeField] string _deathFromPatrolTrigger = "DeathFromPatrol";
     [SerializeField] string _deathFromAttackTrigger = "DeathFromAttack";
 
     [Header("Animator states (names must match controller)")]
-    [SerializeField] string _patrolStateName = "Patrol";
     [SerializeField] string _patrolTriggerStateName = "PatrolTrigger";
     [SerializeField] string _agroTriggerStateName = "AgroTrigger";
-    [SerializeField] string _attackStateName = "Attack";
-    [SerializeField] string _agroBlendStateName = "Blend Tree Agro";
-    [SerializeField] string _patrolBlendStateName = "Blend Tree Patrol";
+    [SerializeField] string _patrolBlendStateName = "PatrolBlendTree";
+    [SerializeField] string _agroBlendStateName = "AgroBlendTree";
+    [SerializeField] string _patrolLandingStateName = "Patrol Landing";
+    [SerializeField] string _agroLandingStateName = "Agro Landing";
 
-    int _jumpHash;
-    int _yPatrolHash;
-    int _yAttackHash;
+    int _yVelocityHash;
+    int _landingHash;
     int _agroHash;
     int _patrolHash;
     int _deathPatrolHash;
     int _deathAttackHash;
+    int _patrolBlendHash;
+    int _agroBlendHash;
+    bool _hasYVelocity;
 
     void Reset()
     {
@@ -40,28 +41,59 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>(true);
 
-        _jumpHash = Animator.StringToHash(_jumpBool);
-        _yPatrolHash = Animator.StringToHash(_yVelocityPatrol);
-        _yAttackHash = Animator.StringToHash(_yVelocityAttack);
-        _agroHash = Animator.StringToHash(_agroTrigger);
-        _patrolHash = Animator.StringToHash(_patrolTrigger);
-        _deathPatrolHash = Animator.StringToHash(_deathFromPatrolTrigger);
-        _deathAttackHash = Animator.StringToHash(_deathFromAttackTrigger);
+        _yVelocityHash = FindParam(_yVelocity, "yVelocity", out _hasYVelocity);
+        _landingHash = FindParam(_landingTrigger, "Landing", out _);
+        _agroHash = FindParam(_agroTrigger, "Agro", out _);
+        _patrolHash = FindParam(_patrolTrigger, "Patrol", out _);
+        _deathPatrolHash = FindParam(_deathFromPatrolTrigger, "DeathFromPatrol", out _);
+        _deathAttackHash = FindParam(_deathFromAttackTrigger, "DeathFromAttack", out _);
+        _patrolBlendHash = Animator.StringToHash(_patrolBlendStateName);
+        _agroBlendHash = Animator.StringToHash(_agroBlendStateName);
     }
 
-    public void SetJump(bool value)
+    int FindParam(string serialized, string fallback, out bool found)
     {
-        if (_animator) _animator.SetBool(_jumpHash, value);
+        found = false;
+        if (_animator == null) return Animator.StringToHash(fallback);
+
+        foreach (var p in _animator.parameters)
+        {
+            if (p.name == serialized)
+            {
+                found = true;
+                return p.nameHash;
+            }
+        }
+
+        foreach (var p in _animator.parameters)
+        {
+            if (p.name == fallback)
+            {
+                found = true;
+                return p.nameHash;
+            }
+        }
+
+        return Animator.StringToHash(fallback);
     }
 
-    public void SetPatrolYVelocity(float positiveY)
+    public void SetYVelocity(float value)
     {
-        if (_animator) _animator.SetFloat(_yPatrolHash, positiveY);
+        if (_animator && _hasYVelocity) _animator.SetFloat(_yVelocityHash, value);
     }
 
-    public void SetAttackYVelocity(float positiveY)
+    public void RestartBlendTree(bool isAggro)
     {
-        if (_animator) _animator.SetFloat(_yAttackHash, positiveY);
+        if (!_animator) return;
+        int hash = isAggro ? _agroBlendHash : _patrolBlendHash;
+        var info = _animator.GetCurrentAnimatorStateInfo(0);
+        if (info.shortNameHash == hash)
+            _animator.Play(hash, 0, 0f);
+    }
+
+    public void FireLanding()
+    {
+        if (_animator) _animator.SetTrigger(_landingHash);
     }
 
     public void TriggerAgro()
@@ -84,11 +116,17 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetTrigger(_deathAttackHash);
     }
 
-    public bool IsInAttackLoop()
+    public bool IsInLanding()
     {
         if (!_animator) return false;
         var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_attackStateName) || s.IsName(_agroBlendStateName);
+        return s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
+    }
+
+    public bool IsInAttackLoop()
+    {
+        if (!_animator) return false;
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_agroBlendStateName);
     }
 
     public bool IsInAgroTrigger()
@@ -106,8 +144,6 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public bool IsInPatrolLoop()
     {
         if (!_animator) return false;
-        var s = _animator.GetCurrentAnimatorStateInfo(0);
-        return s.IsName(_patrolStateName) || s.IsName(_patrolBlendStateName);
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_patrolBlendStateName);
     }
 }
-

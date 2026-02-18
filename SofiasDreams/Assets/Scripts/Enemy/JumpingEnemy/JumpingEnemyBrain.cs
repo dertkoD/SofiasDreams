@@ -51,7 +51,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
     // Aggro Runtime
     [HideInInspector] public float ForgetLeft;
-    [HideInInspector] public bool LostSightTimerRunning;
     [HideInInspector] public Vector2 LastSeenPos;
     [HideInInspector] public bool HasLastSeen;
     [HideInInspector] public int LastChaseDirSign = +1;
@@ -64,6 +63,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float PrevY;
     [HideInInspector] public float LandingStunUntil;
     [HideInInspector] public float LastJumpStartedAt;
+    [HideInInspector] public float JumpStartVy;
+    [HideInInspector] public bool LandingTriggered;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -142,7 +143,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             {
                 Motor.StopHorizontal();
                 JumpBool = false; 
-                Anim.SetJump(false); 
                 TickAnimatorParams();
                 return;
             }
@@ -152,9 +152,11 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         if (Anim != null && Motor != null)
         {
-            bool inTrigger = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
-            bool stableGround = IsStableOnGround();
-            Motor.SetFrozen(inTrigger && stableGround && !JumpBool);
+            bool inTriggerAnim = Anim.IsInAgroTrigger() || Anim.IsInPatrolTrigger();
+            bool inAggroTriggerState = CurrentState == AggroTriggerState;
+            bool inLanding = Anim.IsInLanding() && Motor.IsGrounded;
+            bool grounded = Motor.IsGrounded && !JumpBool;
+            Motor.SetFrozen(((inTriggerAnim || inAggroTriggerState) && grounded) || inLanding);
         }
 
         TickAnimatorParams();
@@ -188,6 +190,11 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             PendingPatrolTrigger = false;
             ChangeState(AggroTriggerState);
         }
+        else if (PendingPatrolTrigger && IsStableOnGround())
+        {
+            PendingPatrolTrigger = false;
+            BeginReturnToPatrol();
+        }
 
         base.Update();
     }
@@ -205,36 +212,47 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             && PrevY < -0.10f
             && Mathf.Abs(y) < 0.02f;
 
+        // Fire landing animation early based on height above ground
+        if (JumpBool && !LandingTriggered && y < 0f)
+        {
+            float triggerH = Config != null ? Config.landingTriggerHeight : 1f;
+            if (triggerH > 0f && IsNearGround(triggerH))
+            {
+                LandingTriggered = true;
+                Anim.FireLanding();
+            }
+        }
+
         if (landedByGround || landedByVelocity)
         {
             JumpBool = false;
-            Anim.SetJump(false);
+
+            if (!LandingTriggered)
+                Anim.FireLanding();
+            LandingTriggered = false;
 
             if (CurrentState is IJumpingState js) js.OnLanded();
-
-            if (PendingAggroTrigger)
-            {
-                PendingAggroTrigger = false;
-                PendingPatrolTrigger = false; 
-                ChangeState(AggroTriggerState);
-            }
-            else if (PendingPatrolTrigger)
-            {
-                PendingPatrolTrigger = false;
-                BeginReturnToPatrol();
-            }
 
             float stun = Config != null ? Mathf.Max(0f, Config.landingStunSeconds) : 0.10f;
             LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
         }
 
-        float yParam = JumpBool ? (Mathf.Abs(y) + 0.01f) : 0f;
+        // yVelocity from rb: 1 = going up (Windup), -1 = falling (Landing)
+        float yParam = 0f;
+        if (JumpBool && !LandingTriggered)
+        {
+            float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
+            yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
 
-        if (CurrentState == AggroState || CurrentState == AggroTriggerState)
-            Anim.SetAttackYVelocity(yParam);
-        else
-            Anim.SetPatrolYVelocity(yParam);
+            // Restart blend tree at the peak so the falling blend clip plays from frame 0
+            if (PrevY > 0f && y <= 0f)
+            {
+                bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
+                Anim.RestartBlendTree(isAggro);
+            }
+        }
+        Anim.SetYVelocity(yParam);
 
         PrevGrounded = grounded;
         PrevY = y;
@@ -249,24 +267,19 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (sees)
         {
             ForgetLeft = Config != null ? Config.aggroForgetSeconds : 0f;
-            LostSightTimerRunning = false;
         }
         else
         {
-            if (!LostSightTimerRunning) LostSightTimerRunning = true;
-            else ForgetLeft = Mathf.Max(0f, ForgetLeft - Time.deltaTime);
+            ForgetLeft = Mathf.Max(0f, ForgetLeft - Time.deltaTime);
         }
     }
 
     public void RequestAggroTrigger()
     {
         if (CurrentState == DeadState) return;
+        if (CurrentState == AggroState || CurrentState == AggroTriggerState) return;
 
-        bool wasAggro = PendingAggroTrigger || CurrentState == AggroState || CurrentState == AggroTriggerState;
-        if (!wasAggro)
-        {
-             if (Config != null) ForgetLeft = Config.aggroForgetSeconds;
-        }
+        if (Config != null) ForgetLeft = Config.aggroForgetSeconds;
 
         if (JumpBool || !IsStableOnGround())
         {
@@ -290,17 +303,18 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         ChangeState(ReturnState);
     }
     
-    public bool StartJump(int dirSign, float height, float speed)
+    public bool StartJump(int dirSign, float height, float horizontalSpeed, float speed = 1f)
     {
         if (Config == null || Motor == null || Anim == null) return false;
         if (Time.time < LandingStunUntil) return false;
 
-        bool ok = Motor.TryJump(dirSign, height, speed);
+        bool ok = Motor.TryJump(dirSign, height, horizontalSpeed, speed);
         if (!ok) return false;
 
         JumpBool = true;
+        LandingTriggered = false;
         LastJumpStartedAt = Time.time;
-        Anim.SetJump(true);
+        JumpStartVy = Motor.Velocity.y;
         return true;
     }
 
@@ -309,7 +323,17 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (Motor == null || Config == null) return false;
         if (!Motor.IsGrounded) return false;
         if (JumpBool) return false;
+        if (Time.time < LandingStunUntil) return false;
+        if (Anim != null && Anim.IsInLanding()) return false;
         return Mathf.Abs(Motor.Velocity.y) <= Mathf.Max(0f, Config.groundedVelocityEpsilon);
+    }
+
+    public bool IsNearGround(float maxHeight)
+    {
+        if (Motor == null || Motor.Rigidbody == null || Config == null) return false;
+        LayerMask mask = Config.groundMask.value != 0 ? Config.groundMask : (LayerMask)~0;
+        var hit = Physics2D.Raycast(Motor.Rigidbody.position, Vector2.down, maxHeight, mask);
+        return hit.collider != null;
     }
     
     // --- Sensing ---
@@ -513,8 +537,7 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
         }
 
         if (_brain.PendingAggroTrigger) return;
-        if (!_brain.Motor.IsGrounded) return;
-        if (Time.time < _brain.LandingStunUntil) return;
+        if (!_brain.IsStableOnGround()) return;
         if (Time.time < _brain.NextJumpAt) return;
 
         // If at waypoint
@@ -555,7 +578,8 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
             _brain.PatrolJumpHasTarget = false;
         }
 
-        if (_brain.StartJump(dir, h, s))
+        float sp = _brain.Config.patrolJumpSpeed;
+        if (_brain.StartJump(dir, h, s, sp))
             _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
     }
 
@@ -580,11 +604,12 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
 public class JumpingAggroTriggerState : IEnemyState
 {
     JumpingEnemyBrain _brain;
+    bool _triggerFired;
     public JumpingAggroTriggerState(JumpingEnemyBrain brain) { _brain = brain; }
 
     public void Enter()
     {
-        _brain.LostSightTimerRunning = false;
+        _triggerFired = false;
         _brain.Motor?.StopAll();
         
         if (_brain.HasLastSeen && _brain.Motor != null)
@@ -595,13 +620,24 @@ public class JumpingAggroTriggerState : IEnemyState
         }
 
         _brain.JumpBool = false;
-        _brain.Anim?.SetJump(false);
-        _brain.Anim?.TriggerAgro();
+
+        if (_brain.IsStableOnGround())
+        {
+            _brain.Anim?.TriggerAgro();
+            _triggerFired = true;
+        }
     }
 
     public void Tick()
     {
-        if (_brain.Anim.IsInAttackLoop())
+        if (!_triggerFired && _brain.IsStableOnGround())
+        {
+            _brain.Motor?.StopAll();
+            _brain.Anim?.TriggerAgro();
+            _triggerFired = true;
+        }
+
+        if (_triggerFired && _brain.Anim.IsInAttackLoop())
         {
             _brain.ChangeState(_brain.AggroState);
         }
@@ -611,7 +647,6 @@ public class JumpingAggroTriggerState : IEnemyState
         // When entering Aggro state, allow immediate jump
         _brain.NextJumpAt = Time.time;
         if (_brain.Config != null) _brain.ForgetLeft = _brain.Config.aggroForgetSeconds;
-        _brain.LostSightTimerRunning = false;
     }
 }
 
@@ -626,20 +661,19 @@ public class JumpingAggroState : IEnemyState
     {
         if (_brain.ForgetLeft <= 0f)
         {
-            if (_brain.Motor.IsGrounded) _brain.BeginReturnToPatrol();
-            else _brain.PendingPatrolTrigger = true;
+            _brain.BeginReturnToPatrol();
             return;
         }
 
-        if (!_brain.Motor.IsGrounded) return;
-        if (Time.time < _brain.LandingStunUntil) return;
+        if (!_brain.IsStableOnGround()) return;
         if (Time.time < _brain.NextJumpAt) return;
 
         int dir = _brain.GetAggroDirectionSign();
         float h = _brain.Config.aggroJumpHeight;
         float s = _brain.Config.aggroJumpHorizontalSpeed;
+        float sp = _brain.Config.aggroJumpSpeed;
 
-        if (_brain.StartJump(dir, h, s))
+        if (_brain.StartJump(dir, h, s, sp))
             _brain.NextJumpAt = Time.time + _brain.Config.aggroJumpCooldown;
     }
     public void Exit() { }
@@ -648,14 +682,15 @@ public class JumpingAggroState : IEnemyState
 public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
 {
     JumpingEnemyBrain _brain;
+    bool _triggerFired;
     public JumpingReturnState(JumpingEnemyBrain brain) { _brain = brain; }
 
     public void Enter()
     {
+        _triggerFired = false;
         _brain.HasLastSeen = false;
         _brain.HasChaseDir = false;
         _brain.HasSeenPlayerAtLeastOnce = false;
-        _brain.LostSightTimerRunning = false;
         _brain.JumpBool = false;
 
         if (_brain.CurrentPath == null || _brain.CurrentPath.Count == 0)
@@ -669,14 +704,25 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
             _brain.PathIndex = _brain.ReturnTargetIndex;
         }
 
-        _brain.Anim?.SetJump(false);
-        _brain.Anim?.TriggerPatrol();
+        if (_brain.IsStableOnGround())
+        {
+            _brain.Anim?.TriggerPatrol();
+            _triggerFired = true;
+        }
+
         _brain.NextJumpAt = Time.time + 0.05f;
     }
 
     public void Tick()
     {
         if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var _)) { _brain.RequestAggroTrigger(); return; }
+
+        if (!_triggerFired && _brain.IsStableOnGround())
+        {
+            _brain.Motor?.StopAll();
+            _brain.Anim?.TriggerPatrol();
+            _triggerFired = true;
+        }
 
         if (_brain.Anim != null && _brain.Anim.IsInPatrolTrigger()) return;
 
@@ -736,7 +782,8 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
                 ? (_brain.transform.localScale.x >= 0f ? +1 : -1)
                 : (dx >= 0f ? +1 : -1);
 
-            if (_brain.StartJump(dir, h, s))
+            float sp = _brain.Config.patrolJumpSpeed;
+            if (_brain.StartJump(dir, h, s, sp))
                 _brain.NextJumpAt = Time.time + _brain.Config.patrolJumpCooldown;
         }
     }
@@ -777,7 +824,6 @@ public class JumpingDeadState : IEnemyState
         _brain.Motor?.StopHorizontal();
         if (_brain.Anim != null)
         {
-            _brain.Anim.SetJump(false);
             bool fromAttack = prev == _brain.AggroState || prev == _brain.AggroTriggerState || _brain.Anim.IsInAttackLoop();
             if (fromAttack) _brain.Anim.TriggerDeathFromAttack();
             else _brain.Anim.TriggerDeathFromPatrol();
