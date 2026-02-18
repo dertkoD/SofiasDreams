@@ -15,6 +15,7 @@ public class JumpingEnemyMotor2D : MonoBehaviour
     IReadOnlyList<IHitStunState> _hitStunStates = Array.Empty<IHitStunState>();
 
     float _baseScaleX;
+    float _baseGravityScale;
     bool _isGrounded;
     bool _frozen;
     RigidbodyConstraints2D _savedConstraints;
@@ -55,7 +56,11 @@ public class JumpingEnemyMotor2D : MonoBehaviour
 
         _baseScaleX = Mathf.Abs(_facingTransform.localScale.x);
         if (_baseScaleX < 0.0001f) _baseScaleX = 1f;
-        if (_rb) _savedConstraints = _rb.constraints;
+        if (_rb)
+        {
+            _savedConstraints = _rb.constraints;
+            _baseGravityScale = _rb.gravityScale;
+        }
     }
 
     void FixedUpdate()
@@ -68,7 +73,11 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         _isGrounded = _groundChecker != null && _groundChecker.IsGrounded;
 
         if (_isGrounded)
+        {
             _airControlActive = false;
+            if (_rb && Mathf.Abs(_rb.gravityScale - _baseGravityScale) > 0.001f)
+                _rb.gravityScale = _baseGravityScale;
+        }
 
         TickAirControl();
     }
@@ -168,7 +177,12 @@ public class JumpingEnemyMotor2D : MonoBehaviour
         Face(horizontalSign);
 
         float sp = Mathf.Max(0.01f, speed);
-        float g = Mathf.Abs(Physics2D.gravity.y * Mathf.Max(0f, _rb.gravityScale));
+
+        // Increase gravity by speed² so the arc completes in 1/speed the time.
+        // Scale vy0 and horizontal speed by speed so height and distance stay the same.
+        _rb.gravityScale = _baseGravityScale * sp * sp;
+
+        float g = Mathf.Abs(Physics2D.gravity.y * _baseGravityScale);
         float H = Mathf.Max(0f, jumpHeight);
         float vy0 = (g > 0f && H > 0f) ? Mathf.Sqrt(2f * g * H) * sp : 0f;
 
