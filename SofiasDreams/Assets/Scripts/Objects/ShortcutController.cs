@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class ShortcutController : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class ShortcutController : MonoBehaviour
 
     [Header("Assign the visual sprite to destroy")]
     [SerializeField] private GameObject visualObject;
+    
+    [Header("Light")]
+    [SerializeField] Light2D spotLight2D;
 
     public void DestroyShortcut()
     {
@@ -15,5 +19,6 @@ public class ShortcutController : MonoBehaviour
             if (col != null) Destroy(col);
         }
         if (visualObject != null) Destroy(visualObject);
+        if (spotLight2D != null)spotLight2D.enabled = false;
     }
 }

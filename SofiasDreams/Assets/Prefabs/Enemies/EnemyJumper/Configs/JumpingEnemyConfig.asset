@@ -25,11 +25,13 @@ MonoBehaviour:
   loopPath: 1
   waypointArriveDistance: 0.2
   patrolJumpCooldown: 0.2
-  patrolJumpHeight: 3
+  patrolJumpHeight: 1.5
   patrolJumpHorizontalSpeed: 3
-  landingStunSeconds: 0
+  patrolJumpSpeed: 1.5
+  landingStunSeconds: 1.5
   landingTriggerHeight: 1.5
   aggroForgetSeconds: 4
   aggroJumpCooldown: 0.1
-  aggroJumpHeight: 4
+  aggroJumpHeight: 3
   aggroJumpHorizontalSpeed: 4
+  aggroJumpSpeed: 2
