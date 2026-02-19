@@ -66,6 +66,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float JumpStartVy;
     [HideInInspector] public bool LandingTriggered;
     [HideInInspector] public bool WaitingForWindup;
+    [HideInInspector] public bool LandingAnimDone;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -239,6 +240,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
             WaitingForWindup = true;
+            LandingAnimDone = false;
         }
 
         float yParam = 0f;
@@ -262,11 +264,23 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     void TickWindupTrigger()
     {
         if (!WaitingForWindup) return;
-        if (Time.time < LandingStunUntil) return;
+        if (Anim == null) { WaitingForWindup = false; return; }
 
-        WaitingForWindup = false;
-        if (Anim != null)
+        bool stunDone = Time.time >= LandingStunUntil;
+
+        if (!LandingAnimDone && Anim.IsLandingAnimationDone())
+        {
+            LandingAnimDone = true;
+            if (!stunDone)
+                Anim.PauseLanding();
+        }
+
+        if (LandingAnimDone && stunDone)
+        {
+            WaitingForWindup = false;
+            Anim.ResumeLanding();
             Anim.FireTriggerWindup();
+        }
     }
 
     float GetLandingStun(bool isAggro)
@@ -331,6 +345,8 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         JumpBool = true;
         LandingTriggered = false;
         WaitingForWindup = false;
+        LandingAnimDone = false;
+        Anim.ResumeLanding();
         LastJumpStartedAt = Time.time;
         JumpStartVy = Motor.Velocity.y;
         return true;
@@ -831,6 +847,7 @@ public class JumpingDeadState : IEnemyState
         _brain.Motor?.StopHorizontal();
         if (_brain.Anim != null)
         {
+            _brain.Anim.ResumeLanding();
             bool fromAttack = prev == _brain.AggroState || prev == _brain.AggroTriggerState || _brain.Anim.IsInAttackLoop();
             if (fromAttack) _brain.Anim.TriggerDeathFromAttack();
             else _brain.Anim.TriggerDeathFromPatrol();

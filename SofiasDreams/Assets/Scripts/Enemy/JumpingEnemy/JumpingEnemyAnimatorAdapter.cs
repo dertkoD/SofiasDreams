@@ -33,6 +33,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     int _agroBlendHash;
     bool _hasYVelocity;
     bool _hasTriggerWindup;
+    bool _landingPaused;
 
     void Reset()
     {
@@ -103,6 +104,29 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     public void FireTriggerWindup()
     {
         if (_animator && _hasTriggerWindup) _animator.SetTrigger(_triggerWindupHash);
+    }
+
+    public bool IsLandingAnimationDone()
+    {
+        if (!_animator) return true;
+        var s = _animator.GetCurrentAnimatorStateInfo(0);
+        bool inLanding = s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
+        if (!inLanding) return true;
+        return s.normalizedTime >= 1.0f;
+    }
+
+    public void PauseLanding()
+    {
+        if (!_animator || _landingPaused) return;
+        _landingPaused = true;
+        _animator.speed = 0f;
+    }
+
+    public void ResumeLanding()
+    {
+        if (!_animator || !_landingPaused) return;
+        _landingPaused = false;
+        _animator.speed = 1f;
     }
 
     public void TriggerAgro()

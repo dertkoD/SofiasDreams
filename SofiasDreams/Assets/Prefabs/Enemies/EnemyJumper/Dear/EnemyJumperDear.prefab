@@ -656,6 +656,7 @@ MonoBehaviour:
   JumpStartVy: 0
   LandingTriggered: 0
   WaitingForWindup: 0
+  LandingAnimDone: 0
   PendingAggroTrigger: 0
   PendingPatrolTrigger: 0
   LastHp: -2147483648
