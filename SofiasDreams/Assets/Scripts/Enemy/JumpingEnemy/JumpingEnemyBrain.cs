@@ -66,7 +66,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float JumpStartVy;
     [HideInInspector] public bool LandingTriggered;
     [HideInInspector] public bool WaitingForWindup;
-    [HideInInspector] public bool LandingAnimDone;
+    [HideInInspector] public float LandingAnimEndTime = -1f;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -240,7 +240,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
             WaitingForWindup = true;
-            LandingAnimDone = false;
+            LandingAnimEndTime = -1f;
         }
 
         float yParam = 0f;
@@ -268,23 +268,22 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         bool stunDone = Time.time >= LandingStunUntil;
 
-        if (!LandingAnimDone)
-        {
-            float nt = Anim.GetLandingNormalizedTime();
-            if (nt >= 1.0f)
-            {
-                LandingAnimDone = true;
-                if (!stunDone)
-                    Anim.PauseLanding();
-            }
-        }
-
         if (stunDone)
         {
             WaitingForWindup = false;
             Anim.ResumeLanding();
             Anim.FireTriggerWindup();
+            return;
         }
+
+        if (LandingAnimEndTime < 0f && Anim.TryGetLandingInfo(out float len, out float nt))
+        {
+            float remaining = Mathf.Max(0f, len * (1f - Mathf.Clamp01(nt)));
+            LandingAnimEndTime = Time.time + remaining;
+        }
+
+        if (LandingAnimEndTime >= 0f && Time.time >= LandingAnimEndTime)
+            Anim.PauseLanding();
     }
 
     float GetLandingStun(bool isAggro)
@@ -349,7 +348,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         JumpBool = true;
         LandingTriggered = false;
         WaitingForWindup = false;
-        LandingAnimDone = false;
+        LandingAnimEndTime = -1f;
         Anim.ResumeLanding();
         LastJumpStartedAt = Time.time;
         JumpStartVy = Motor.Velocity.y;
