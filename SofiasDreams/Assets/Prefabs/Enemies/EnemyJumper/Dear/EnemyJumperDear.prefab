@@ -602,6 +602,7 @@ MonoBehaviour:
   _animator: {fileID: 4308740017295864520}
   _yVelocity: yVelocity
   _landingTrigger: Landing
+  _triggerWindup: TriggerWindup
   _agroTrigger: Agro
   _patrolTrigger: Patrol
   _deathFromPatrolTrigger: DeathFromPatrol
@@ -654,6 +655,7 @@ MonoBehaviour:
   LastJumpStartedAt: 0
   JumpStartVy: 0
   LandingTriggered: 0
+  WaitingForWindup: 0
   PendingAggroTrigger: 0
   PendingPatrolTrigger: 0
   LastHp: -2147483648

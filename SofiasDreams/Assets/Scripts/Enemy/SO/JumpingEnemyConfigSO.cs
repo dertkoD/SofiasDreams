@@ -29,7 +29,7 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float patrolJumpHorizontalSpeed = 3.5f;
     [Tooltip("Multiplier for the overall jump speed. >1 = faster, <1 = slower.")]
     [Min(0.01f)] public float patrolJumpSpeed = 1f;
-    [Min(0f)] public float landingStunSeconds = 0.10f;
+    [Min(0f)] public float patrolLandingStunSeconds = 0.10f;
     [Tooltip("Height above ground at which the landing animation triggers (raycast down).")]
     [Min(0f)] public float landingTriggerHeight = 1.0f;
 
@@ -40,5 +40,5 @@ public class JumpingEnemyConfigSO : ScriptableObject
     [Min(0f)] public float aggroJumpHorizontalSpeed = 5.0f;
     [Tooltip("Multiplier for the overall jump speed. >1 = faster, <1 = slower.")]
     [Min(0.01f)] public float aggroJumpSpeed = 1f;
+    [Min(0f)] public float aggroLandingStunSeconds = 0.10f;
 }
-

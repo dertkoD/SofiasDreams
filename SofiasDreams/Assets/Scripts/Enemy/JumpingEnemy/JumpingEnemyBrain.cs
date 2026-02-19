@@ -65,6 +65,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
     [HideInInspector] public float LastJumpStartedAt;
     [HideInInspector] public float JumpStartVy;
     [HideInInspector] public bool LandingTriggered;
+    [HideInInspector] public bool WaitingForWindup;
     
     // Pending Triggers
     [HideInInspector] public bool PendingAggroTrigger;
@@ -160,6 +161,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         }
 
         TickAnimatorParams();
+        TickWindupTrigger();
 
         bool sees = TrySense(out var target);
         if (sees)
@@ -212,7 +214,6 @@ public class JumpingEnemyBrain : BaseEnemyBrain
             && PrevY < -0.10f
             && Mathf.Abs(y) < 0.02f;
 
-        // Fire landing animation early based on height above ground
         if (JumpBool && !LandingTriggered && y < 0f)
         {
             float triggerH = Config != null ? Config.landingTriggerHeight : 1f;
@@ -233,19 +234,19 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
             if (CurrentState is IJumpingState js) js.OnLanded();
 
-            float stun = Config != null ? Mathf.Max(0f, Config.landingStunSeconds) : 0.10f;
+            bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
+            float stun = GetLandingStun(isAggro);
             LandingStunUntil = Mathf.Max(LandingStunUntil, Time.time + stun);
             NextJumpAt = Mathf.Max(NextJumpAt, LandingStunUntil);
+            WaitingForWindup = true;
         }
 
-        // yVelocity from rb: 1 = going up (Windup), -1 = falling (Landing)
         float yParam = 0f;
         if (JumpBool && !LandingTriggered)
         {
             float maxVy = Mathf.Max(Mathf.Abs(JumpStartVy), 0.01f);
             yParam = Mathf.Clamp(y / maxVy, -1f, 1f);
 
-            // Restart blend tree at the peak so the falling blend clip plays from frame 0
             if (PrevY > 0f && y <= 0f)
             {
                 bool isAggro = CurrentState == AggroState || CurrentState == AggroTriggerState;
@@ -256,6 +257,22 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         PrevGrounded = grounded;
         PrevY = y;
+    }
+
+    void TickWindupTrigger()
+    {
+        if (!WaitingForWindup) return;
+        if (Time.time < LandingStunUntil) return;
+
+        WaitingForWindup = false;
+        if (Anim != null)
+            Anim.FireTriggerWindup();
+    }
+
+    float GetLandingStun(bool isAggro)
+    {
+        if (Config == null) return 0.10f;
+        return Mathf.Max(0f, isAggro ? Config.aggroLandingStunSeconds : Config.patrolLandingStunSeconds);
     }
 
     // --- Logic & Helpers ---
@@ -313,6 +330,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         JumpBool = true;
         LandingTriggered = false;
+        WaitingForWindup = false;
         LastJumpStartedAt = Time.time;
         JumpStartVy = Motor.Velocity.y;
         return true;
@@ -324,6 +342,7 @@ public class JumpingEnemyBrain : BaseEnemyBrain
         if (!Motor.IsGrounded) return false;
         if (JumpBool) return false;
         if (Time.time < LandingStunUntil) return false;
+        if (WaitingForWindup) return false;
         if (Anim != null && Anim.IsInLanding()) return false;
         return Mathf.Abs(Motor.Velocity.y) <= Mathf.Max(0f, Config.groundedVelocityEpsilon);
     }
@@ -522,14 +541,6 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
     {
         if (_brain.Config == null || _brain.Motor == null) return;
         
-        // Check Aggro
-        if (_brain.TrySense(out var t)) { _brain.RequestAggroTrigger(); return; } // Actually Brain.Update calls logic too, but we need to break
-        // Actually Brain checks `sees` and updates timers. RequestAggroTrigger is triggered by events.
-        // But in original TickPatrol: if (sees) { RequestAggroTrigger(); break; }
-        // So we should check here too or rely on Brain?
-        // Brain's Update: "bool sees = TrySense... if(sees)..."
-        // But Brain DOES NOT automatically switch to Aggro unless PendingAggroTrigger.
-        // We need to request it here.
         if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var _))
         {
             _brain.RequestAggroTrigger();
@@ -546,7 +557,6 @@ public class JumpingPatrolState : IEnemyState, JumpingEnemyBrain.IJumpingState
         if (Vector2.Distance(_brain.transform.position, cur) <= arrive)
             _brain.AdvancePathIndex();
 
-        // Check Jump Distance
         if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0)
         {
             Vector2 targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
@@ -644,7 +654,6 @@ public class JumpingAggroTriggerState : IEnemyState
     }
     public void Exit() 
     {
-        // When entering Aggro state, allow immediate jump
         _brain.NextJumpAt = Time.time;
         if (_brain.Config != null) _brain.ForgetLeft = _brain.Config.aggroForgetSeconds;
     }
@@ -726,7 +735,6 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
 
         if (_brain.Anim != null && _brain.Anim.IsInPatrolTrigger()) return;
 
-        // Check if back on route
         if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0 && _brain.Motor.IsGrounded)
         {
             float minX = float.MaxValue;
@@ -747,7 +755,6 @@ public class JumpingReturnState : IEnemyState, JumpingEnemyBrain.IJumpingState
             }
         }
 
-        // Return logic
         if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0 && _brain.ReturningToRoute)
         {
             Vector2 dst = _brain.CurrentPath.GetPoint(_brain.ReturnTargetIndex);
