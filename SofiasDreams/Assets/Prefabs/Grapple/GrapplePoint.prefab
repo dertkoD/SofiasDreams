@@ -222,9 +222,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d5d8a3aa88acb5489e1822a18946a04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gizmoSize: 0.4
-  gizmoColor: {r: 0.06579768, g: 0.7433963, b: 0, a: 1}
   spotLight2D: {fileID: 9093548110745559441}
+  onIntensity: 1
+  fadeInTime: 0.15
+  fadeOutTime: 0.2
 --- !u!58 &6386310771247928244
 CircleCollider2D:
   m_ObjectHideFlags: 0

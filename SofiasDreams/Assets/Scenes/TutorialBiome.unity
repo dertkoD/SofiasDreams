@@ -61222,6 +61222,11 @@ MonoBehaviour:
   oneShot: 1
   hint: {fileID: 274973662}
   destroyHintOnUse: 1
+  spotLight2D: {fileID: 1493379363}
+  baseIntensity: 3
+  pulseAmplitude: 1.65
+  pulseSpeed: 1.5
+  fadeOutTime: 0.25
   _dissolveController: {fileID: 554466143}
   _dissolveSettings: {fileID: 11400000, guid: 9c3198f7bc7fd21428b771eb9774be35, type: 2}
 --- !u!4 &554466142
@@ -86045,6 +86050,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BonfireInteractable
   bonfireId: bonfire_01
   checkpoint: {fileID: 259669235}
+  bonfireLight: {fileID: 589277761}
+  baseIntensity: 1.5
+  pulseAmplitude: 0
+  pulseSpeed: 0
+  igniteTime: 0.35
 --- !u!212 &1989230756
 SpriteRenderer:
   serializedVersion: 2

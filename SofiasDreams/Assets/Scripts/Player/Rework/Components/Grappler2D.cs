@@ -23,18 +23,12 @@ public class Grappler2D : MonoBehaviour, IGrappler
     float     _originalGravity;
     bool      _gravityOverridden;
     Coroutine _routine;
-    
+
     [Header("Grapple Point Light")]
     [SerializeField] float highlightScanInterval = 0.10f;
 
-    float _nextHighlightScanTime;
-
+    float _nextScan;
     readonly HashSet<GrapplePoint> _litCandidates = new HashSet<GrapplePoint>();
-
-    readonly HashSet<GrapplePoint> _tmpCandidates = new HashSet<GrapplePoint>();
-
-    readonly List<GrapplePoint> _tmpToDisable = new List<GrapplePoint>();
-
     GrapplePoint _latchedPoint;
 
     public bool IsGrappling => _isGrappling;
@@ -72,93 +66,102 @@ public class Grappler2D : MonoBehaviour, IGrappler
     {
         _bus?.Unsubscribe<GrappleCommand>(OnGrappleCommand);
     }
-    
+
     void Update()
     {
         if (!_configured || rb == null) return;
-
         if (_isGrappling) return;
 
-        if (Time.time < _nextHighlightScanTime) return;
-        _nextHighlightScanTime = Time.time + Mathf.Max(0.01f, highlightScanInterval);
+        if (Time.time < _nextScan) return;
+        _nextScan = Time.time + Mathf.Max(0.02f, highlightScanInterval);
 
         RefreshCandidateLights();
     }
 
     void RefreshCandidateLights()
     {
-        bool canGrappleNow = Time.time >= _cooldownUntil && !_isGrappling;
-
-        _tmpCandidates.Clear();
-
-        if (canGrappleNow)
+        // если на кулдауне — гасим кандидатов (чтобы не подсвечивать пока нельзя)
+        if (Time.time < _cooldownUntil)
         {
-            Vector2 origin = rb.position;
-            var hits = Physics2D.OverlapCircleAll(origin, _s.radius, _s.grappleLayer);
+            ClearCandidates();
+            return;
+        }
 
-            if (hits != null)
+        Vector2 origin = rb ? rb.position : (Vector2)transform.position;
+        var hits = Physics2D.OverlapCircleAll(origin, _s.radius, _s.grappleLayer);
+
+        // текущие кандидаты
+        var current = new HashSet<GrapplePoint>();
+
+        if (hits != null)
+        {
+            foreach (var h in hits)
             {
-                foreach (var h in hits)
-                {
-                    if (!h) continue;
+                if (!h) continue;
 
-                    var gp = h.GetComponentInParent<GrapplePoint>() ?? h.GetComponentInChildren<GrapplePoint>();
-                    if (!gp) continue;
+                // lock check
+                var lockComp = h.GetComponentInParent<GrapplePointLock>()
+                            ?? h.GetComponentInChildren<GrapplePointLock>();
+                if (lockComp != null && lockComp.IsLocked)
+                    continue;
 
-                    // latched всегда держим включенным отдельно
-                    if (_latchedPoint != null && gp == _latchedPoint) continue;
+                // must have GrapplePoint to control light
+                var gp = h.GetComponentInParent<GrapplePoint>()
+                      ?? h.GetComponentInChildren<GrapplePoint>();
+                if (!gp) continue;
 
-                    Vector2 p = h.transform.position;
-                    if (IsEligibleCandidate(origin, p, h))
-                        _tmpCandidates.Add(gp);
-                }
+                if (_latchedPoint != null && gp == _latchedPoint)
+                    continue;
+
+                Vector2 p = h.transform.position;
+                Vector2 toP = p - origin;
+                if (toP.sqrMagnitude < 1e-6f) continue;
+
+                Vector2 dir = toP.normalized;
+
+                // half-circle above
+                if (Vector2.Dot(dir, Vector2.up) < 0f)
+                    continue;
+
+                // obstacle check
+                if (Physics2D.Linecast(origin, p, _s.obstacleLayer))
+                    continue;
+
+                current.Add(gp);
             }
         }
 
-        foreach (var gp in _tmpCandidates)
+        // включаем новые
+        foreach (var gp in current)
         {
-            if (gp == null) continue;
             if (_litCandidates.Add(gp))
                 gp.SetCandidate(true);
         }
 
-        _tmpToDisable.Clear();
+        // выключаем ушедшие
+        var toOff = new List<GrapplePoint>();
         foreach (var was in _litCandidates)
         {
-            if (was == null) { _tmpToDisable.Add(was); continue; }
-            if (!_tmpCandidates.Contains(was))
-                _tmpToDisable.Add(was);
+            if (was == null || !current.Contains(was))
+                toOff.Add(was);
         }
 
-        foreach (var off in _tmpToDisable)
+        foreach (var off in toOff)
         {
             if (off != null && off != _latchedPoint)
                 off.SetCandidate(false);
-
             _litCandidates.Remove(off);
         }
     }
 
-    bool IsEligibleCandidate(Vector2 origin, Vector2 point, Collider2D hitCollider)
+    void ClearCandidates()
     {
-        var lockComp = hitCollider.GetComponentInParent<GrapplePointLock>()
-                       ?? hitCollider.GetComponentInChildren<GrapplePointLock>();
-        if (lockComp != null && lockComp.IsLocked)
-            return false;
-
-        Vector2 toP = point - origin;
-        float distSq = toP.sqrMagnitude;
-        if (distSq < 1e-6f) return false;
-
-        Vector2 dir = toP.normalized;
-
-        if (Vector2.Dot(dir, Vector2.up) < 0f)
-            return false;
-
-        if (Physics2D.Linecast(origin, point, _s.obstacleLayer))
-            return false;
-
-        return true;
+        foreach (var gp in _litCandidates)
+        {
+            if (gp != null && gp != _latchedPoint)
+                gp.SetCandidate(false);
+        }
+        _litCandidates.Clear();
     }
 
     void LatchPoint(GrapplePoint p)
@@ -166,10 +169,7 @@ public class Grappler2D : MonoBehaviour, IGrappler
         if (_latchedPoint == p) return;
 
         if (_latchedPoint != null)
-        {
             _latchedPoint.SetLatched(false);
-            _latchedPoint = null;
-        }
 
         _latchedPoint = p;
 
@@ -177,12 +177,11 @@ public class Grappler2D : MonoBehaviour, IGrappler
         {
             _latchedPoint.SetCandidate(false);
             _litCandidates.Remove(_latchedPoint);
-
             _latchedPoint.SetLatched(true);
         }
     }
 
-    void ReleaseLatchedPoint()
+    void ReleaseLatchedPoint(bool rescanCandidates)
     {
         if (_latchedPoint != null)
         {
@@ -190,7 +189,8 @@ public class Grappler2D : MonoBehaviour, IGrappler
             _latchedPoint = null;
         }
 
-        RefreshCandidateLights();
+        if (rescanCandidates)
+            RefreshCandidateLights();
     }
 
     void OnGrappleCommand(GrappleCommand _)
@@ -199,19 +199,19 @@ public class Grappler2D : MonoBehaviour, IGrappler
         if (_isGrappling) return;
         if (Time.time < _cooldownUntil) return;
 
-        if (!TryFindTarget(out var point, out var targetPos))
+        if (!TryFindTarget(out var point, out var target))
         {
             _bus.Fire(new GrappleFinished { interrupted = true });
             return;
         }
-        
+
         LatchPoint(point);
 
-        // flip immediately toward grapple point ---
+        // flip immediately toward grapple point
         if (_mover != null)
         {
             Vector2 origin = rb ? rb.position : (Vector2)transform.position;
-            Vector2 toTarget = targetPos - origin;
+            Vector2 toTarget = target - origin;
 
             if (Mathf.Abs(toTarget.x) > 0.01f)
             {
@@ -219,9 +219,9 @@ public class Grappler2D : MonoBehaviour, IGrappler
                 _mover.ForceFacing(desiredDir);
             }
         }
-        
+
         _cooldownUntil = Time.time + _s.cooldown;
-        _routine = StartCoroutine(GrappleRoutine(targetPos));
+        _routine = StartCoroutine(GrappleRoutine(target));
     }
 
     bool TryFindTarget(out GrapplePoint bestPoint, out Vector2 bestTarget)
@@ -230,7 +230,6 @@ public class Grappler2D : MonoBehaviour, IGrappler
         bestTarget = Vector2.zero;
 
         Vector2 origin = rb ? rb.position : (Vector2)transform.position;
-
         var hits = Physics2D.OverlapCircleAll(origin, _s.radius, _s.grappleLayer);
         if (hits == null || hits.Length == 0) return false;
 
@@ -240,15 +239,30 @@ public class Grappler2D : MonoBehaviour, IGrappler
         {
             if (!h) continue;
 
-            var gp = h.GetComponentInParent<GrapplePoint>() ?? h.GetComponentInChildren<GrapplePoint>();
+            var lockComp = h.GetComponentInParent<GrapplePointLock>()
+                        ?? h.GetComponentInChildren<GrapplePointLock>();
+            if (lockComp != null && lockComp.IsLocked)
+                continue;
+
+            var gp = h.GetComponentInParent<GrapplePoint>()
+                  ?? h.GetComponentInChildren<GrapplePoint>();
             if (!gp) continue;
 
             Vector2 p = h.transform.position;
+            Vector2 toP = p - origin;
+            float distSq = toP.sqrMagnitude;
+            if (distSq < 1e-6f) continue;
 
-            if (!IsEligibleCandidate(origin, p, h))
+            Vector2 dir = toP.normalized;
+
+            // only above
+            if (Vector2.Dot(dir, Vector2.up) < 0f)
                 continue;
 
-            float distSq = (p - origin).sqrMagnitude;
+            // obstacle check
+            if (Physics2D.Linecast(origin, p, _s.obstacleLayer))
+                continue;
+
             if (distSq < bestDistSq)
             {
                 bestDistSq = distSq;
@@ -267,25 +281,21 @@ public class Grappler2D : MonoBehaviour, IGrappler
         _gate?.BlockMovement(MobilityBlockReason.Grapple);
         _gate?.BlockJump(MobilityBlockReason.Grapple);
 
-        // Tell animator we started grappling (will play frames 1–2 then 3)
         _bus.Fire(new GrappleStarted { point = target });
-        
-        _originalGravity   = rb.gravityScale;
+
+        _originalGravity = rb.gravityScale;
         _gravityOverridden = false;
 
         if (_s.zeroGravityWhileGrappling)
         {
-            rb.gravityScale   = 0f;
+            rb.gravityScale = 0f;
             _gravityOverridden = true;
         }
 
-        // Save entry speed BEFORE we freeze for startup
         _savedEntrySpeed = rb.linearVelocity.magnitude;
 
-        // Freeze velocity during anticipation so player doesn’t slide
         rb.linearVelocity = Vector2.zero;
 
-        // --- Startup pause for frames 1–2 ---
         if (_s.startupDelay > 0f)
         {
             float t = 0f;
@@ -295,11 +305,10 @@ public class Grappler2D : MonoBehaviour, IGrappler
                 yield return new WaitForFixedUpdate();
             }
         }
-        // ------------------------------------
 
-        Vector2 startPos       = rb.position;
-        Vector2 toTargetStart  = target - startPos;
-        
+        Vector2 startPos = rb.position;
+        Vector2 toTargetStart = target - startPos;
+
         _savedTravelDir = toTargetStart.sqrMagnitude > 1e-6f
             ? toTargetStart.normalized
             : Vector2.up;
@@ -314,13 +323,13 @@ public class Grappler2D : MonoBehaviour, IGrappler
         while (true)
         {
             Vector2 pos = rb.position;
-            Vector2 to  = target - pos;
-            float d2    = to.sqrMagnitude;
+            Vector2 to = target - pos;
+            float d2 = to.sqrMagnitude;
             if (d2 <= stopSqr) break;
 
-            Vector2 dir  = to.normalized;
-            float step   = _s.moveSpeed * dt;
-            float dist   = Mathf.Sqrt(d2);
+            Vector2 dir = to.normalized;
+            float step = _s.moveSpeed * dt;
+            float dist = Mathf.Sqrt(d2);
             if (step > dist) step = dist;
 
             rb.MovePosition(pos + dir * step);
@@ -331,9 +340,9 @@ public class Grappler2D : MonoBehaviour, IGrappler
         {
             _isGrappling = false;
             _bus.Fire(new GrappleFinished { interrupted = false });
-            
+
             Vector2 pos = rb.position;
-            Vector2 to  = target - pos;
+            Vector2 to = target - pos;
             Vector2 dir = to.sqrMagnitude > 1e-6f ? to.normalized : _savedTravelDir;
             Vector2 desired = target - dir * Mathf.Max(_s.arrivalClearance, 0f);
 
@@ -341,12 +350,12 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
             if (_gravityOverridden)
             {
-                rb.gravityScale    = _originalGravity;
+                rb.gravityScale = _originalGravity;
                 _gravityOverridden = false;
             }
 
-            float   carry    = _savedEntrySpeed * Mathf.Clamp01(_s.carryOverEntrySpeedFactor);
-            float   strength = _s.exitStrength + carry;
+            float carry = _savedEntrySpeed * Mathf.Clamp01(_s.carryOverEntrySpeedFactor);
+            float strength = _s.exitStrength + carry;
             Vector2 rawExitVel = _savedTravelDir * strength;
 
             float maxX = Mathf.Max(0f, _s.maxExitSpeedX);
@@ -421,7 +430,7 @@ public class Grappler2D : MonoBehaviour, IGrappler
         }
 
         float keepOff = Mathf.Max(_s.hardLockDuration, _s.exitBlendTime);
-        float guard   = 0f;
+        float guard = 0f;
         while (guard < keepOff)
         {
             guard += Time.fixedDeltaTime;
@@ -431,7 +440,7 @@ public class Grappler2D : MonoBehaviour, IGrappler
         _gate?.UnblockMovement(MobilityBlockReason.Grapple);
         _gate?.UnblockJump(MobilityBlockReason.Grapple);
 
-        ReleaseLatchedPoint();
+        ReleaseLatchedPoint(rescanCandidates: true);
         _routine = null;
     }
 
@@ -444,7 +453,7 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         if (_gravityOverridden)
         {
-            rb.gravityScale    = _originalGravity;
+            rb.gravityScale = _originalGravity;
             _gravityOverridden = false;
         }
 
@@ -453,8 +462,8 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         _isGrappling = false;
         _bus.Fire(new GrappleFinished { interrupted = true });
-        
-        ReleaseLatchedPoint();
+
+        ReleaseLatchedPoint(rescanCandidates: true);
         _routine = null;
     }
 
