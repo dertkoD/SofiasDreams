@@ -268,14 +268,18 @@ public class JumpingEnemyBrain : BaseEnemyBrain
 
         bool stunDone = Time.time >= LandingStunUntil;
 
-        if (!LandingAnimDone && Anim.IsLandingAnimationDone())
+        if (!LandingAnimDone)
         {
-            LandingAnimDone = true;
-            if (!stunDone)
-                Anim.PauseLanding();
+            float nt = Anim.GetLandingNormalizedTime();
+            if (nt >= 1.0f)
+            {
+                LandingAnimDone = true;
+                if (!stunDone)
+                    Anim.PauseLanding();
+            }
         }
 
-        if (LandingAnimDone && stunDone)
+        if (stunDone)
         {
             WaitingForWindup = false;
             Anim.ResumeLanding();
