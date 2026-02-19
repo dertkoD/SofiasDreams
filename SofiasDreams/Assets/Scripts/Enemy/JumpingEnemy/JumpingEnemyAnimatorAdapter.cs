@@ -123,6 +123,12 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     {
         if (!_animator || _landingPaused) return;
         _landingPaused = true;
+
+        var s = _animator.GetCurrentAnimatorStateInfo(0);
+        bool inLanding = s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
+        if (inLanding)
+            _animator.Play(s.shortNameHash, 0, 1f);
+
         _animator.speed = 0f;
     }
 
