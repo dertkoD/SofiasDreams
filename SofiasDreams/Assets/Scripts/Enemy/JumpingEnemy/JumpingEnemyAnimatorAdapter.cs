@@ -8,6 +8,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     [Header("Animator params (names must match controller)")]
     [SerializeField] string _yVelocity = "yVelocity";
     [SerializeField] string _landingTrigger = "Landing";
+    [SerializeField] string _triggerWindup = "TriggerWindup";
     [SerializeField] string _agroTrigger = "Agro";
     [SerializeField] string _patrolTrigger = "Patrol";
     [SerializeField] string _deathFromPatrolTrigger = "DeathFromPatrol";
@@ -23,6 +24,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
 
     int _yVelocityHash;
     int _landingHash;
+    int _triggerWindupHash;
     int _agroHash;
     int _patrolHash;
     int _deathPatrolHash;
@@ -30,6 +32,8 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
     int _patrolBlendHash;
     int _agroBlendHash;
     bool _hasYVelocity;
+    bool _hasTriggerWindup;
+    bool _landingPaused;
 
     void Reset()
     {
@@ -43,6 +47,7 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
 
         _yVelocityHash = FindParam(_yVelocity, "yVelocity", out _hasYVelocity);
         _landingHash = FindParam(_landingTrigger, "Landing", out _);
+        _triggerWindupHash = FindParam(_triggerWindup, "TriggerWindup", out _hasTriggerWindup);
         _agroHash = FindParam(_agroTrigger, "Agro", out _);
         _patrolHash = FindParam(_patrolTrigger, "Patrol", out _);
         _deathPatrolHash = FindParam(_deathFromPatrolTrigger, "DeathFromPatrol", out _);
@@ -96,6 +101,30 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetTrigger(_landingHash);
     }
 
+    public void FireTriggerWindup()
+    {
+        if (_animator && _hasTriggerWindup) _animator.SetTrigger(_triggerWindupHash);
+    }
+
+    public void PauseLandingNearEnd()
+    {
+        if (!_animator || _landingPaused) return;
+        var s = _animator.GetCurrentAnimatorStateInfo(0);
+        bool inLanding = s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
+        if (!inLanding) return;
+        if (s.normalizedTime < 0.85f) return;
+
+        _landingPaused = true;
+        _animator.speed = 0f;
+    }
+
+    public void ResumeLanding()
+    {
+        if (!_animator || !_landingPaused) return;
+        _landingPaused = false;
+        _animator.speed = 1f;
+    }
+
     public void TriggerAgro()
     {
         if (_animator) _animator.SetTrigger(_agroHash);
@@ -121,6 +150,18 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (!_animator) return false;
         var s = _animator.GetCurrentAnimatorStateInfo(0);
         return s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
+    }
+
+    public bool IsInPatrolLanding()
+    {
+        if (!_animator) return false;
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_patrolLandingStateName);
+    }
+
+    public bool IsInAgroLanding()
+    {
+        if (!_animator) return false;
+        return _animator.GetCurrentAnimatorStateInfo(0).IsName(_agroLandingStateName);
     }
 
     public bool IsInAttackLoop()

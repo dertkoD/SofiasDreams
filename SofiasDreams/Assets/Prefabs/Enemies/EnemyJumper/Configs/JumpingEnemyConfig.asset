@@ -28,10 +28,11 @@ MonoBehaviour:
   patrolJumpHeight: 1.5
   patrolJumpHorizontalSpeed: 3
   patrolJumpSpeed: 1.5
-  landingStunSeconds: 1.5
-  landingTriggerHeight: 1.5
+  patrolLandingStunSeconds: 0
+  landingTriggerHeight: 0.5
   aggroForgetSeconds: 4
   aggroJumpCooldown: 0.1
   aggroJumpHeight: 3
   aggroJumpHorizontalSpeed: 4
   aggroJumpSpeed: 2
+  aggroLandingStunSeconds: 1.5
