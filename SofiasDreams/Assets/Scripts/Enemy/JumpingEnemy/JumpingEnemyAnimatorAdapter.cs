@@ -106,29 +106,15 @@ public class JumpingEnemyAnimatorAdapter : MonoBehaviour
         if (_animator && _hasTriggerWindup) _animator.SetTrigger(_triggerWindupHash);
     }
 
-    public bool TryGetLandingInfo(out float clipLength, out float normalizedTime)
-    {
-        clipLength = 0f;
-        normalizedTime = 0f;
-        if (!_animator) return false;
-        var s = _animator.GetCurrentAnimatorStateInfo(0);
-        bool inLanding = s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
-        if (!inLanding) return false;
-        clipLength = s.length;
-        normalizedTime = s.normalizedTime;
-        return true;
-    }
-
-    public void PauseLanding()
+    public void PauseLandingNearEnd()
     {
         if (!_animator || _landingPaused) return;
-        _landingPaused = true;
-
         var s = _animator.GetCurrentAnimatorStateInfo(0);
         bool inLanding = s.IsName(_patrolLandingStateName) || s.IsName(_agroLandingStateName);
-        if (inLanding)
-            _animator.Play(s.shortNameHash, 0, 1f);
+        if (!inLanding) return;
+        if (s.normalizedTime < 0.85f) return;
 
+        _landingPaused = true;
         _animator.speed = 0f;
     }
 
