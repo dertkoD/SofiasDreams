@@ -63,12 +63,15 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         if (_input.HealPressed())  _commands.HealBegin();
         if (_input.HealReleased()) _commands.HealCancel();
-        
+
         if (_input.DashPressed())
             _commands.Dash();
-        
+
         if (_input.InteractPressed())
             _commands.Interact();
+
+        if (_input.WeaponSwitchPressed())
+            _commands.SwitchWeapon();
     }
 
     void HandleAttack(bool jumpPressedThisFrame)

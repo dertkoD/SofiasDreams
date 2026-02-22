@@ -48,15 +48,32 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [Header("Grapple")]
     [SerializeField] string pIsGrappling = "isGrappling";
 
+    [Header("Weapon Switch")]
+    [SerializeField] string pChangeWeaponTrig = "ChangeWeapon";
+    [SerializeField] string stChangeWeapon    = "ChangeWeapon";
+
+    [Header("Dagger combo")]
+    [SerializeField] string pDagAtk1 = "IsDaggerAttack1";
+    [SerializeField] string pDagAtk2 = "IsDaggerAttack2";
+    [SerializeField] string pDagSuperTrig = "DaggerAttackSuper";
+    [SerializeField] string stDagSuper    = "DaggerAttackSuper";
+
+    [Header("Dagger air")]
+    [SerializeField] string pDagFlyUpBool   = "DaggerFlyAttackUp";
+    [SerializeField] string pDagFlyDownBool = "DaggerFlyAttackDown";
+    [SerializeField] string stDagFlyUp      = "DaggerFlyAttackUp";
+    [SerializeField] string stDagFlyDown    = "DaggerFlyAttackDown";
+
     [Header("Tracking Settings")]
-    [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f; 
-    [SerializeField] float enterTimeout = 0.25f;   
-    [SerializeField] float safetyTimeout = 2.0f;  
+    [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f;
+    [SerializeField] float enterTimeout = 0.25f;
+    [SerializeField] float safetyTimeout = 2.0f;
 
     SignalBus _bus;
     PlayerAnimatorConfig _configOverride;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
+    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
 
     [Inject]
     void Construct(SignalBus bus, [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null)
@@ -134,7 +151,50 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pAirUpBool, true);
         Restart(ref _tAirUp, TrackAirBool(stAirUp, pAirUpBool, AttackMode.AirUp));
     }
-    
+
+    // ───────── Dagger ─────────
+
+    public void PlayDaggerAttack(int index)
+    {
+        SetBool(pDagAtk1, index == 1);
+        SetBool(pDagAtk2, index == 2);
+    }
+
+    public void PlayDaggerSuperAttack()
+    {
+        if (!animator) return;
+        SetBool(pDagAtk1, false);
+        SetBool(pDagAtk2, false);
+        animator.SetTrigger(pDagSuperTrig);
+        Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.DaggerSuper, index = 3 })));
+    }
+
+    public void PlayDaggerFlyAttackUp()
+    {
+        if (!animator) return;
+        SetBool(pDagFlyUpBool, true);
+        Restart(ref _tDagFlyUp, TrackAirBool(stDagFlyUp, pDagFlyUpBool, AttackMode.DaggerFlyUp));
+    }
+
+    public void PlayDaggerFlyAttackDown()
+    {
+        if (!animator) return;
+        SetBool(pDagFlyDownBool, true);
+        Restart(ref _tDagFlyDown, TrackAirBool(stDagFlyDown, pDagFlyDownBool, AttackMode.DaggerFlyDown));
+    }
+
+    public void PlayChangeWeapon(Action onComplete = null)
+    {
+        if (!animator)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+        animator.SetTrigger(pChangeWeaponTrig);
+        Restart(ref _tChangeWeapon, TrackExitByName(stChangeWeapon, onComplete));
+    }
+
     public void PlayHealStart()
     {
         if (!animator) return;
@@ -222,6 +282,19 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         pDashTrig = config.dashTrigger;
         pIsGrappling = config.grappleBool;
 
+        pChangeWeaponTrig = config.changeWeaponTrigger;
+        stChangeWeapon    = config.changeWeaponState;
+
+        pDagAtk1        = config.daggerAttack1Bool;
+        pDagAtk2        = config.daggerAttack2Bool;
+        pDagSuperTrig   = config.daggerSuperTrigger;
+        stDagSuper      = config.daggerSuperState;
+
+        pDagFlyUpBool   = config.daggerFlyUpBool;
+        pDagFlyDownBool = config.daggerFlyDownBool;
+        stDagFlyUp      = config.daggerFlyUpState;
+        stDagFlyDown    = config.daggerFlyDownState;
+
         clipEndThreshold = config.clipEndThreshold;
         enterTimeout = config.enterTimeout;
         safetyTimeout = config.safetyTimeout;
@@ -302,9 +375,19 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             SetBool(pAtk3, false);
         }
 
+        if (e.mode == AttackMode.DaggerCombo)
+        {
+            SetBool(pDagAtk1, false);
+            SetBool(pDagAtk2, false);
+        }
+
         if (e.mode == AttackMode.Up     && _tUp      != null) { StopCoroutine(_tUp);      _tUp      = null; }
         if (e.mode == AttackMode.AirFwd && _tAirFwd  != null) { StopCoroutine(_tAirFwd);  _tAirFwd  = null; SetBool(pAirFwdBool,  false); }
         if (e.mode == AttackMode.AirDown&& _tAirDown != null) { StopCoroutine(_tAirDown); _tAirDown = null; SetBool(pAirDownBool, false); }
         if (e.mode == AttackMode.AirUp  && _tAirUp   != null) { StopCoroutine(_tAirUp);   _tAirUp   = null; SetBool(pAirUpBool,   false); }
+
+        if (e.mode == AttackMode.DaggerSuper  && _tDagSuper  != null) { StopCoroutine(_tDagSuper);  _tDagSuper  = null; }
+        if (e.mode == AttackMode.DaggerFlyUp  && _tDagFlyUp  != null) { StopCoroutine(_tDagFlyUp);  _tDagFlyUp  = null; SetBool(pDagFlyUpBool,   false); }
+        if (e.mode == AttackMode.DaggerFlyDown&& _tDagFlyDown!= null) { StopCoroutine(_tDagFlyDown); _tDagFlyDown= null; SetBool(pDagFlyDownBool, false); }
     }
 }

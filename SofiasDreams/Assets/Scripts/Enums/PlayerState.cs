@@ -1,4 +1,4 @@
 public enum PlayerState
 {
-    Idle, Move, Jump, Attack, Heal, Hurt, Dead, Dash, Grapple, BonfireRest
+    Idle, Move, Jump, Attack, Heal, Hurt, Dead, Dash, Grapple, BonfireRest, ChangeWeapon
 }

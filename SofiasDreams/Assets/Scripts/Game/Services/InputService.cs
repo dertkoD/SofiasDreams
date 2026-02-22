@@ -18,4 +18,5 @@ public class InputService : IInputService
     public bool GrapplePressed() => Input.GetKeyDown(KeyCode.E);
 
     public bool InteractPressed() => Input.GetKeyDown(KeyCode.F);
+    public bool WeaponSwitchPressed() => Input.GetKeyDown(KeyCode.Tab);
 }
