@@ -55,6 +55,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [Header("Dagger combo")]
     [SerializeField] string pDagAtk1 = "IsDaggerAttack1";
     [SerializeField] string pDagAtk2 = "IsDaggerAttack2";
+    [SerializeField] string stDagAtk1 = "DaggerAttack1";
+    [SerializeField] string stDagAtk2 = "DaggerAttack2";
     [SerializeField] string pDagSuperTrig = "DaggerAttackSuper";
     [SerializeField] string stDagSuper    = "DaggerAttackSuper";
 
@@ -71,15 +73,20 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
     SignalBus _bus;
     PlayerAnimatorConfig _configOverride;
+    DaggerCombat _daggerCombat;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
-    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
+    Coroutine _tChangeWeapon, _tDagCombo, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
 
     [Inject]
-    void Construct(SignalBus bus, [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null)
+    void Construct(
+        SignalBus bus,
+        [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null,
+        [Inject(Optional = true)] DaggerCombat daggerCombat = null)
     {
         _bus = bus;
         _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
+        _daggerCombat = daggerCombat;
     }
 
     public void Initialize()
@@ -158,6 +165,11 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     {
         SetBool(pDagAtk1, index == 1);
         SetBool(pDagAtk2, index == 2);
+
+        if (!animator) return;
+        string stateName = index == 1 ? stDagAtk1 : stDagAtk2;
+        string boolParam = index == 1 ? pDagAtk1  : pDagAtk2;
+        Restart(ref _tDagCombo, TrackDaggerCombo(stateName, boolParam));
     }
 
     public void PlayDaggerSuperAttack()
@@ -167,7 +179,37 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pDagAtk2, false);
         animator.SetTrigger(pDagSuperTrig);
         Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
-            _bus?.Fire(new AttackFinished { mode = AttackMode.DaggerSuper, index = 3 })));
+            _daggerCombat?.FinishFromAnimation()));
+    }
+
+    IEnumerator TrackDaggerCombo(string stateName, string boolParam)
+    {
+        float t = 0f;
+        while (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName) && t < enterTimeout)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName))
+        {
+            SetBool(boolParam, false);
+            _daggerCombat?.FinishFromAnimation();
+            yield break;
+        }
+
+        float safe = 0f;
+        while (safe < safetyTimeout)
+        {
+            var st = animator.GetCurrentAnimatorStateInfo(atkLayer);
+            if (!st.IsName(stateName)) break;
+            if (st.normalizedTime >= clipEndThreshold) break;
+            safe += Time.deltaTime;
+            yield return null;
+        }
+
+        SetBool(boolParam, false);
+        _daggerCombat?.FinishFromAnimation();
     }
 
     public void PlayDaggerFlyAttackUp()
@@ -287,6 +329,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
         pDagAtk1        = config.daggerAttack1Bool;
         pDagAtk2        = config.daggerAttack2Bool;
+        stDagAtk1       = config.daggerAttack1State;
+        stDagAtk2       = config.daggerAttack2State;
         pDagSuperTrig   = config.daggerSuperTrigger;
         stDagSuper      = config.daggerSuperState;
 
@@ -377,6 +421,14 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
         if (e.mode == AttackMode.DaggerCombo)
         {
+            if (_tDagCombo != null) { StopCoroutine(_tDagCombo); _tDagCombo = null; }
+            SetBool(pDagAtk1, false);
+            SetBool(pDagAtk2, false);
+        }
+
+        if (e.mode == AttackMode.DaggerSuper)
+        {
+            if (_tDagCombo  != null) { StopCoroutine(_tDagCombo);  _tDagCombo  = null; }
             SetBool(pDagAtk1, false);
             SetBool(pDagAtk2, false);
         }

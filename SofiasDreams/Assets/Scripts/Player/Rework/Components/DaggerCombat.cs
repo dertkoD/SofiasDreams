@@ -13,11 +13,12 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     bool _superQueued;
-    int _hitsLanded;
+    bool _step1Hit;
+    bool _step2Hit;
     Coroutine _floatCo;
 
     public bool IsAttacking => _attacking;
-    public bool CanSuperAttack => _hitsLanded >= 2 && _step == 2;
+    public bool CanSuperAttack => _step == 2;
 
     public float CurrentDamage =>
         _step == 1 ? (_cfg ? _cfg.damage1 : 8f) :
@@ -61,19 +62,16 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     public bool TryRequestSuperAttack()
     {
-        if (CanSuperAttack)
-        {
-            if (_attacking)
-            {
-                _superQueued = true;
-                return true;
-            }
+        if (!CanSuperAttack) return false;
 
-            StartSuper();
+        if (_attacking)
+        {
+            _superQueued = true;
             return true;
         }
 
-        return false;
+        StartSuper();
+        return true;
     }
 
     public void Interrupt()
@@ -91,7 +89,8 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _queued = false;
         _superQueued = false;
         _step = 0;
-        _hitsLanded = 0;
+        _step1Hit = false;
+        _step2Hit = false;
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
@@ -99,7 +98,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!_attacking) return;
 
-        if (_superQueued && _step == 2 && _hitsLanded >= 2)
+        if (_superQueued && _step == 2)
         {
             _superQueued = false;
             _queued = false;
@@ -122,7 +121,8 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = false;
         _bus.Fire(new AttackFinished { mode = mode, index = _step });
         _step = 0;
-        _hitsLanded = 0;
+        _step1Hit = false;
+        _step2Hit = false;
     }
 
     void StartSuper()
@@ -130,13 +130,21 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = true;
         _step = 3;
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
-        ApplyFloat();
     }
 
     void OnEnemyHit(EnemyHit e)
     {
-        if (_attacking && (_step == 1 || _step == 2))
-            _hitsLanded++;
+        if (!_attacking) return;
+
+        switch (_step)
+        {
+            case 1: _step1Hit = true; break;
+            case 2: _step2Hit = true; break;
+            case 3:
+                if (_step1Hit && _step2Hit)
+                    ApplyFloat();
+                break;
+        }
     }
 
     void ApplyFloat()
