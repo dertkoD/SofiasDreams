@@ -53,4 +53,15 @@ public class Weapon : MonoBehaviour
         target.ApplyDamage(Damage, hitPoint, hitNormal, gameObject);
         _bus.Fire(new EnemyHit { target = target });
     }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
+            return;
+
+        var hb = other.GetComponent<Hurtbox2D>();
+        var target = hb ? hb.Owner : null;
+        if (target != null)
+            _hitThisSwing.Remove(target);
+    }
 }
