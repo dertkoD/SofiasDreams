@@ -174,18 +174,16 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
-        {
-            _daggerCombat.RequestAttack();
-            _state = PlayerState.Attack;
-            return;
-        }
-
         if (_jumper.IsGrounded)
             _mover.StopHorizontal();
 
         Block(MobilityBlockReason.Attack);
-        _combo.RequestAttack();
+
+        if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
+            _daggerCombat.RequestAttack();
+        else
+            _combo.RequestAttack();
+
         _state = PlayerState.Attack;
     }
 

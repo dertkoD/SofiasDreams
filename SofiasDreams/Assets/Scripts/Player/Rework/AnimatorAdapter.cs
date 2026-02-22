@@ -76,7 +76,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     DaggerCombat _daggerCombat;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
-    Coroutine _tChangeWeapon, _tDagCombo, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
+    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
 
     [Inject]
     void Construct(
@@ -165,11 +165,6 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     {
         SetBool(pDagAtk1, index == 1);
         SetBool(pDagAtk2, index == 2);
-
-        if (!animator) return;
-        string stateName = index == 1 ? stDagAtk1 : stDagAtk2;
-        string boolParam = index == 1 ? pDagAtk1  : pDagAtk2;
-        Restart(ref _tDagCombo, TrackDaggerCombo(stateName, boolParam));
     }
 
     public void PlayDaggerSuperAttack()
@@ -180,36 +175,6 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         animator.SetTrigger(pDagSuperTrig);
         Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
             _daggerCombat?.FinishFromAnimation()));
-    }
-
-    IEnumerator TrackDaggerCombo(string stateName, string boolParam)
-    {
-        float t = 0f;
-        while (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName) && t < enterTimeout)
-        {
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        if (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName))
-        {
-            SetBool(boolParam, false);
-            _daggerCombat?.FinishFromAnimation();
-            yield break;
-        }
-
-        float safe = 0f;
-        while (safe < safetyTimeout)
-        {
-            var st = animator.GetCurrentAnimatorStateInfo(atkLayer);
-            if (!st.IsName(stateName)) break;
-            if (st.normalizedTime >= clipEndThreshold) break;
-            safe += Time.deltaTime;
-            yield return null;
-        }
-
-        SetBool(boolParam, false);
-        _daggerCombat?.FinishFromAnimation();
     }
 
     public void PlayDaggerFlyAttackUp()
@@ -419,16 +384,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             SetBool(pAtk3, false);
         }
 
-        if (e.mode == AttackMode.DaggerCombo)
+        if (e.mode is AttackMode.DaggerCombo or AttackMode.DaggerSuper)
         {
-            if (_tDagCombo != null) { StopCoroutine(_tDagCombo); _tDagCombo = null; }
-            SetBool(pDagAtk1, false);
-            SetBool(pDagAtk2, false);
-        }
-
-        if (e.mode == AttackMode.DaggerSuper)
-        {
-            if (_tDagCombo  != null) { StopCoroutine(_tDagCombo);  _tDagCombo  = null; }
             SetBool(pDagAtk1, false);
             SetBool(pDagAtk2, false);
         }
