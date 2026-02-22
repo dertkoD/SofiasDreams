@@ -726,6 +726,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5395965832727822489}
+  highlightScanInterval: 0.1
 --- !u!114 &2648787401972596842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1071,7 +1072,7 @@ MonoBehaviour:
   enemyHurtboxLayers:
     serializedVersion: 2
     m_Bits: 139264
-  defaultConfig: {fileID: 0}
+  defaultConfig: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
 --- !u!61 &595650535312990113
 BoxCollider2D:
   m_ObjectHideFlags: 0
