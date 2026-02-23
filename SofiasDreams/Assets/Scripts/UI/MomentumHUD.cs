@@ -18,10 +18,9 @@ public class MomentumHUD : MonoBehaviour
     SignalBus _bus;
 
     [Inject]
-    public void Construct(SignalBus bus) => _bus = bus;
-
-    void OnEnable()
+    public void Construct(SignalBus bus)
     {
+        _bus = bus;
         _bus.Subscribe<WeaponSwitched>(OnWeaponSwitched);
         _bus.Subscribe<MomentumChanged>(OnMomentumChanged);
 
@@ -29,10 +28,10 @@ public class MomentumHUD : MonoBehaviour
         Refresh(0);
     }
 
-    void OnDisable()
+    void OnDestroy()
     {
-        _bus.TryUnsubscribe<WeaponSwitched>(OnWeaponSwitched);
-        _bus.TryUnsubscribe<MomentumChanged>(OnMomentumChanged);
+        _bus?.TryUnsubscribe<WeaponSwitched>(OnWeaponSwitched);
+        _bus?.TryUnsubscribe<MomentumChanged>(OnMomentumChanged);
     }
 
     void OnWeaponSwitched(WeaponSwitched s)
@@ -65,7 +64,6 @@ public class MomentumHUD : MonoBehaviour
             if (!levelContainers[lvl]) continue;
 
             int first = lvl * segmentsPerLevel;
-            int last  = first + segmentsPerLevel - 1;
             bool hasAny = activeSegments > first;
             levelContainers[lvl].SetActive(hasAny);
         }
