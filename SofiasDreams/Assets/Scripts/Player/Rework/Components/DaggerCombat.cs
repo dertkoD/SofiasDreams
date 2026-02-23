@@ -15,7 +15,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _superQueued;
     bool _step1Hit;
     bool _step2Hit;
-    Coroutine _timerCo;
     Coroutine _floatCo;
 
     public bool IsAttacking => _attacking;
@@ -55,7 +54,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _superQueued = false;
         _step = (_step % 2) + 1;
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerCombo, index = _step });
-        StartTimer(GetStepDuration(_step));
     }
 
     public bool TryRequestSuperAttack()
@@ -76,7 +74,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!_attacking && _step == 0) return;
 
-        StopTimer();
         if (_floatCo != null) { StopCoroutine(_floatCo); _floatCo = null; }
 
         var mode = _step == 3 ? AttackMode.DaggerSuper : AttackMode.DaggerCombo;
@@ -92,7 +89,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     public void FinishFromAnimation()
     {
         if (!_attacking) return;
-        StopTimer();
 
         if (_superQueued && _step == 2)
         {
@@ -110,7 +106,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
             _step++;
             _attacking = true;
             _bus.Fire(new AttackStarted { mode = AttackMode.DaggerCombo, index = _step });
-            StartTimer(GetStepDuration(_step));
             return;
         }
 
@@ -142,28 +137,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
                     ApplyFloat();
                 break;
         }
-    }
-
-    float GetStepDuration(int step) =>
-        step == 1 ? (_cfg ? _cfg.attack1Duration : 0.35f)
-                   : (_cfg ? _cfg.attack2Duration : 0.35f);
-
-    void StartTimer(float duration)
-    {
-        StopTimer();
-        _timerCo = StartCoroutine(AttackTimer(duration));
-    }
-
-    void StopTimer()
-    {
-        if (_timerCo != null) { StopCoroutine(_timerCo); _timerCo = null; }
-    }
-
-    IEnumerator AttackTimer(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        _timerCo = null;
-        FinishFromAnimation();
     }
 
     void ApplyFloat()
