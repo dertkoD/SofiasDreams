@@ -23,4 +23,8 @@ public class DaggerAttackConfig : ScriptableObject
     [Range(0f, 1f)] public float floatGravityScale = 0.1f;
     [Tooltip("How long the reduced gravity lasts (seconds)")]
     [Min(0)] public float floatGravityDuration = 0.3f;
+
+    [Header("Air attack hover")]
+    [Tooltip("Gravity scale while performing dagger air attacks (0 = full freeze)")]
+    [Range(0f, 1f)] public float airHoverGravityScale = 0f;
 }

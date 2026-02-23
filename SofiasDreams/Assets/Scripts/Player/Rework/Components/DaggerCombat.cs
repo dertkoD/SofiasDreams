@@ -37,11 +37,15 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         if (!rb) rb = GetComponent<Rigidbody2D>();
         _origGravity = rb ? rb.gravityScale : 1f;
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
+        _bus.Subscribe<AttackStarted>(OnAttackStarted);
+        _bus.Subscribe<AttackFinished>(OnAttackFinished);
     }
 
     public void Dispose()
     {
         _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
+        _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
+        _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
     }
 
     // ───── Combo (2 hits) ─────
@@ -149,6 +153,33 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         RestoreGravity();
         _floatCo = null;
+    }
+
+    // ───── Air attack hover ─────
+
+    static bool IsDaggerAirMode(AttackMode m) =>
+        m is AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
+
+    void OnAttackStarted(AttackStarted s)
+    {
+        if (!IsDaggerAirMode(s.mode) || !rb) return;
+
+        if (!_gravityOverridden)
+        {
+            _origGravity = rb.gravityScale;
+            _gravityOverridden = true;
+        }
+
+        rb.gravityScale = _cfg != null ? _cfg.airHoverGravityScale : 0f;
+        var v = rb.linearVelocity;
+        v.y = 0f;
+        rb.linearVelocity = v;
+    }
+
+    void OnAttackFinished(AttackFinished s)
+    {
+        if (!IsDaggerAirMode(s.mode)) return;
+        RestoreGravity();
     }
 
     void RestoreGravity()
