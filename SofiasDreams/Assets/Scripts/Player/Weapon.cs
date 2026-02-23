@@ -55,10 +55,11 @@ public class Weapon : MonoBehaviour
         int dmg = Damage;
         if (BackstabMultiplier > 1f)
         {
-            Transform enemyRoot = other.transform.root;
-            float enemyFacing   = Mathf.Sign(enemyRoot.localScale.x);
-            float weaponSide    = Mathf.Sign(transform.position.x - enemyRoot.position.x);
-            if (weaponSide != enemyFacing)
+            Transform enemyRoot  = other.transform.root;
+            Transform playerRoot = transform.root;
+            float enemyFacing = Mathf.Sign(enemyRoot.localScale.x);
+            float playerSide  = Mathf.Sign(playerRoot.position.x - enemyRoot.position.x);
+            if (playerSide != enemyFacing)
                 dmg = Mathf.RoundToInt(dmg * BackstabMultiplier);
         }
 
