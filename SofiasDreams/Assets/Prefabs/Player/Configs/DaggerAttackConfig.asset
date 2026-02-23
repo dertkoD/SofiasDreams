@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7153a87eccc88cd4cbd9dbad736e6416, type: 3}
   m_Name: DaggerAttackConfig
   m_EditorClassIdentifier: Assembly-CSharp::DaggerAttackConfig
-  damage1: 8
-  damage2: 8
-  superDamage: 25
-  comboWindowTime: 0.6
+  damage1: 1
+  damage2: 1
+  superDamage: 1
+  chargeTime: 0.5
   superLaunchForce: 12
   floatDuration: 0.6
   floatGravityScale: 0.1

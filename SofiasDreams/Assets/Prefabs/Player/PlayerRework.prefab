@@ -484,6 +484,7 @@ GameObject:
   - component: {fileID: 8026534820593938046}
   - component: {fileID: 1573057834305744189}
   - component: {fileID: -1492794088512554747}
+  - component: {fileID: 6001317811132243814}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -821,6 +822,8 @@ MonoBehaviour:
   stDagAtk2: DaggerAttack2
   pDagSuperTrig: DaggerAttackSuperTrig
   stDagSuper: DaggerAttackSuper
+  pDagParryTrig: DaggerParryTrig
+  stDagParry: DaggerParry
   pDagFlyUpBool: DaggerFlyAttackUp
   pDagFlyDownBool: DaggerFlyAttackDown
   stDagFlyUp: DaggerFlyAttackUp
@@ -854,6 +857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DeadZone: 0.1
+  chargeHoldTime: 0.5
 --- !u!114 &4717383369296729062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1114,6 +1118,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DaggerCombat
   rb: {fileID: 5395965832727822489}
+--- !u!114 &6001317811132243814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6d3374ca301e2f4c967a183ea0c39f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DaggerMomentum
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
