@@ -58,6 +58,10 @@ public class SceneInstaller : MonoInstaller
             .FromComponentInHierarchy()
             .AsSingle();
 
+        Container.Bind<MomentumHUD>()
+            .FromComponentInHierarchy()
+            .AsSingle();
+
         Container.BindInterfacesAndSelfTo<Bootstrapper>()
             .FromComponentInHierarchy()
             .AsSingle();

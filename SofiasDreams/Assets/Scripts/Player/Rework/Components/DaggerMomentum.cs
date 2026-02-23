@@ -53,6 +53,9 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         int prevLevel = Mathf.FloorToInt(prev) / SegmentsPerLevel;
         if (Level < prevLevel)
             Debug.Log($"[Momentum] Decay → Level {Level} ({Segments}/{MaxSegments})");
+
+        if (Mathf.FloorToInt(prev) != Segments)
+            FireChanged();
     }
 
     public void OnParrySuccess()
@@ -81,6 +84,7 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         _segments = 0f;
         _decayTimer = 0f;
         Debug.Log($"[Momentum] Damage taken! Reset → Level 0 (0/{MaxSegments}) was Level {prevLevel}");
+        FireChanged();
     }
 
     void AddSegments(int amount, string source)
@@ -93,10 +97,23 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
 
         if (Level > prevLevel)
             Debug.Log($"[Momentum] ★ Level UP! {prevLevel} → {Level}");
+
+        FireChanged();
     }
 
     void ResetDecayTimer()
     {
         _decayTimer = _cfg ? _cfg.decayDelay : 5f;
+    }
+
+    void FireChanged()
+    {
+        _bus.Fire(new MomentumChanged
+        {
+            segments = Segments,
+            maxSegments = MaxSegments,
+            level = Level,
+            maxLevels = _cfg ? _cfg.maxLevels : 3
+        });
     }
 }
