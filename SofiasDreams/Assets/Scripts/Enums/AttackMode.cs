@@ -1,4 +1,5 @@
-public enum  AttackMode
+public enum AttackMode
 {
-    Combo, Up, AirFwd, AirDown, AirUp
+    Combo, Up, AirFwd, AirDown, AirUp,
+    DaggerCombo, DaggerSuper, DaggerFlyUp, DaggerFlyDown
 }

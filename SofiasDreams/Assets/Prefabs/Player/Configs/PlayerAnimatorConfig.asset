@@ -32,8 +32,21 @@ MonoBehaviour:
   healProcessTrigger: HealingProcess
   healStartTrigger: StartHealing
   healEndTrigger: EndHealing
+  healEndState: EndHealing
   dashTrigger: Dash
   grappleBool: isGrappling
+  changeWeaponTrigger: ChangeWeapon
+  changeWeaponState: ChangeWeapon
+  daggerAttack1Bool: IsDaggerAttack1
+  daggerAttack2Bool: IsDaggerAttack2
+  daggerAttack1State: DaggerAttack1
+  daggerAttack2State: DaggerAttack2
+  daggerSuperTrigger: DaggerAttackSuperTrig
+  daggerSuperState: DaggerAttackSuper
+  daggerFlyUpBool: DaggerFlyAttackUp
+  daggerFlyDownBool: DaggerFlyAttackDown
+  daggerFlyUpState: DaggerFlyAttackUp
+  daggerFlyDownState: DaggerFlyAttackDown
   clipEndThreshold: 0.98
   enterTimeout: 0.25
   safetyTimeout: 2

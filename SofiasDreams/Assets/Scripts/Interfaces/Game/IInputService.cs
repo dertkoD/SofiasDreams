@@ -1,4 +1,4 @@
-public interface  IInputService
+public interface IInputService
 {
     float GetMoveAxis();
     float GetVerticalRaw();
@@ -11,6 +11,7 @@ public interface  IInputService
     bool HealReleased();
     bool DashPressed();
     bool GrapplePressed();
-
     bool InteractPressed();
+    bool WeaponSwitchPressed();
+    bool ParryPressed();
 }

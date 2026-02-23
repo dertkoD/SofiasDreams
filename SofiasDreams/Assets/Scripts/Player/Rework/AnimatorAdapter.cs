@@ -48,21 +48,52 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [Header("Grapple")]
     [SerializeField] string pIsGrappling = "isGrappling";
 
+    [Header("Weapon Switch")]
+    [SerializeField] string pChangeWeaponTrig = "ChangeWeapon";
+    [SerializeField] string stChangeWeapon    = "ChangeWeapon";
+
+    [Header("Dagger combo")]
+    [SerializeField] string pDagAtk1 = "IsDaggerAttack1";
+    [SerializeField] string pDagAtk2 = "IsDaggerAttack2";
+    [SerializeField] string stDagAtk1 = "DaggerAttack1";
+    [SerializeField] string stDagAtk2 = "DaggerAttack2";
+    [SerializeField] string pDagSuperTrig = "DaggerAttackSuperTrig";
+    [SerializeField] string stDagSuper    = "DaggerAttackSuper";
+
+    [Header("Dagger parry")]
+    [SerializeField] string pDagParryTrig = "DaggerParryTrig";
+    [SerializeField] string stDagParry    = "DaggerParry";
+
+    [Header("Dagger air")]
+    [SerializeField] string pDagFlyUpBool   = "DaggerFlyAttackUp";
+    [SerializeField] string pDagFlyDownBool = "DaggerFlyAttackDown";
+    [SerializeField] string stDagFlyUp      = "DaggerFlyAttackUp";
+    [SerializeField] string stDagFlyDown    = "DaggerFlyAttackDown";
+
     [Header("Tracking Settings")]
-    [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f; 
-    [SerializeField] float enterTimeout = 0.25f;   
-    [SerializeField] float safetyTimeout = 2.0f;  
+    [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f;
+    [SerializeField] float enterTimeout = 0.25f;
+    [SerializeField] float safetyTimeout = 2.0f;
 
     SignalBus _bus;
     PlayerAnimatorConfig _configOverride;
+    DaggerCombat _daggerCombat;
+    DaggerMomentum _daggerMomentum;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
+    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
 
     [Inject]
-    void Construct(SignalBus bus, [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null)
+    void Construct(
+        SignalBus bus,
+        [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null,
+        [Inject(Optional = true)] DaggerCombat daggerCombat = null,
+        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null)
     {
         _bus = bus;
         _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
+        _daggerCombat = daggerCombat;
+        _daggerMomentum = daggerMomentum;
     }
 
     public void Initialize()
@@ -134,7 +165,69 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pAirUpBool, true);
         Restart(ref _tAirUp, TrackAirBool(stAirUp, pAirUpBool, AttackMode.AirUp));
     }
-    
+
+    // ───────── Dagger ─────────
+
+    public void PlayDaggerAttack(int index)
+    {
+        SetBool(pDagAtk1, index == 1);
+        SetBool(pDagAtk2, index == 2);
+
+        if (!animator) return;
+        ApplyMomentumSpeed();
+        string state = index == 1 ? stDagAtk1 : stDagAtk2;
+        animator.Play(state, atkLayer, 0f);
+
+        if (index == 2)
+            Restart(ref _tDagSuper, TrackExitByName(stDagAtk2, () =>
+            {
+                SetBool(pDagAtk2, false);
+                RestoreAnimatorSpeed();
+                _daggerCombat?.DaggerFinishFromAnimation();
+            }));
+    }
+
+    public void PlayDaggerSuperAttack()
+    {
+        if (!animator) return;
+        SetBool(pDagAtk1, false);
+        SetBool(pDagAtk2, false);
+        animator.SetTrigger(pDagSuperTrig);
+        Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
+            _daggerCombat?.DaggerFinishFromAnimation()));
+    }
+
+    public void PlayDaggerParry()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pDagParryTrig);
+    }
+
+    public void PlayDaggerFlyAttackUp()
+    {
+        if (!animator) return;
+        SetBool(pDagFlyUpBool, true);
+        Restart(ref _tDagFlyUp, TrackAirBool(stDagFlyUp, pDagFlyUpBool, AttackMode.DaggerFlyUp));
+    }
+
+    public void PlayDaggerFlyAttackDown()
+    {
+        if (!animator) return;
+        SetBool(pDagFlyDownBool, true);
+        Restart(ref _tDagFlyDown, TrackAirBool(stDagFlyDown, pDagFlyDownBool, AttackMode.DaggerFlyDown));
+    }
+
+    public void PlayChangeWeapon(Action onComplete = null)
+    {
+        if (!animator)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+        animator.SetTrigger(pChangeWeaponTrig);
+        Restart(ref _tChangeWeapon, TrackExitByName(stChangeWeapon, onComplete));
+    }
+
     public void PlayHealStart()
     {
         if (!animator) return;
@@ -187,6 +280,18 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
     void SetBool(string name, bool v) { if (animator) animator.SetBool(name, v); }
 
+    void ApplyMomentumSpeed()
+    {
+        if (!animator || _daggerMomentum == null) return;
+        animator.speed = _daggerMomentum.SpeedMultiplier;
+    }
+
+    void RestoreAnimatorSpeed()
+    {
+        if (!animator) return;
+        animator.speed = 1f;
+    }
+
     void ApplyConfig(PlayerAnimatorConfig config)
     {
         if (config == null)
@@ -221,6 +326,24 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
         pDashTrig = config.dashTrigger;
         pIsGrappling = config.grappleBool;
+
+        pChangeWeaponTrig = config.changeWeaponTrigger;
+        stChangeWeapon    = config.changeWeaponState;
+
+        pDagAtk1        = config.daggerAttack1Bool;
+        pDagAtk2        = config.daggerAttack2Bool;
+        stDagAtk1       = config.daggerAttack1State;
+        stDagAtk2       = config.daggerAttack2State;
+        pDagSuperTrig   = config.daggerSuperTrigger;
+        stDagSuper      = config.daggerSuperState;
+
+        pDagParryTrig   = config.daggerParryTrigger;
+        stDagParry      = config.daggerParryState;
+
+        pDagFlyUpBool   = config.daggerFlyUpBool;
+        pDagFlyDownBool = config.daggerFlyDownBool;
+        stDagFlyUp      = config.daggerFlyUpState;
+        stDagFlyDown    = config.daggerFlyDownState;
 
         clipEndThreshold = config.clipEndThreshold;
         enterTimeout = config.enterTimeout;
@@ -302,9 +425,20 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             SetBool(pAtk3, false);
         }
 
+        if (e.mode is AttackMode.DaggerCombo or AttackMode.DaggerSuper)
+        {
+            SetBool(pDagAtk1, false);
+            SetBool(pDagAtk2, false);
+            RestoreAnimatorSpeed();
+        }
+
         if (e.mode == AttackMode.Up     && _tUp      != null) { StopCoroutine(_tUp);      _tUp      = null; }
         if (e.mode == AttackMode.AirFwd && _tAirFwd  != null) { StopCoroutine(_tAirFwd);  _tAirFwd  = null; SetBool(pAirFwdBool,  false); }
         if (e.mode == AttackMode.AirDown&& _tAirDown != null) { StopCoroutine(_tAirDown); _tAirDown = null; SetBool(pAirDownBool, false); }
         if (e.mode == AttackMode.AirUp  && _tAirUp   != null) { StopCoroutine(_tAirUp);   _tAirUp   = null; SetBool(pAirUpBool,   false); }
+
+        if (e.mode == AttackMode.DaggerSuper  && _tDagSuper  != null) { StopCoroutine(_tDagSuper);  _tDagSuper  = null; }
+        if (e.mode == AttackMode.DaggerFlyUp  && _tDagFlyUp  != null) { StopCoroutine(_tDagFlyUp);  _tDagFlyUp  = null; SetBool(pDagFlyUpBool,   false); }
+        if (e.mode == AttackMode.DaggerFlyDown&& _tDagFlyDown!= null) { StopCoroutine(_tDagFlyDown); _tDagFlyDown= null; SetBool(pDagFlyDownBool, false); }
     }
 }

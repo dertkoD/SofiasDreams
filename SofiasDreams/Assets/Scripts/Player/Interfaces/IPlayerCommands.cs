@@ -1,19 +1,19 @@
-public interface  IPlayerCommands
+public interface IPlayerCommands
 {
     void Move(float x);
     void Stop();
     void Jump();
     void JumpRelease();
-    void Attack();      
-    void UpAttack();    
+    void Attack();
+    void UpAttack();
 
-    void ForwardJumpAttack(); 
-    void UpJumpAttack();      
-    void DownJumpAttack();    
+    void ForwardJumpAttack();
+    void UpJumpAttack();
+    void DownJumpAttack();
 
     void HealBegin();
     void HealCancel();
-    
+
     void Dash();
 
     void Grapple();
@@ -21,6 +21,12 @@ public interface  IPlayerCommands
     void DropPlatform();
 
     void Interact();
+
+    void SwitchWeapon();
+
+    void ChargedAttack();
+
+    void Parry();
 
     void ApplyDamage(DamageInfo info);
 }

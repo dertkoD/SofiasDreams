@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db11eedfaa94f234b9e8c1c6ecc2162e, type: 3}
-  m_Name: BugEnemyHealthConfig
-  m_EditorClassIdentifier: 
-  maxHP: 4
-  invulnTime: 0
+  m_Script: {fileID: 11500000, guid: 4d8e604453b36d6488a23bad8e6e344b, type: 3}
+  m_Name: PlayerDaggerConfig
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerWeaponConfig
+  baseDamage: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 139264
+  knockbackForce: 0

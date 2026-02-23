@@ -35,7 +35,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             _facade = facade ?? GetComponentInParent<EnemyFacade>();
     }
 
-    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source)
+    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f)
     {
         if (_health == null)
         {
@@ -50,6 +50,8 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             return;
         }
 
+        float kbForce = knockbackOverride >= 0f ? knockbackOverride : _hitConfig.knockbackForce;
+
         DamageInfo info = new DamageInfo
         {
             amount      = amount,
@@ -57,7 +59,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             hitNormal   = hitNormal,
             source      = source ? source.transform : null,
             impulse     = hitNormal != Vector2.zero
-                ? hitNormal.normalized * _hitConfig.knockbackForce
+                ? hitNormal.normalized * kbForce
                 : Vector2.zero,
             stunSeconds = _hitConfig.hitStun,
             bypassInvuln = false

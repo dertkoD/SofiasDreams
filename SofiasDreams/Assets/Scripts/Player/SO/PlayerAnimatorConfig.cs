@@ -39,7 +39,29 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string dashTrigger   = "Dash";
     public string grappleBool   = "isGrappling";
 
-    [Header("Tracking")]   
+    [Header("Weapon Switch")]
+    public string changeWeaponTrigger = "ChangeWeapon";
+    public string changeWeaponState   = "ChangeWeapon";
+
+    [Header("Dagger combo")]
+    public string daggerAttack1Bool  = "IsDaggerAttack1";
+    public string daggerAttack2Bool  = "IsDaggerAttack2";
+    public string daggerAttack1State = "DaggerAttack1";
+    public string daggerAttack2State = "DaggerAttack2";
+    public string daggerSuperTrigger = "DaggerAttackSuperTrig";
+    public string daggerSuperState   = "DaggerAttackSuper";
+
+    [Header("Dagger parry")]
+    public string daggerParryTrigger = "DaggerParryTrig";
+    public string daggerParryState   = "DaggerParry";
+
+    [Header("Dagger air attacks")]
+    public string daggerFlyUpBool    = "DaggerFlyAttackUp";
+    public string daggerFlyDownBool  = "DaggerFlyAttackDown";
+    public string daggerFlyUpState   = "DaggerFlyAttackUp";
+    public string daggerFlyDownState = "DaggerFlyAttackDown";
+
+    [Header("Tracking")]
     [Range(0.5f, 1f)] public float clipEndThreshold = 0.98f;
     [Min(0f)] public float enterTimeout  = 0.25f;
     [Min(0f)] public float safetyTimeout = 2.0f;

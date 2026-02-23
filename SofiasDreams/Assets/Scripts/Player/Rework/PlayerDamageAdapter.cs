@@ -22,15 +22,17 @@ public class PlayerDamageAdapter : MonoBehaviour, IDamageable
 
     public bool IsAlive => _health != null && _health.IsAlive;
 
-    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source)
+    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f)
     {
         if (_commands == null || !IsAlive)
             return;
 
-        float knockbackForce = _hitReaction != null ? _hitReaction.knockbackForce : defaultKnockbackForce;
+        float kbForce = knockbackOverride >= 0f
+            ? knockbackOverride
+            : (_hitReaction != null ? _hitReaction.knockbackForce : defaultKnockbackForce);
         Vector2 impulse = hitNormal == Vector2.zero
             ? Vector2.zero
-            : -hitNormal.normalized * knockbackForce;
+            : -hitNormal.normalized * kbForce;
 
         var info = new DamageInfo {
             amount      = amount,

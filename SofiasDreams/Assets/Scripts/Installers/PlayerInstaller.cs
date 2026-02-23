@@ -17,6 +17,7 @@ public class PlayerInstaller : MonoInstaller
     public PlayerAnimatorConfig animatorSO;
     public PlayerWeaponConfig weaponSO;
     public CameraShakeConfig shakeSO;
+    public DaggerAttackConfig daggerAttackSO;
 
     public override void InstallBindings()
     {
@@ -44,6 +45,10 @@ public class PlayerInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<GrappleHairTrailSprites>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<CameraShakeService>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerInteractor>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<DaggerCombat>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<DaggerMomentum>().FromComponentOnRoot().AsSingle();
+
+        Container.Bind<IWeaponManager>().To<WeaponManager>().AsSingle();
 
         if (moveSO)     Container.BindInstance(moveSO);
         if (jumpSO)     Container.BindInstance(jumpSO);
@@ -58,5 +63,6 @@ public class PlayerInstaller : MonoInstaller
         if (animatorSO) Container.BindInstance(animatorSO);
         if (weaponSO)   Container.BindInstance(weaponSO);
         if (shakeSO)    Container.BindInstance(shakeSO);
+        if (daggerAttackSO) Container.BindInstance(daggerAttackSO);
     }
 }

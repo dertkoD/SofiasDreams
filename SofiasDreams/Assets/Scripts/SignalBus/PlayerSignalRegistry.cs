@@ -24,6 +24,8 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<InteractPressed>();
         container.DeclareSignal<DashUnlocked>();
         container.DeclareSignal<PlayerDeathVfxFinished>();
+        container.DeclareSignal<WeaponSwitched>();
+        container.DeclareSignal<MomentumChanged>();
     }
 
     public static void DeclarePlayerSignals(DiContainer container)
