@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 9164047221485089898}
   - component: {fileID: 4770960375929246362}
   - component: {fileID: 7106047019113535080}
-  m_Layer: 6
+  m_Layer: 10
   m_Name: DaggerWeapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -254,7 +254,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5754717, g: 0.5564703, b: 0.5564703, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -325,7 +325,7 @@ MonoBehaviour:
   enemyHurtboxLayers:
     serializedVersion: 2
     m_Bits: 139264
-  defaultConfig: {fileID: 0}
+  defaultConfig: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
 --- !u!1 &1106692598933030757
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,6 +483,7 @@ GameObject:
   - component: {fileID: 4575646902207013832}
   - component: {fileID: 8026534820593938046}
   - component: {fileID: 1573057834305744189}
+  - component: {fileID: -1492794088512554747}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -654,6 +655,7 @@ MonoBehaviour:
   animatorSO: {fileID: 11400000, guid: 8719c19fb2c9994438161a6a8cf07b47, type: 2}
   weaponSO: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
   shakeSO: {fileID: 11400000, guid: 4c88ee441b819ae4b9d23b35bd03288f, type: 2}
+  daggerAttackSO: {fileID: 11400000, guid: 07e1c617fe9a2be45a2d6f5a54fbb941, type: 2}
 --- !u!114 &-8336346839882354902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -811,6 +813,18 @@ MonoBehaviour:
   stHealEnd: EndHealing
   pDashTrig: Dash
   pIsGrappling: isGrappling
+  pChangeWeaponTrig: ChangeWeaponTrigger
+  stChangeWeapon: ChangeWeapon
+  pDagAtk1: IsDaggerAttack1
+  pDagAtk2: IsDaggerAttack2
+  stDagAtk1: DaggerAttack1
+  stDagAtk2: DaggerAttack2
+  pDagSuperTrig: DaggerAttackSuperTrig
+  stDagSuper: DaggerAttackSuper
+  pDagFlyUpBool: DaggerFlyAttackUp
+  pDagFlyDownBool: DaggerFlyAttackDown
+  stDagFlyUp: DaggerFlyAttackUp
+  stDagFlyDown: DaggerFlyAttackDown
   clipEndThreshold: 0.98
   enterTimeout: 0.25
   safetyTimeout: 2
@@ -1087,6 +1101,19 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
+--- !u!114 &-1492794088512554747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f92d066bfcd91468c8500c05cdba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DaggerCombat
+  rb: {fileID: 5395965832727822489}
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0

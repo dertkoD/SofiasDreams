@@ -174,7 +174,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pDagAtk2, false);
         animator.SetTrigger(pDagSuperTrig);
         Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
-            _daggerCombat?.FinishFromAnimation()));
+            _daggerCombat?.DaggerFinishFromAnimation()));
     }
 
     public void PlayDaggerFlyAttackUp()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Zenject;
@@ -86,7 +87,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
-    public void FinishFromAnimation()
+    public void DaggerFinishFromAnimation()
     {
         if (!_attacking) return;
 
