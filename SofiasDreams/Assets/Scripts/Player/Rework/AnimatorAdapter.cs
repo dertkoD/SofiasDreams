@@ -173,6 +173,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         if (!animator) return;
         string state = index == 1 ? stDagAtk1 : stDagAtk2;
         animator.Play(state, atkLayer, 0f);
+
+        if (index == 2)
+            Restart(ref _tDagSuper, TrackExitByName(stDagAtk2, () =>
+            {
+                SetBool(pDagAtk2, false);
+                _daggerCombat?.DaggerFinishFromAnimation();
+            }));
     }
 
     public void PlayDaggerSuperAttack()
