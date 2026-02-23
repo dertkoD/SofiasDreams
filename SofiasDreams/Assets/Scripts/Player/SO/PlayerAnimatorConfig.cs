@@ -48,7 +48,7 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string daggerAttack2Bool  = "IsDaggerAttack2";
     public string daggerAttack1State = "DaggerAttack1";
     public string daggerAttack2State = "DaggerAttack2";
-    public string daggerSuperTrigger = "DaggerAttackSuper";
+    public string daggerSuperTrigger = "DaggerAttackSuperTrig";
     public string daggerSuperState   = "DaggerAttackSuper";
 
     [Header("Dagger air attacks")]

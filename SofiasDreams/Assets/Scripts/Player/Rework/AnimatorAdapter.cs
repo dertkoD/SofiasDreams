@@ -57,7 +57,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string pDagAtk2 = "IsDaggerAttack2";
     [SerializeField] string stDagAtk1 = "DaggerAttack1";
     [SerializeField] string stDagAtk2 = "DaggerAttack2";
-    [SerializeField] string pDagSuperTrig = "DaggerAttackSuper";
+    [SerializeField] string pDagSuperTrig = "DaggerAttackSuperTrig";
     [SerializeField] string stDagSuper    = "DaggerAttackSuper";
 
     [Header("Dagger air")]
