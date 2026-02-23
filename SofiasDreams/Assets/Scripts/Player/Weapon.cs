@@ -21,7 +21,7 @@ public class Weapon : MonoBehaviour
     void Construct(SignalBus bus, [Inject(Optional = true)] PlayerWeaponConfig injectedConfig = null)
     {
         _bus = bus;
-        _runtimeConfig = injectedConfig ? injectedConfig : defaultConfig;
+        _runtimeConfig = defaultConfig ? defaultConfig : injectedConfig;
     }
 
     private void Reset()
