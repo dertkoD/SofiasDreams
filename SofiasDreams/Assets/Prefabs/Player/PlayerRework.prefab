@@ -325,7 +325,7 @@ MonoBehaviour:
   enemyHurtboxLayers:
     serializedVersion: 2
     m_Bits: 139264
-  defaultConfig: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
+  defaultConfig: {fileID: 11400000, guid: f78d90ac757050c46b1dc441e75a714e, type: 2}
 --- !u!1 &1106692598933030757
 GameObject:
   m_ObjectHideFlags: 0
