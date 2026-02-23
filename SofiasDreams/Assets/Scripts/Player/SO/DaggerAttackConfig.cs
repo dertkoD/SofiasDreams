@@ -8,9 +8,9 @@ public class DaggerAttackConfig : ScriptableObject
     [Min(1)] public float damage2 = 8f;
     [Min(1)] public float superDamage = 25f;
 
-    [Header("Combo")]
-    [Tooltip("Max hits in the normal combo before super")]
-    public int comboLength = 2;
+    [Header("Charged attack")]
+    [Tooltip("How long the attack button must be held to charge")]
+    [Min(0.1f)] public float chargeTime = 0.5f;
 
     [Header("Super attack — float effect")]
     [Min(0)] public float superLaunchForce = 12f;

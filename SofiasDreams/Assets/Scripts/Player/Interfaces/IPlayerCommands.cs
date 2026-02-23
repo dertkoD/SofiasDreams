@@ -24,5 +24,7 @@ public interface IPlayerCommands
 
     void SwitchWeapon();
 
+    void ChargedAttack();
+
     void ApplyDamage(DamageInfo info);
 }

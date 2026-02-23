@@ -194,13 +194,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
-            if (_jumper.IsGrounded)
-            {
-                if (!_daggerCombat.TryRequestSuperAttack())
-                    _daggerCombat.RequestAttack();
-                _state = PlayerState.Attack;
-            }
-            else
+            if (!_jumper.IsGrounded)
             {
                 if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
                     Block(MobilityBlockReason.Attack);
@@ -345,6 +339,22 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _health.ApplyDamage(info);
         _mover.StopHorizontal();
         _knock.Apply(info);
+    }
+
+    public void ChargedAttack()
+    {
+        if (_state == PlayerState.Dead) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt
+            or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
+
+        if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+
+        if (_jumper.IsGrounded)
+            _mover.StopHorizontal();
+
+        Block(MobilityBlockReason.Attack);
+        _daggerCombat.RequestChargedAttack();
+        _state = PlayerState.Attack;
     }
 
     public void SwitchWeapon()
