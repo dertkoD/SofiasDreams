@@ -165,6 +165,10 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     {
         SetBool(pDagAtk1, index == 1);
         SetBool(pDagAtk2, index == 2);
+
+        if (!animator) return;
+        string state = index == 1 ? stDagAtk1 : stDagAtk2;
+        animator.Play(state, atkLayer, 0f);
     }
 
     public void PlayDaggerSuperAttack()
