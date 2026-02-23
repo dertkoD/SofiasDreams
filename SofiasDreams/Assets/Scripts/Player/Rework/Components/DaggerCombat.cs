@@ -13,6 +13,8 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     Coroutine _floatCo;
+    float _origGravity;
+    bool _gravityOverridden;
 
     public bool IsAttacking => _attacking;
 
@@ -33,6 +35,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     public void Initialize()
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
+        _origGravity = rb ? rb.gravityScale : 1f;
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
     }
 
@@ -71,6 +74,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = false;
         _bus.Fire(new AttackFinished { mode = mode, index = _step });
         _step = 0;
+        RestoreGravity();
     }
 
     // ───── Charged attack (independent) ─────
@@ -81,6 +85,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         _attacking = true;
         _step = 3;
+        LaunchPlayer();
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
     }
 
@@ -88,7 +93,8 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!_attacking && _step == 0) return;
 
-        if (_floatCo != null) { StopCoroutine(_floatCo); _floatCo = null; }
+        StopFloatCoroutine();
+        RestoreGravity();
 
         var mode = _step == 3 ? AttackMode.DaggerSuper : AttackMode.DaggerCombo;
         _attacking = false;
@@ -97,35 +103,67 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
-    // ───── Hit → float ─────
+    // ───── Hit → launch enemy + player float ─────
 
     void OnEnemyHit(EnemyHit e)
     {
-        if (_attacking && _step == 3)
-            ApplyFloat();
+        if (!_attacking || _step != 3) return;
+
+        LaunchEnemy(e.target);
     }
 
-    void ApplyFloat()
+    void LaunchPlayer()
     {
         if (!rb || _cfg == null) return;
 
         var v = rb.linearVelocity;
-        v.y = _cfg.superLaunchForce;
+        v.y = _cfg.playerLaunchForce;
         rb.linearVelocity = v;
 
-        if (_floatCo != null) StopCoroutine(_floatCo);
-        _floatCo = StartCoroutine(FloatRoutine());
+        StopFloatCoroutine();
+        _floatCo = StartCoroutine(FloatGravityRoutine());
     }
 
-    IEnumerator FloatRoutine()
+    void LaunchEnemy(IDamageable target)
     {
-        float origGravity = rb.gravityScale;
+        if (_cfg == null) return;
+        if (target is not MonoBehaviour mb) return;
+
+        var enemyRb = mb.GetComponentInParent<Rigidbody2D>();
+        if (enemyRb)
+            enemyRb.AddForce(Vector2.up * _cfg.enemyLaunchForce, ForceMode2D.Impulse);
+    }
+
+    IEnumerator FloatGravityRoutine()
+    {
+        if (!_gravityOverridden)
+        {
+            _origGravity = rb.gravityScale;
+            _gravityOverridden = true;
+        }
+
         rb.gravityScale = _cfg != null ? _cfg.floatGravityScale : 0.1f;
 
-        float duration = _cfg != null ? _cfg.floatDuration : 0.6f;
+        float duration = _cfg != null ? _cfg.floatGravityDuration : 0.3f;
         yield return new WaitForSeconds(duration);
 
-        rb.gravityScale = origGravity;
+        RestoreGravity();
         _floatCo = null;
+    }
+
+    void RestoreGravity()
+    {
+        if (!_gravityOverridden || !rb) return;
+        rb.gravityScale = _origGravity;
+        _gravityOverridden = false;
+    }
+
+    void StopFloatCoroutine()
+    {
+        if (_floatCo != null)
+        {
+            StopCoroutine(_floatCo);
+            _floatCo = null;
+        }
     }
 }
