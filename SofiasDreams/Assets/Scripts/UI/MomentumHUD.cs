@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 public class MomentumHUD : MonoBehaviour
@@ -12,6 +13,9 @@ public class MomentumHUD : MonoBehaviour
     [Header("Segments (blue squares, 5 per level, total 15)\n" +
             "Order: [0-4] = level 1, [5-9] = level 2, [10-14] = level 3")]
     [SerializeField] GameObject[] segments;
+
+    [Header("Timer circle (Image with Filled type)")]
+    [SerializeField] Image timerCircle;
 
     [SerializeField] int segmentsPerLevel = 5;
 
@@ -44,6 +48,7 @@ public class MomentumHUD : MonoBehaviour
     void OnMomentumChanged(MomentumChanged s)
     {
         Refresh(s.segments);
+        if (timerCircle) timerCircle.fillAmount = s.circleFill;
     }
 
     void SetVisible(bool visible)

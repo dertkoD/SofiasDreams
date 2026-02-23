@@ -45,7 +45,12 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         if (_weapon.CurrentWeapon != WeaponType.Dagger || _segments <= 0f) return;
 
         _decayTimer -= Time.deltaTime;
-        if (_decayTimer > 0f) return;
+
+        if (_decayTimer > 0f)
+        {
+            FireChanged();
+            return;
+        }
 
         float rate = _cfg ? _cfg.decayRate : 1f;
         float prev = _segments;
@@ -55,8 +60,7 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         if (Level < prevLevel)
             Debug.Log($"[Momentum] Decay → Level {Level} ({Segments}/{MaxSegments})");
 
-        if (Mathf.FloorToInt(prev) != Segments)
-            FireChanged();
+        FireChanged();
     }
 
     public void OnParrySuccess()
@@ -107,6 +111,17 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         _decayTimer = _cfg ? _cfg.decayDelay : 5f;
     }
 
+    float ComputeCircleFill()
+    {
+        if (_segments <= 0f) return 0f;
+
+        float delay = _cfg ? _cfg.decayDelay : 5f;
+        if (_decayTimer > 0f)
+            return Mathf.Clamp01(_decayTimer / delay);
+
+        return _segments - Mathf.Floor(_segments);
+    }
+
     void FireChanged()
     {
         _bus.Fire(new MomentumChanged
@@ -114,7 +129,8 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
             segments = Segments,
             maxSegments = MaxSegments,
             level = Level,
-            maxLevels = _cfg ? _cfg.maxLevels : 3
+            maxLevels = _cfg ? _cfg.maxLevels : 3,
+            circleFill = ComputeCircleFill()
         });
     }
 }
