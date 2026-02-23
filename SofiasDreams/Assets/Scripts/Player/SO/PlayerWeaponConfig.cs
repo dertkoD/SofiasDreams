@@ -8,4 +8,7 @@ public class PlayerWeaponConfig : ScriptableObject
 
     [Tooltip("Knockback force applied to targets. -1 = use target's default")]
     public float knockbackForce = -1f;
+
+    [Tooltip("Damage multiplier when hitting from behind. 1 = no bonus")]
+    [Min(1f)] public float backstabMultiplier = 1f;
 }

@@ -14,6 +14,7 @@ public class Weapon : MonoBehaviour
     int Damage => _runtimeConfig ? _runtimeConfig.baseDamage : attackDamage;
     LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
     float KnockbackForce => _runtimeConfig ? _runtimeConfig.knockbackForce : -1f;
+    float BackstabMultiplier => _runtimeConfig ? _runtimeConfig.backstabMultiplier : 1f;
 
     SignalBus _bus;
 
@@ -51,7 +52,17 @@ public class Weapon : MonoBehaviour
         Vector2 hitPoint  = other.ClosestPoint(transform.position);
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
 
-        target.ApplyDamage(Damage, hitPoint, hitNormal, gameObject, KnockbackForce);
+        int dmg = Damage;
+        if (BackstabMultiplier > 1f)
+        {
+            Transform enemyRoot = other.transform.root;
+            float enemyFacing   = Mathf.Sign(enemyRoot.localScale.x);
+            float weaponSide    = Mathf.Sign(transform.position.x - enemyRoot.position.x);
+            if (weaponSide != enemyFacing)
+                dmg = Mathf.RoundToInt(dmg * BackstabMultiplier);
+        }
+
+        target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, KnockbackForce);
         _bus.Fire(new EnemyHit { target = target });
     }
 
