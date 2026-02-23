@@ -53,12 +53,12 @@ public class Weapon : MonoBehaviour
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
 
         int dmg = Damage;
-        if (BackstabMultiplier > 1f)
+        if (BackstabMultiplier > 1f && target is MonoBehaviour mb)
         {
-            Transform enemyRoot  = other.transform.root;
+            Transform enemyT     = mb.transform;
             Transform playerRoot = transform.root;
-            float enemyFacing = Mathf.Sign(enemyRoot.localScale.x);
-            float playerSide  = Mathf.Sign(playerRoot.position.x - enemyRoot.position.x);
+            float enemyFacing = Mathf.Sign(enemyT.lossyScale.x);
+            float playerSide  = Mathf.Sign(playerRoot.position.x - enemyT.position.x);
             if (playerSide != enemyFacing)
                 dmg = Mathf.RoundToInt(dmg * BackstabMultiplier);
         }
