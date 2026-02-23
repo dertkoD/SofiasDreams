@@ -73667,6 +73667,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8527599876316810027, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8546018518667429147, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
       propertyPath: m_Pivot.x
       value: 0

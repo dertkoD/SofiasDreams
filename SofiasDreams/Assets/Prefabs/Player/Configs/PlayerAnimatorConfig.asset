@@ -43,8 +43,10 @@ MonoBehaviour:
   daggerAttack2State: DaggerAttack2
   daggerSuperTrigger: DaggerAttackSuperTrig
   daggerSuperState: DaggerAttackSuper
-  daggerFlyUpBool: DaggerFlyAttackUp
-  daggerFlyDownBool: DaggerFlyAttackDown
+  daggerParryTrigger: DaggerParryTrig
+  daggerParryState: DaggerParry
+  daggerFlyUpBool: IsDaggerFlyAttackUp
+  daggerFlyDownBool: IsDaggerFlyAttackDown
   daggerFlyUpState: DaggerFlyAttackUp
   daggerFlyDownState: DaggerFlyAttackDown
   clipEndThreshold: 0.98

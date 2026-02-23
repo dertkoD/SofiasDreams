@@ -16,6 +16,19 @@ MonoBehaviour:
   damage2: 1
   superDamage: 1
   chargeTime: 0.5
-  superLaunchForce: 12
-  floatDuration: 0.6
+  playerLaunchForce: 12
+  enemyLaunchForce: 14
   floatGravityScale: 0.1
+  floatGravityDuration: 0.3
+  airHoverGravityScale: 0
+  segmentsPerLevel: 5
+  maxLevels: 3
+  speedBonusPerLevel: 0.2
+  normalHitSegments: 0
+  backstabSegments: 1
+  parrySegments: 5
+  decayDelay: 5
+  decayRate: 1
+  parryWindow: 0.25
+  parryStunDuration: 1
+  parryTeleportOffset: 1.5
