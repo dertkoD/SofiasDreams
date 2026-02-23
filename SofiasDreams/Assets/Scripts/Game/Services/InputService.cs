@@ -19,4 +19,5 @@ public class InputService : IInputService
 
     public bool InteractPressed() => Input.GetKeyDown(KeyCode.F);
     public bool WeaponSwitchPressed() => Input.GetKeyDown(KeyCode.Tab);
+    public bool ParryPressed() => Input.GetMouseButtonDown(1);
 }

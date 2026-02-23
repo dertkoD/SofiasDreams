@@ -26,5 +26,7 @@ public interface IPlayerCommands
 
     void ChargedAttack();
 
+    void Parry();
+
     void ApplyDamage(DamageInfo info);
 }

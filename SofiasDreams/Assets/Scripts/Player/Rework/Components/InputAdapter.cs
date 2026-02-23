@@ -86,6 +86,9 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         if (_input.WeaponSwitchPressed())
             _commands.SwitchWeapon();
+
+        if (_input.ParryPressed())
+            _commands.Parry();
     }
 
     void HandleAttack(bool jumpPressedThisFrame)

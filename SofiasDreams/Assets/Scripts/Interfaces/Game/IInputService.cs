@@ -13,4 +13,5 @@ public interface IInputService
     bool GrapplePressed();
     bool InteractPressed();
     bool WeaponSwitchPressed();
+    bool ParryPressed();
 }

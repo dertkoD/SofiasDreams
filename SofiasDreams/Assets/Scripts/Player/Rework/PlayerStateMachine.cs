@@ -301,9 +301,16 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (EnemyCombatGate.IsBonfireSafe)
             return;
-        
+
         if (_state == PlayerState.Dead || _state == PlayerState.BonfireRest)
             return;
+
+        if (_daggerCombat.IsParrying && _weaponManager.CurrentWeapon == WeaponType.Dagger
+            && info.source != null)
+        {
+            _daggerCombat.TryExecuteParry(info.source);
+            return;
+        }
 
         if (_health.IsInvincible && !info.bypassInvuln)
             return;
@@ -339,6 +346,18 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _health.ApplyDamage(info);
         _mover.StopHorizontal();
         _knock.Apply(info);
+    }
+
+    public void Parry()
+    {
+        if (_state == PlayerState.Dead) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Dash
+            or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+
+        if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+
+        _daggerCombat.RequestParry();
+        _anim.PlayDaggerParry();
     }
 
     public void ChargedAttack()

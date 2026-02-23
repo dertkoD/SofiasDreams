@@ -13,10 +13,13 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     Coroutine _floatCo;
+    Coroutine _parryCo;
     float _origGravity;
     bool _gravityOverridden;
+    bool _parrying;
 
     public bool IsAttacking => _attacking;
+    public bool IsParrying => _parrying;
 
     public float CurrentDamage =>
         _step == 1 ? (_cfg ? _cfg.damage1 : 8f) :
@@ -153,6 +156,67 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         RestoreGravity();
         _floatCo = null;
+    }
+
+    // ───── Parry ─────
+
+    public void RequestParry()
+    {
+        if (_parrying) return;
+        if (_parryCo != null) StopCoroutine(_parryCo);
+        _parryCo = StartCoroutine(ParryWindowRoutine());
+    }
+
+    public bool TryExecuteParry(Transform attacker)
+    {
+        if (!_parrying || attacker == null) return false;
+
+        _parrying = false;
+        if (_parryCo != null) { StopCoroutine(_parryCo); _parryCo = null; }
+
+        TeleportBehind(attacker);
+        StunEnemy(attacker);
+
+        Debug.Log("[DaggerCombat] Parry successful!");
+        return true;
+    }
+
+    IEnumerator ParryWindowRoutine()
+    {
+        _parrying = true;
+        float window = _cfg != null ? _cfg.parryWindow : 0.25f;
+        yield return new WaitForSeconds(window);
+        _parrying = false;
+        _parryCo = null;
+    }
+
+    void TeleportBehind(Transform enemy)
+    {
+        if (!rb) return;
+
+        float enemyFacing = Mathf.Sign(enemy.lossyScale.x);
+        float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
+        float behindX = enemy.position.x - enemyFacing * offset;
+
+        rb.position = new Vector2(behindX, rb.position.y);
+
+        var mover = GetComponent<Mover2D>();
+        if (mover) mover.ForceFacing((int)enemyFacing);
+    }
+
+    void StunEnemy(Transform enemy)
+    {
+        var kb = enemy.GetComponentInChildren<Knockback2D>();
+        if (kb == null) return;
+
+        float stunDur = _cfg != null ? _cfg.parryStunDuration : 1f;
+        var info = new DamageInfo
+        {
+            amount = 0,
+            impulse = Vector2.zero,
+            stunSeconds = stunDur
+        };
+        kb.Apply(info);
     }
 
     // ───── Air attack hover ─────

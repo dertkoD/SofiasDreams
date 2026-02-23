@@ -15,6 +15,7 @@ public interface IPlayerAnimator
     void PlayDaggerFlyAttackDown();
 
     void PlayChangeWeapon(System.Action onComplete = null);
+    void PlayDaggerParry();
 
     void PlayHealStart();
     void PlayHealEnd(bool interrupted, System.Action onComplete = null);
