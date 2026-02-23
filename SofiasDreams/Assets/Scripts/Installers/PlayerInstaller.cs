@@ -46,6 +46,7 @@ public class PlayerInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<CameraShakeService>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<PlayerInteractor>().FromComponentOnRoot().AsSingle();
         Container.BindInterfacesAndSelfTo<DaggerCombat>().FromComponentOnRoot().AsSingle();
+        Container.BindInterfacesAndSelfTo<DaggerMomentum>().FromComponentOnRoot().AsSingle();
 
         Container.Bind<IWeaponManager>().To<WeaponManager>().AsSingle();
 

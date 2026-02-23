@@ -78,6 +78,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     SignalBus _bus;
     PlayerAnimatorConfig _configOverride;
     DaggerCombat _daggerCombat;
+    DaggerMomentum _daggerMomentum;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
     Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
@@ -86,11 +87,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     void Construct(
         SignalBus bus,
         [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null,
-        [Inject(Optional = true)] DaggerCombat daggerCombat = null)
+        [Inject(Optional = true)] DaggerCombat daggerCombat = null,
+        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null)
     {
         _bus = bus;
         _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
         _daggerCombat = daggerCombat;
+        _daggerMomentum = daggerMomentum;
     }
 
     public void Initialize()
@@ -171,6 +174,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pDagAtk2, index == 2);
 
         if (!animator) return;
+        ApplyMomentumSpeed();
         string state = index == 1 ? stDagAtk1 : stDagAtk2;
         animator.Play(state, atkLayer, 0f);
 
@@ -178,6 +182,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             Restart(ref _tDagSuper, TrackExitByName(stDagAtk2, () =>
             {
                 SetBool(pDagAtk2, false);
+                RestoreAnimatorSpeed();
                 _daggerCombat?.DaggerFinishFromAnimation();
             }));
     }
@@ -274,6 +279,18 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     // ───────── Helpers ─────────
 
     void SetBool(string name, bool v) { if (animator) animator.SetBool(name, v); }
+
+    void ApplyMomentumSpeed()
+    {
+        if (!animator || _daggerMomentum == null) return;
+        animator.speed = _daggerMomentum.SpeedMultiplier;
+    }
+
+    void RestoreAnimatorSpeed()
+    {
+        if (!animator) return;
+        animator.speed = 1f;
+    }
 
     void ApplyConfig(PlayerAnimatorConfig config)
     {
@@ -412,6 +429,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         {
             SetBool(pDagAtk1, false);
             SetBool(pDagAtk2, false);
+            RestoreAnimatorSpeed();
         }
 
         if (e.mode == AttackMode.Up     && _tUp      != null) { StopCoroutine(_tUp);      _tUp      = null; }

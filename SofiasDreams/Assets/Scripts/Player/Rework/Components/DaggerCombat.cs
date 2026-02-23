@@ -8,6 +8,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     SignalBus _bus;
     DaggerAttackConfig _cfg;
+    DaggerMomentum _momentum;
 
     int _step;
     bool _attacking;
@@ -27,10 +28,13 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         (_cfg ? _cfg.superDamage : 25f);
 
     [Inject]
-    void Construct(SignalBus bus, [Inject(Optional = true)] DaggerAttackConfig cfg = null)
+    void Construct(SignalBus bus,
+        [Inject(Optional = true)] DaggerAttackConfig cfg = null,
+        [Inject(Optional = true)] DaggerMomentum momentum = null)
     {
         _bus = bus;
         _cfg = cfg;
+        _momentum = momentum;
     }
 
     public void Configure(DaggerAttackConfig cfg) => _cfg = cfg;
@@ -176,6 +180,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         TeleportBehind(attacker);
         StunEnemy(attacker);
+        _momentum?.OnParrySuccess();
 
         Debug.Log("[DaggerCombat] Parry successful!");
         return true;

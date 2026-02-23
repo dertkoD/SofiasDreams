@@ -53,6 +53,7 @@ public class Weapon : MonoBehaviour
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
 
         int dmg = Damage;
+        bool backstab = false;
         if (BackstabMultiplier > 1f && target is MonoBehaviour mb)
         {
             Transform enemyT     = mb.transform;
@@ -60,11 +61,14 @@ public class Weapon : MonoBehaviour
             float enemyFacing = Mathf.Sign(enemyT.lossyScale.x);
             float playerSide  = Mathf.Sign(playerRoot.position.x - enemyT.position.x);
             if (playerSide != enemyFacing)
+            {
                 dmg = Mathf.RoundToInt(dmg * BackstabMultiplier);
+                backstab = true;
+            }
         }
 
         target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, KnockbackForce);
-        _bus.Fire(new EnemyHit { target = target });
+        _bus.Fire(new EnemyHit { target = target, isBackstab = backstab });
     }
 
     private void OnTriggerExit2D(Collider2D other)
