@@ -12,7 +12,7 @@ public class ShortcutDamageable : MonoBehaviour, IDamageable
     // Shortcuts don't really have HP, but we must implement the interface
     public bool IsAlive => !_isDestroyed;
 
-    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source)
+    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f)
     {
         if (_isDestroyed)
             return;

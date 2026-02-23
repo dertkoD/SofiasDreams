@@ -13,6 +13,7 @@ public class Weapon : MonoBehaviour
 
     int Damage => _runtimeConfig ? _runtimeConfig.baseDamage : attackDamage;
     LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
+    float KnockbackForce => _runtimeConfig ? _runtimeConfig.knockbackForce : -1f;
 
     SignalBus _bus;
 
@@ -50,7 +51,7 @@ public class Weapon : MonoBehaviour
         Vector2 hitPoint  = other.ClosestPoint(transform.position);
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
 
-        target.ApplyDamage(Damage, hitPoint, hitNormal, gameObject);
+        target.ApplyDamage(Damage, hitPoint, hitNormal, gameObject, KnockbackForce);
         _bus.Fire(new EnemyHit { target = target });
     }
 
