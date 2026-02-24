@@ -40,13 +40,13 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
         _origEnabled = sprites.Select(s => s && s.enabled).ToArray();
     }
 
-    public void OnDamage(Vector2 sourcePos)
+    public void OnDamage(Vector2 sourcePos, bool applyKnockback = true)
     {
         if (!InHitStun)
-            StartCoroutine(HitCR(sourcePos));
+            StartCoroutine(HitCR(sourcePos, applyKnockback));
     }
 
-    IEnumerator HitCR(Vector2 sourcePos)
+    IEnumerator HitCR(Vector2 sourcePos, bool applyKnockback)
     {
         InHitStun = true;
 
@@ -57,7 +57,7 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
         float prevAnimSpeed = animator ? animator.speed : 1f;
         if (animator) animator.speed = 0f;
 
-        if (rb && _hitConfig != null)
+        if (applyKnockback && rb && _hitConfig != null)
         {
             float dir = Mathf.Sign(transform.position.x - sourcePos.x);
             if (dir == 0) dir = -1f;

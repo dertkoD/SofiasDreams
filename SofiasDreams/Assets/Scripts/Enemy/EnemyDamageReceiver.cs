@@ -76,7 +76,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
                 ? hitPoint
                 : (source ? (Vector2)source.transform.position : (Vector2)transform.position);
 
-            _feedback.OnDamage(src);
+            _feedback.OnDamage(src, applyKnockback: kbForce > 0f);
         }
 
         if (_knockback != null)
