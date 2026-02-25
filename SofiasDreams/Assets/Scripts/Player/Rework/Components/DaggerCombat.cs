@@ -19,6 +19,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     float _origGravity;
     bool _gravityOverridden;
     bool _parrying;
+    float _chargedCooldownTimer;
 
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
@@ -89,15 +90,26 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     // ───── Charged attack (independent) ─────
 
+    public bool IsChargedReady => _chargedCooldownTimer <= 0f;
+
+    void Update()
+    {
+        if (_chargedCooldownTimer > 0f)
+            _chargedCooldownTimer -= Time.deltaTime;
+    }
+
     public void RequestChargedAttack()
     {
+        if (_chargedCooldownTimer > 0f) return;
         if (_attacking) Interrupt();
 
         _attacking = true;
         _step = 3;
-        LaunchPlayer();
+        _chargedCooldownTimer = _cfg ? _cfg.chargedCooldown : 1.5f;
+        StopFloatCoroutine();
+        _floatCo = StartCoroutine(LaunchPlayerRoutine());
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
-        Debug.Log($"[DaggerCombat] ChargedAttack launched! rb={rb != null}, cfg={_cfg != null}");
+        Debug.Log($"[DaggerCombat] ChargedAttack fired! force={(_cfg ? _cfg.playerLaunchForce : 0)}");
     }
 
     public void Interrupt()
@@ -116,30 +128,26 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     // ───── Player launch on charged attack ─────
 
-    void LaunchPlayer()
+    IEnumerator LaunchPlayerRoutine()
     {
-        if (!rb || _cfg == null) return;
+        if (!rb || _cfg == null) yield break;
 
-        var v = rb.linearVelocity;
-        v.y = _cfg.playerLaunchForce;
-        rb.linearVelocity = v;
-
-        StopFloatCoroutine();
-        _floatCo = StartCoroutine(FloatGravityRoutine());
-    }
-
-    IEnumerator FloatGravityRoutine()
-    {
         if (!_gravityOverridden)
         {
             _origGravity = rb.gravityScale;
             _gravityOverridden = true;
         }
+        rb.gravityScale = _cfg.floatGravityScale;
 
-        rb.gravityScale = _cfg != null ? _cfg.floatGravityScale : 0.1f;
+        yield return new WaitForFixedUpdate();
 
-        float duration = _cfg != null ? _cfg.floatGravityDuration : 0.3f;
-        yield return new WaitForSeconds(duration);
+        float force = _cfg.playerLaunchForce;
+        rb.linearVelocity = new Vector2(0f, 0f);
+        rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
+
+        Debug.Log($"[DaggerCombat] Launch applied! vel={rb.linearVelocity}, gravity={rb.gravityScale}");
+
+        yield return new WaitForSeconds(_cfg.floatGravityDuration);
 
         RestoreGravity();
         _floatCo = null;

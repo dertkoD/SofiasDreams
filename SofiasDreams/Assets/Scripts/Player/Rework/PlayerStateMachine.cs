@@ -371,10 +371,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+        if (!_daggerCombat.IsChargedReady) return;
 
-        if (_jumper.IsGrounded)
-            _mover.StopHorizontal();
-
+        _mover.StopHorizontal();
         Block(MobilityBlockReason.Attack);
         _daggerCombat.RequestChargedAttack();
         _state = PlayerState.Attack;

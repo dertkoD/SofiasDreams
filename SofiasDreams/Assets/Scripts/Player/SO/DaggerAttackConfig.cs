@@ -9,14 +9,12 @@ public class DaggerAttackConfig : ScriptableObject
     [Min(1)] public float superDamage = 25f;
 
     [Header("Charged attack")]
-    [Tooltip("How long the attack button must be held to charge")]
-    [Min(0.1f)] public float chargeTime = 0.5f;
+    [Tooltip("Cooldown between charged attacks (seconds)")]
+    [Min(0)] public float chargedCooldown = 1.5f;
 
     [Header("Charged attack — launch")]
     [Tooltip("Upward velocity applied to the player")]
     [Min(0)] public float playerLaunchForce = 12f;
-    [Tooltip("Upward impulse applied to the enemy on hit")]
-    [Min(0)] public float enemyLaunchForce = 14f;
 
     [Header("Charged attack — float gravity")]
     [Tooltip("Gravity scale during float (lower = floatier)")]
