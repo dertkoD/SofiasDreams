@@ -5,14 +5,12 @@ using Zenject;
 public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] float DeadZone = 0.1f;
-    [SerializeField] float chargeHoldTime = 0.5f;
 
     IInputService _input;
     IPlayerCommands _commands;
     SignalBus _bus;
     bool _isGrounded = true;
     bool _attackDownLastFrame;
-    float _attackHoldTime;
 
     [Inject]
     public void Construct(IInputService input, IPlayerCommands commands, SignalBus bus)
@@ -62,19 +60,6 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         HandleAttack(jumpPressedThisFrame);
 
-        bool attackDown = _input.AttackHeld();
-        if (attackDown)
-        {
-            _attackHoldTime += Time.deltaTime;
-        }
-        else
-        {
-            if (_attackDownLastFrame && _attackHoldTime >= chargeHoldTime)
-                _commands.ChargedAttack();
-            _attackHoldTime = 0f;
-        }
-        _attackDownLastFrame = attackDown;
-
         if (_input.HealPressed())  _commands.HealBegin();
         if (_input.HealReleased()) _commands.HealCancel();
 
@@ -98,6 +83,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         bool attackDown = _input.AttackHeld();
         bool attackPressedThisFrame = attackDown && !_attackDownLastFrame;
+        _attackDownLastFrame = attackDown;
 
         float y = _input.GetVerticalRaw();
 

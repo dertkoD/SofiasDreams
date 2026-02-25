@@ -44,14 +44,12 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
         _origGravity = rb ? rb.gravityScale : 1f;
-        _bus.Subscribe<EnemyHit>(OnEnemyHit);
         _bus.Subscribe<AttackStarted>(OnAttackStarted);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
     }
 
     public void Dispose()
     {
-        _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
         _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
     }
@@ -115,14 +113,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
-    // ───── Hit → launch enemy + player float ─────
-
-    void OnEnemyHit(EnemyHit e)
-    {
-        if (!_attacking || _step != 3) return;
-
-        LaunchEnemy(e.target);
-    }
+    // ───── Player launch on charged attack ─────
 
     void LaunchPlayer()
     {
@@ -134,16 +125,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         StopFloatCoroutine();
         _floatCo = StartCoroutine(FloatGravityRoutine());
-    }
-
-    void LaunchEnemy(IDamageable target)
-    {
-        if (_cfg == null) return;
-        if (target is not MonoBehaviour mb) return;
-
-        var enemyRb = mb.GetComponentInParent<Rigidbody2D>();
-        if (enemyRb)
-            enemyRb.AddForce(Vector2.up * _cfg.enemyLaunchForce, ForceMode2D.Impulse);
     }
 
     IEnumerator FloatGravityRoutine()

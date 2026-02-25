@@ -194,7 +194,11 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
-            if (!_jumper.IsGrounded)
+            if (_jumper.IsGrounded)
+            {
+                ChargedAttack();
+            }
+            else
             {
                 if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
                     Block(MobilityBlockReason.Attack);
