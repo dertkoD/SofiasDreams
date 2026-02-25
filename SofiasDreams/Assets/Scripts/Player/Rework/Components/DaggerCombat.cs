@@ -97,6 +97,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _step = 3;
         LaunchPlayer();
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
+        Debug.Log($"[DaggerCombat] ChargedAttack launched! rb={rb != null}, cfg={_cfg != null}");
     }
 
     public void Interrupt()

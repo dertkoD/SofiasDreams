@@ -5,12 +5,14 @@ using Zenject;
 public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] float DeadZone = 0.1f;
+    [SerializeField] float upAttackBuffer = 0.08f;
 
     IInputService _input;
     IPlayerCommands _commands;
     SignalBus _bus;
     bool _isGrounded = true;
     bool _attackDownLastFrame;
+    float _pendingGroundAttackTimer;
 
     [Inject]
     public void Construct(IInputService input, IPlayerCommands commands, SignalBus bus)
@@ -87,6 +89,21 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         float y = _input.GetVerticalRaw();
 
+        if (_pendingGroundAttackTimer > 0f)
+        {
+            _pendingGroundAttackTimer -= Time.deltaTime;
+            if (y > 0f)
+            {
+                _pendingGroundAttackTimer = 0f;
+                _commands.UpAttack();
+            }
+            else if (_pendingGroundAttackTimer <= 0f)
+            {
+                _commands.Attack();
+            }
+            return;
+        }
+
         if (_isGrounded)
         {
             if (attackPressedThisFrame)
@@ -94,7 +111,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
                 if (y > 0f)
                     _commands.UpAttack();
                 else
-                    _commands.Attack();
+                    _pendingGroundAttackTimer = upAttackBuffer;
             }
         }
         else
