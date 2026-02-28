@@ -19,6 +19,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _gravityOverridden;
     bool _parrying;
     float _chargedCooldownTimer;
+    float _parryCooldownTimer;
 
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
@@ -90,11 +91,14 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     // ───── Charged attack (independent) ─────
 
     public bool IsChargedReady => _chargedCooldownTimer <= 0f;
+    public bool IsParryReady => _parryCooldownTimer <= 0f;
 
     void Update()
     {
         if (_chargedCooldownTimer > 0f)
             _chargedCooldownTimer -= Time.deltaTime;
+        if (_parryCooldownTimer > 0f)
+            _parryCooldownTimer -= Time.deltaTime;
     }
 
     public void RequestChargedAttack()
@@ -157,6 +161,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     public void RequestParry()
     {
         _parrying = true;
+        _parryCooldownTimer = _cfg ? _cfg.parryCooldown : 1f;
     }
 
     public void ParryFinishFromAnimation()

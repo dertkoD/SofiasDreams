@@ -360,7 +360,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
-        if (_daggerCombat.IsParrying) return;
+        if (_daggerCombat.IsParrying || !_daggerCombat.IsParryReady) return;
 
         _mover.StopHorizontal();
         Block(MobilityBlockReason.Parry);

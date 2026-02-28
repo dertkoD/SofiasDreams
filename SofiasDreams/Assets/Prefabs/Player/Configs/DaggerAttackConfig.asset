@@ -28,5 +28,6 @@ MonoBehaviour:
   parrySegments: 5
   decayDelay: 5
   decayRate: 1
+  parryCooldown: 1
   parryStunDuration: 1
   parryTeleportOffset: 1.5
