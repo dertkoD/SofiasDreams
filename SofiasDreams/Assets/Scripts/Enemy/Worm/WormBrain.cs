@@ -214,10 +214,16 @@ public class WormPatrolState : IEnemyState
     const float StuckCheckInterval = 0.5f;
     const float MinProgressDistance = 0.15f;
     const float MaxStuckTime = 3f;
+    const float WanderReverseCooldown = 0.3f;
+    const float WanderStuckThreshold = 0.5f;
+    const float WanderMinSpeed = 0.1f;
 
     float _stuckTimer;
     float _stuckCheckTimer;
     Vector2 _lastRecordedPos;
+
+    float _wanderReverseCooldown;
+    float _wanderStuckTimer;
 
     public WormPatrolState(WormBrain brain) { _brain = brain; }
 
@@ -235,6 +241,8 @@ public class WormPatrolState : IEnemyState
         _stuckTimer = 0f;
         _stuckCheckTimer = 0f;
         _lastRecordedPos = _brain.transform.position;
+        _wanderReverseCooldown = 0f;
+        _wanderStuckTimer = 0f;
     }
 
     public void Tick()
@@ -286,9 +294,24 @@ public class WormPatrolState : IEnemyState
 
     void TickWander()
     {
-        if (_brain.Motor.IsWallAhead(_brain.PatrolDir) || _brain.Motor.IsLedgeAhead(_brain.PatrolDir))
+        _wanderReverseCooldown -= Time.deltaTime;
+
+        bool blocked = _brain.Motor.IsWallAhead(_brain.PatrolDir)
+                    || _brain.Motor.IsLedgeAhead(_brain.PatrolDir);
+
+        if (Mathf.Abs(_brain.Motor.Velocity.x) < WanderMinSpeed)
+            _wanderStuckTimer += Time.deltaTime;
+        else
+            _wanderStuckTimer = 0f;
+
+        bool stuck = _wanderStuckTimer >= WanderStuckThreshold;
+
+        if ((blocked || stuck) && _wanderReverseCooldown <= 0f)
         {
             _brain.PatrolDir *= -1;
+            _brain.Motor.Face(_brain.PatrolDir);
+            _wanderReverseCooldown = WanderReverseCooldown;
+            _wanderStuckTimer = 0f;
         }
     }
 
@@ -322,6 +345,9 @@ public class WormPatrolState : IEnemyState
         _brain.CurrentPath = null;
         _brain.PatrolPathLost = true;
         _brain.PatrolDir *= -1;
+        _brain.Motor.Face(_brain.PatrolDir);
+        _wanderReverseCooldown = WanderReverseCooldown;
+        _wanderStuckTimer = 0f;
     }
 
     public void Exit() { }
