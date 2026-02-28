@@ -39,6 +39,7 @@ public class WormBrain : BaseEnemyBrain
     [HideInInspector] public EnemyPatrolPath CurrentPath;
     [HideInInspector] public int PathIndex;
     [HideInInspector] public int PatrolDir = 1;
+    [HideInInspector] public bool PatrolPathLost;
 
     int _lastHp;
 
@@ -123,7 +124,11 @@ public class WormBrain : BaseEnemyBrain
     {
         if (CurrentState == PatrolState)
         {
-            if (CurrentPath != null) CurrentPath = null;
+            if (CurrentPath != null)
+            {
+                CurrentPath = null;
+                PatrolPathLost = true;
+            }
             PatrolDir *= -1;
             Motor.Face(PatrolDir);
         }
@@ -205,6 +210,15 @@ public class WormBrain : BaseEnemyBrain
 public class WormPatrolState : IEnemyState
 {
     WormBrain _brain;
+
+    const float StuckCheckInterval = 0.5f;
+    const float MinProgressDistance = 0.15f;
+    const float MaxStuckTime = 3f;
+
+    float _stuckTimer;
+    float _stuckCheckTimer;
+    Vector2 _lastRecordedPos;
+
     public WormPatrolState(WormBrain brain) { _brain = brain; }
 
     public void Enter()
@@ -214,77 +228,100 @@ public class WormPatrolState : IEnemyState
         _brain.Anim?.ResetAllTriggers();
         _brain.Anim?.TriggerPatrol();
         _brain.Motor.SetFrozen(false);
-        if (_brain.PatrolPath != null) _brain.CurrentPath = _brain.PatrolPath;
+
+        if (!_brain.PatrolPathLost && _brain.PatrolPath != null)
+            _brain.CurrentPath = _brain.PatrolPath;
+
+        _stuckTimer = 0f;
+        _stuckCheckTimer = 0f;
+        _lastRecordedPos = _brain.transform.position;
     }
 
     public void Tick()
     {
-        bool seesPlayer = _brain.ForgetTimer > 0 && _brain.Target != null; 
-        // Note: The original used 'seesPlayer' bool passed from Update, which was strictly Vision check.
-        // But logic also checked Aggro: "if (seesPlayer) EnterTrigger".
-        // Here we use ForgetTimer which is updated by vision.
-        // Original: "if (seesPlayer) EnterTrigger". seesPlayer was local var from vision check.
-        
-        // Wait, original:
-        // bool seesPlayer = _vision.TryGetClosestTarget...
-        // TickPatrol(seesPlayer) -> if (seesPlayer) EnterTrigger.
-        // It didn't use ForgetTimer for entering trigger from patrol, only direct sight?
-        // Let's check original... 
-        // Yes: "if (seesPlayer) EnterTrigger();"
-        // And ForgetTimer was updated but not used for STARTING aggro in patrol?
-        
-        // Re-reading original Update:
-        // bool seesPlayer = ...
-        // if (seesPlayer) { ... _forgetTimer = ... } else { ... }
-        // case Patrol: TickPatrol(seesPlayer);
-        // void TickPatrol(bool seesPlayer) { if (seesPlayer) EnterTrigger(); ... }
-        
-        // So strict vision required to start aggro.
-        
-        // However, OnHealthChanged also calls EnterTrigger.
-        
-        // I will access vision check directly if possible or rely on Brain's update.
-        // Brain updates Target and ForgetTimer.
-        // But Brain doesn't expose "IsSeesPlayerThisFrame".
-        // I can check Vision again or check ForgetTimer == Max?
-        // Or I can change Brain to expose "SeesPlayer".
-        
         if (_brain.Vision && _brain.Vision.TryGetClosestTarget(out var t))
         {
             _brain.ChangeState(_brain.TriggerState);
             return;
         }
 
-        // Patrol Move
         if (_brain.CurrentPath != null && _brain.CurrentPath.Count > 0)
         {
-            Vector2 targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
-            float dx = targetPt.x - _brain.transform.position.x;
-
-            if (Mathf.Abs(dx) < 0.2f)
-            {
-                _brain.AdvancePathIndex();
-                targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
-                dx = targetPt.x - _brain.transform.position.x;
-            }
-
-            _brain.PatrolDir = dx >= 0 ? 1 : -1;
-
-            if (_brain.Motor.IsWallAhead(_brain.PatrolDir) || _brain.Motor.IsLedgeAhead(_brain.PatrolDir))
-            {
-                _brain.CurrentPath = null;
-                _brain.PatrolDir *= -1;
-            }
+            TickPathPatrol();
         }
         else
         {
-            if (_brain.Motor.IsLedgeAhead(_brain.PatrolDir) || _brain.Motor.IsWallAhead(_brain.PatrolDir))
-            {
-                _brain.PatrolDir *= -1;
-            }
+            TickWander();
         }
 
         _brain.Motor.Move(_brain.Config.patrolSpeed, _brain.Config.patrolAcceleration, _brain.PatrolDir);
+    }
+
+    void TickPathPatrol()
+    {
+        Vector2 targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+        float dx = targetPt.x - _brain.transform.position.x;
+
+        if (Mathf.Abs(dx) < 0.2f)
+        {
+            _brain.AdvancePathIndex();
+            ResetStuckTracking();
+            targetPt = _brain.CurrentPath.GetPoint(_brain.PathIndex);
+            dx = targetPt.x - _brain.transform.position.x;
+        }
+
+        _brain.PatrolDir = dx >= 0 ? 1 : -1;
+
+        if (_brain.Motor.IsWallAhead(_brain.PatrolDir) || _brain.Motor.IsLedgeAhead(_brain.PatrolDir))
+        {
+            LosePatrolPath();
+            return;
+        }
+
+        if (CheckStuck())
+        {
+            LosePatrolPath();
+        }
+    }
+
+    void TickWander()
+    {
+        if (_brain.Motor.IsWallAhead(_brain.PatrolDir) || _brain.Motor.IsLedgeAhead(_brain.PatrolDir))
+        {
+            _brain.PatrolDir *= -1;
+        }
+    }
+
+    bool CheckStuck()
+    {
+        _stuckCheckTimer += Time.deltaTime;
+        if (_stuckCheckTimer < StuckCheckInterval) return false;
+
+        _stuckCheckTimer = 0f;
+        Vector2 currentPos = _brain.transform.position;
+        float moved = Vector2.Distance(currentPos, _lastRecordedPos);
+
+        if (moved < MinProgressDistance)
+            _stuckTimer += StuckCheckInterval;
+        else
+            _stuckTimer = 0f;
+
+        _lastRecordedPos = currentPos;
+        return _stuckTimer >= MaxStuckTime;
+    }
+
+    void ResetStuckTracking()
+    {
+        _stuckTimer = 0f;
+        _stuckCheckTimer = 0f;
+        _lastRecordedPos = _brain.transform.position;
+    }
+
+    void LosePatrolPath()
+    {
+        _brain.CurrentPath = null;
+        _brain.PatrolPathLost = true;
+        _brain.PatrolDir *= -1;
     }
 
     public void Exit() { }
