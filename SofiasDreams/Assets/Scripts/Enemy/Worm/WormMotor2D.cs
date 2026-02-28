@@ -156,6 +156,21 @@ public class WormMotor2D : MonoBehaviour
         return false;
     }
 
+    public bool IsTouchingWall(int dir)
+    {
+        if (!_rb) return false;
+
+        ContactPoint2D[] contacts = new ContactPoint2D[10];
+        int n = _rb.GetContacts(contacts);
+
+        for (int i = 0; i < n; i++)
+        {
+            if (contacts[i].normal.x * dir < -0.5f)
+                return true;
+        }
+        return false;
+    }
+
     public void NotifyBounceStarted()
     {
         if (_groundChecker) _groundChecker.NotifyBounceStarted();
