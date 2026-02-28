@@ -261,7 +261,7 @@ MonoBehaviour:
     m_Bits: 128
   probeOffset: {x: 0, y: 0}
   probeForward: 2.03
-  probeDown: 0.75
+  probeDown: 2
   facingTransform: {fileID: 0}
   drawGizmos: 0
   gizmoColor: {r: 1, g: 0, b: 1, a: 1}
