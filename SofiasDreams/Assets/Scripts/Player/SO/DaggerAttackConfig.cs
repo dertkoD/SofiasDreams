@@ -43,8 +43,6 @@ public class DaggerAttackConfig : ScriptableObject
     public float decayRate = 1f;
 
     [Header("Parry")]
-    [Tooltip("Duration of the parry window after pressing RMB")]
-    [Min(0.01f)] public float parryWindow = 0.25f;
     [Tooltip("Stun duration applied to the enemy on successful parry")]
     [Min(0)] public float parryStunDuration = 1f;
     [Tooltip("How far behind the enemy the player teleports")]

@@ -15,7 +15,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     Coroutine _floatCo;
-    Coroutine _parryCo;
     float _origGravity;
     bool _gravityOverridden;
     bool _parrying;
@@ -155,11 +154,11 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     // ───── Parry ─────
 
+    public void SetParrying(bool value) => _parrying = value;
+
     public void RequestParry()
     {
         if (_parrying) return;
-        if (_parryCo != null) StopCoroutine(_parryCo);
-        _parryCo = StartCoroutine(ParryWindowRoutine());
     }
 
     public bool TryExecuteParry(Transform attacker)
@@ -167,7 +166,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         if (!_parrying || attacker == null) return false;
 
         _parrying = false;
-        if (_parryCo != null) { StopCoroutine(_parryCo); _parryCo = null; }
 
         TeleportBehind(attacker);
         StunEnemy(attacker);
@@ -175,15 +173,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         Debug.Log("[DaggerCombat] Parry successful!");
         return true;
-    }
-
-    IEnumerator ParryWindowRoutine()
-    {
-        _parrying = true;
-        float window = _cfg != null ? _cfg.parryWindow : 0.25f;
-        yield return new WaitForSeconds(window);
-        _parrying = false;
-        _parryCo = null;
     }
 
     void TeleportBehind(Transform enemy)

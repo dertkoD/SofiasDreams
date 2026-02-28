@@ -359,8 +359,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+        if (_daggerCombat.IsParrying) return;
 
-        _daggerCombat.RequestParry();
         _anim.PlayDaggerParry();
     }
 
