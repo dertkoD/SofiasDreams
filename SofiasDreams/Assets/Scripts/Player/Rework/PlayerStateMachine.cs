@@ -354,13 +354,17 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void Parry()
     {
-        if (_state == PlayerState.Dead) return;
+        if (_state == PlayerState.Dead) { Debug.Log("[Parry] blocked: Dead"); return; }
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Dash
-            or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+            or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon)
+        { Debug.Log($"[Parry] blocked: state={_state}"); return; }
 
-        if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
-        if (_daggerCombat.IsParrying) return;
+        if (_weaponManager.CurrentWeapon != WeaponType.Dagger)
+        { Debug.Log($"[Parry] blocked: weapon={_weaponManager.CurrentWeapon}"); return; }
 
+        if (_daggerCombat.IsParrying) { Debug.Log("[Parry] blocked: already parrying"); return; }
+
+        Debug.Log("[Parry] → PlayDaggerParry()");
         _anim.PlayDaggerParry();
     }
 

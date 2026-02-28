@@ -4,20 +4,26 @@ public class DaggerParryTrigger : MonoBehaviour
 {
     DaggerCombat _combat;
     bool _parried;
+    bool _initialized;
 
     void Awake()
     {
         _combat = GetComponentInParent<DaggerCombat>();
+        gameObject.SetActive(false);
+        _initialized = true;
     }
 
     void OnEnable()
     {
+        if (!_initialized) return;
         _parried = false;
         if (_combat) _combat.SetParrying(true);
+        Debug.Log("[DaggerParryTrigger] Window OPEN");
     }
 
     void OnDisable()
     {
+        if (!_initialized) return;
         if (_combat) _combat.SetParrying(false);
     }
 
@@ -29,6 +35,7 @@ public class DaggerParryTrigger : MonoBehaviour
         if (enemy == null) return;
 
         _parried = true;
+        Debug.Log($"[DaggerParryTrigger] Hit enemy: {enemy.name}");
 
         if (_combat && _combat.TryExecuteParry(enemy))
             gameObject.SetActive(false);
