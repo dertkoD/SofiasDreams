@@ -83,6 +83,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.Subscribe<GrappleFinished>(OnGrappleFinished);
         _bus.Subscribe<InteractPressed>(OnInteractPressed);
         _bus.Subscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
+        _bus.Subscribe<ParryFinished>(OnParryFinished);
     }
 
     public void Dispose()
@@ -101,7 +102,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.TryUnsubscribe<GrappleFinished>(OnGrappleFinished);
         _bus.TryUnsubscribe<InteractPressed>(OnInteractPressed);
         _bus.TryUnsubscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
-
+        _bus.TryUnsubscribe<ParryFinished>(OnParryFinished);
     }
 
     // ───────────────────── Commands ─────────────────────
@@ -361,8 +362,19 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
         if (_daggerCombat.IsParrying) return;
 
+        _mover.StopHorizontal();
+        Block(MobilityBlockReason.Parry);
+        _state = PlayerState.Attack;
+
         _daggerCombat.RequestParry();
         _anim.PlayDaggerParry();
+    }
+
+    void OnParryFinished(ParryFinished _)
+    {
+        Unblock(MobilityBlockReason.Parry);
+        if (_state == PlayerState.Attack)
+            _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
     }
 
     public void ChargedAttack()

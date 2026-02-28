@@ -162,6 +162,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     public void ParryFinishFromAnimation()
     {
         _parrying = false;
+        _bus.Fire(new ParryFinished());
     }
 
     public bool TryExecuteParry(Transform attacker)
@@ -173,6 +174,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         TeleportBehind(attacker);
         StunEnemy(attacker);
         _momentum?.OnParrySuccess();
+        _bus.Fire(new ParryFinished());
 
         Debug.Log("[DaggerCombat] Parry successful!");
         return true;
