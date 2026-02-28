@@ -154,16 +154,19 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     // ───── Parry ─────
 
-    public void SetParrying(bool value) => _parrying = value;
-
     public void RequestParry()
     {
-        if (_parrying) return;
+        _parrying = true;
+    }
+
+    public void ParryFinishFromAnimation()
+    {
+        _parrying = false;
     }
 
     public bool TryExecuteParry(Transform attacker)
     {
-        if (!_parrying || attacker == null) return false;
+        if (attacker == null) return false;
 
         _parrying = false;
 
