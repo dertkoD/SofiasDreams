@@ -61385,7 +61385,7 @@ MonoBehaviour:
   groundEnemyPrefab: {fileID: 4831771523523908512, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
   flyingEnemyPrefab: {fileID: 1217531415248443041, guid: 8ce35e73cd225fc45821a4e83656e6de, type: 3}
   jumpingEnemyPrefab: {fileID: 5534651348796208987, guid: 6a6c1d8faf105de4d99923c4e9a8eb7a, type: 3}
-  wormEnemyPrefab: {fileID: 6210117844752786583, guid: 3ccfbc7d868031a46893db000d8e346b, type: 3}
+  wormEnemyPrefab: {fileID: 6210117844752786583, guid: b4ea3f3e04b570948aad35d13cfddfc3, type: 3}
   swarmEnemyPrefab: {fileID: 8125583343641682487, guid: 23bbc0fee2dc8b741ae3fd97a9334a7e, type: 3}
   lazyMiniBossPrefab: {fileID: 973517408187533830, guid: 5fee84c3f51146c498e67015ed8bfe28, type: 3}
 --- !u!114 &562734850
@@ -82903,7 +82903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d5579472a33444cbcc2791b02b903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: 9, y: -19.7, z: 0}
+  startPos: {x: 68.4, y: 1.31, z: 0}
   _enemySpawnPoints:
   - {fileID: 783268736}
   - {fileID: 767699206}
