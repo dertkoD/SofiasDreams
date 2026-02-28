@@ -67,6 +67,9 @@ public class Weapon : MonoBehaviour
             }
         }
 
+        if (backstab)
+            Debug.Log($"[Weapon] Backstab! dmg={dmg} (x{BackstabMultiplier})");
+
         target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, KnockbackForce);
         _bus.Fire(new EnemyHit { target = target, isBackstab = backstab });
     }

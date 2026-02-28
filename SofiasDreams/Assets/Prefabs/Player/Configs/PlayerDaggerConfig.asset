@@ -17,3 +17,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 139264
   knockbackForce: 0
+  backstabMultiplier: 2

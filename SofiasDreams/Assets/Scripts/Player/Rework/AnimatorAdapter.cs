@@ -81,7 +81,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     DaggerMomentum _daggerMomentum;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
-    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown;
+    Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown, _tDagParry;
 
     [Inject]
     void Construct(
@@ -201,6 +201,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     {
         if (!animator) return;
         animator.SetTrigger(pDagParryTrig);
+        Restart(ref _tDagParry, TrackExitByName(stDagParry, () =>
+            _daggerCombat?.ParryFinishFromAnimation()));
     }
 
     public void PlayDaggerFlyAttackUp()

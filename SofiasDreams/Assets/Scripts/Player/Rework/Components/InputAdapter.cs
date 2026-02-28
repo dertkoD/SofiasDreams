@@ -5,14 +5,14 @@ using Zenject;
 public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] float DeadZone = 0.1f;
-    [SerializeField] float chargeHoldTime = 0.5f;
+    [SerializeField] float upAttackBuffer = 0.08f;
 
     IInputService _input;
     IPlayerCommands _commands;
     SignalBus _bus;
     bool _isGrounded = true;
     bool _attackDownLastFrame;
-    float _attackHoldTime;
+    float _pendingGroundAttackTimer;
 
     [Inject]
     public void Construct(IInputService input, IPlayerCommands commands, SignalBus bus)
@@ -62,19 +62,6 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         HandleAttack(jumpPressedThisFrame);
 
-        bool attackDown = _input.AttackHeld();
-        if (attackDown)
-        {
-            _attackHoldTime += Time.deltaTime;
-        }
-        else
-        {
-            if (_attackDownLastFrame && _attackHoldTime >= chargeHoldTime)
-                _commands.ChargedAttack();
-            _attackHoldTime = 0f;
-        }
-        _attackDownLastFrame = attackDown;
-
         if (_input.HealPressed())  _commands.HealBegin();
         if (_input.HealReleased()) _commands.HealCancel();
 
@@ -98,8 +85,24 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         bool attackDown = _input.AttackHeld();
         bool attackPressedThisFrame = attackDown && !_attackDownLastFrame;
+        _attackDownLastFrame = attackDown;
 
         float y = _input.GetVerticalRaw();
+
+        if (_pendingGroundAttackTimer > 0f)
+        {
+            _pendingGroundAttackTimer -= Time.deltaTime;
+            if (y > 0f)
+            {
+                _pendingGroundAttackTimer = 0f;
+                _commands.UpAttack();
+            }
+            else if (_pendingGroundAttackTimer <= 0f)
+            {
+                _commands.Attack();
+            }
+            return;
+        }
 
         if (_isGrounded)
         {
@@ -108,7 +111,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
                 if (y > 0f)
                     _commands.UpAttack();
                 else
-                    _commands.Attack();
+                    _pendingGroundAttackTimer = upAttackBuffer;
             }
         }
         else

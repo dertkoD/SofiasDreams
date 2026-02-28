@@ -15,10 +15,11 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     Coroutine _floatCo;
-    Coroutine _parryCo;
     float _origGravity;
     bool _gravityOverridden;
     bool _parrying;
+    float _chargedCooldownTimer;
+    float _parryCooldownTimer;
 
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
@@ -44,14 +45,12 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
         _origGravity = rb ? rb.gravityScale : 1f;
-        _bus.Subscribe<EnemyHit>(OnEnemyHit);
         _bus.Subscribe<AttackStarted>(OnAttackStarted);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
     }
 
     public void Dispose()
     {
-        _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
         _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
     }
@@ -91,14 +90,29 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     // ───── Charged attack (independent) ─────
 
+    public bool IsChargedReady => _chargedCooldownTimer <= 0f;
+    public bool IsParryReady => _parryCooldownTimer <= 0f;
+
+    void Update()
+    {
+        if (_chargedCooldownTimer > 0f)
+            _chargedCooldownTimer -= Time.deltaTime;
+        if (_parryCooldownTimer > 0f)
+            _parryCooldownTimer -= Time.deltaTime;
+    }
+
     public void RequestChargedAttack()
     {
+        if (_chargedCooldownTimer > 0f) return;
         if (_attacking) Interrupt();
 
         _attacking = true;
         _step = 3;
-        LaunchPlayer();
+        _chargedCooldownTimer = _cfg ? _cfg.chargedCooldown : 1.5f;
+        StopFloatCoroutine();
+        _floatCo = StartCoroutine(LaunchPlayerRoutine());
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
+        Debug.Log($"[DaggerCombat] ChargedAttack fired! force={(_cfg ? _cfg.playerLaunchForce : 0)}");
     }
 
     public void Interrupt()
@@ -115,49 +129,28 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
-    // ───── Hit → launch enemy + player float ─────
+    // ───── Player launch on charged attack ─────
 
-    void OnEnemyHit(EnemyHit e)
+    IEnumerator LaunchPlayerRoutine()
     {
-        if (!_attacking || _step != 3) return;
+        if (!rb || _cfg == null) yield break;
 
-        LaunchEnemy(e.target);
-    }
-
-    void LaunchPlayer()
-    {
-        if (!rb || _cfg == null) return;
-
-        var v = rb.linearVelocity;
-        v.y = _cfg.playerLaunchForce;
-        rb.linearVelocity = v;
-
-        StopFloatCoroutine();
-        _floatCo = StartCoroutine(FloatGravityRoutine());
-    }
-
-    void LaunchEnemy(IDamageable target)
-    {
-        if (_cfg == null) return;
-        if (target is not MonoBehaviour mb) return;
-
-        var enemyRb = mb.GetComponentInParent<Rigidbody2D>();
-        if (enemyRb)
-            enemyRb.AddForce(Vector2.up * _cfg.enemyLaunchForce, ForceMode2D.Impulse);
-    }
-
-    IEnumerator FloatGravityRoutine()
-    {
         if (!_gravityOverridden)
         {
             _origGravity = rb.gravityScale;
             _gravityOverridden = true;
         }
+        rb.gravityScale = _cfg.floatGravityScale;
 
-        rb.gravityScale = _cfg != null ? _cfg.floatGravityScale : 0.1f;
+        yield return new WaitForFixedUpdate();
 
-        float duration = _cfg != null ? _cfg.floatGravityDuration : 0.3f;
-        yield return new WaitForSeconds(duration);
+        float force = _cfg.playerLaunchForce;
+        rb.linearVelocity = new Vector2(0f, 0f);
+        rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
+
+        Debug.Log($"[DaggerCombat] Launch applied! vel={rb.linearVelocity}, gravity={rb.gravityScale}");
+
+        yield return new WaitForSeconds(_cfg.floatGravityDuration);
 
         RestoreGravity();
         _floatCo = null;
@@ -167,33 +160,29 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     public void RequestParry()
     {
-        if (_parrying) return;
-        if (_parryCo != null) StopCoroutine(_parryCo);
-        _parryCo = StartCoroutine(ParryWindowRoutine());
+        _parrying = true;
+        _parryCooldownTimer = _cfg ? _cfg.parryCooldown : 1f;
+    }
+
+    public void ParryFinishFromAnimation()
+    {
+        _parrying = false;
+        _bus.Fire(new ParryFinished());
     }
 
     public bool TryExecuteParry(Transform attacker)
     {
-        if (!_parrying || attacker == null) return false;
+        if (attacker == null) return false;
 
         _parrying = false;
-        if (_parryCo != null) { StopCoroutine(_parryCo); _parryCo = null; }
 
         TeleportBehind(attacker);
         StunEnemy(attacker);
         _momentum?.OnParrySuccess();
+        _bus.Fire(new ParryFinished());
 
         Debug.Log("[DaggerCombat] Parry successful!");
         return true;
-    }
-
-    IEnumerator ParryWindowRoutine()
-    {
-        _parrying = true;
-        float window = _cfg != null ? _cfg.parryWindow : 0.25f;
-        yield return new WaitForSeconds(window);
-        _parrying = false;
-        _parryCo = null;
     }
 
     void TeleportBehind(Transform enemy)

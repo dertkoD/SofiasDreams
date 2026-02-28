@@ -35,7 +35,7 @@ MonoBehaviour:
   healEndState: EndHealing
   dashTrigger: Dash
   grappleBool: isGrappling
-  changeWeaponTrigger: ChangeWeapon
+  changeWeaponTrigger: ChangeWeaponTrigger
   changeWeaponState: ChangeWeapon
   daggerAttack1Bool: IsDaggerAttack1
   daggerAttack2Bool: IsDaggerAttack2
@@ -43,7 +43,7 @@ MonoBehaviour:
   daggerAttack2State: DaggerAttack2
   daggerSuperTrigger: DaggerAttackSuperTrig
   daggerSuperState: DaggerAttackSuper
-  daggerParryTrigger: DaggerParryTrig
+  daggerParryTrigger: DaggerParryTrigger
   daggerParryState: DaggerParry
   daggerFlyUpBool: IsDaggerFlyAttackUp
   daggerFlyDownBool: IsDaggerFlyAttackDown

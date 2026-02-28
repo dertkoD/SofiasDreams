@@ -83,6 +83,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.Subscribe<GrappleFinished>(OnGrappleFinished);
         _bus.Subscribe<InteractPressed>(OnInteractPressed);
         _bus.Subscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
+        _bus.Subscribe<ParryFinished>(OnParryFinished);
     }
 
     public void Dispose()
@@ -101,7 +102,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _bus.TryUnsubscribe<GrappleFinished>(OnGrappleFinished);
         _bus.TryUnsubscribe<InteractPressed>(OnInteractPressed);
         _bus.TryUnsubscribe<BonfireRestStateChanged>(OnBonfireRestStateChanged);
-
+        _bus.TryUnsubscribe<ParryFinished>(OnParryFinished);
     }
 
     // ───────────────────── Commands ─────────────────────
@@ -194,7 +195,11 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
-            if (!_jumper.IsGrounded)
+            if (_jumper.IsGrounded)
+            {
+                ChargedAttack();
+            }
+            else
             {
                 if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
                     Block(MobilityBlockReason.Attack);
@@ -355,9 +360,21 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.Grapple or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+        if (_daggerCombat.IsParrying || !_daggerCombat.IsParryReady) return;
+
+        _mover.StopHorizontal();
+        Block(MobilityBlockReason.Parry);
+        _state = PlayerState.Attack;
 
         _daggerCombat.RequestParry();
         _anim.PlayDaggerParry();
+    }
+
+    void OnParryFinished(ParryFinished _)
+    {
+        Unblock(MobilityBlockReason.Parry);
+        if (_state == PlayerState.Attack)
+            _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
     }
 
     public void ChargedAttack()
@@ -367,10 +384,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
 
         if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
+        if (!_daggerCombat.IsChargedReady) return;
 
-        if (_jumper.IsGrounded)
-            _mover.StopHorizontal();
-
+        _mover.StopHorizontal();
         Block(MobilityBlockReason.Attack);
         _daggerCombat.RequestChargedAttack();
         _state = PlayerState.Attack;
