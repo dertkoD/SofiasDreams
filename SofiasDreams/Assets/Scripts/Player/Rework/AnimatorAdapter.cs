@@ -202,7 +202,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     public void PlaySwordDashAttack()
     {
         if (!animator) return;
-        animator.SetTrigger(pSwordDashAtkTrig);
+        animator.Play(stSwordDashAtk, atkLayer, 0f);
         Restart(ref _tSwordDashAtk, TrackExitByName(stSwordDashAtk, () =>
             _bus?.Fire(new AttackFinished { mode = AttackMode.SwordDashAttack, index = 0 })));
     }
