@@ -33,7 +33,6 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     float       _moveX;
     AttackMode? _activeAttack;
-    bool        _dashAttackBuffered;
 
     public PlayerStateMachine(
         SignalBus bus, IMobilityGate gate,
@@ -177,7 +176,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (_state != PlayerState.Dash) return false;
         if (_weaponManager.CurrentWeapon == WeaponType.Sword)
-            _dashAttackBuffered = true;
+            _swordCombat.BufferDashAttack();
         return true;
     }
 
@@ -547,6 +546,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _anim.PlaySwordAirUpAttack();
                 break;
             case AttackMode.SwordDashAttack:
+                Block(MobilityBlockReason.Attack);
                 _anim.PlaySwordDashAttack();
                 break;
             case AttackMode.SwordSuper:
@@ -626,22 +626,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnDashStarted(DashStarted s)
     {
         _state = PlayerState.Dash;
-        _dashAttackBuffered = false;
+        _swordCombat.ClearDashAttackBuffer();
     }
 
     void OnDashFinished(DashFinished s)
     {
         if (_state == PlayerState.Dead || _state == PlayerState.Hurt)
             return;
-
-        if (_dashAttackBuffered && _weaponManager.CurrentWeapon == WeaponType.Sword)
-        {
-            _dashAttackBuffered = false;
-            Block(MobilityBlockReason.Attack);
-            _state = PlayerState.Attack;
-            _bus.Fire(new AttackStarted { mode = AttackMode.SwordDashAttack, index = 0 });
-            return;
-        }
 
         if (_jumper.IsGrounded)
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;

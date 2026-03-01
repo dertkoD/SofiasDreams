@@ -18,6 +18,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     AttackMode? _activeSuperMode;
     float _chargeProgress;
     bool _wasHeld;
+    bool _dashAttackBuffered;
 
     [Inject]
     void Construct(SignalBus bus,
@@ -72,6 +73,23 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             _bus.Fire(new SwordChargeChanged { progress = 0f });
             _wasHeld = false;
         }
+    }
+
+    // ───── Dash attack (animation event) ─────
+
+    public void BufferDashAttack() => _dashAttackBuffered = true;
+    public void ClearDashAttackBuffer() => _dashAttackBuffered = false;
+    public bool HasDashAttackBuffered => _dashAttackBuffered;
+
+    /// <summary>
+    /// Call from Dash animation clip event at the end of the clip.
+    /// If attack was pressed during dash, fires SwordDashAttack.
+    /// </summary>
+    public void OnDashEnd()
+    {
+        if (!_dashAttackBuffered) return;
+        _dashAttackBuffered = false;
+        _bus.Fire(new AttackStarted { mode = AttackMode.SwordDashAttack, index = 0 });
     }
 
     public void RequestAttack()
