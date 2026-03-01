@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -41,7 +42,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = 0 });
     }
 
-    public void FinishFromAnimation()
+    public void FinishFromSwordAnimation()
     {
         if (!_attacking) return;
 
