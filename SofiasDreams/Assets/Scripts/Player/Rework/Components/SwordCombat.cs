@@ -62,11 +62,23 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     void Update()
     {
-        if (_input == null || _weaponManager == null) return;
+        if (_input == null || _weaponManager == null)
+        {
+            Debug.LogWarning($"[SwordCombat] Update skip: _input={_input != null}, _weaponManager={_weaponManager != null}");
+            return;
+        }
         if (_weaponManager.CurrentWeapon != WeaponType.Sword) return;
 
-        if (_isDashing && _input.AttackPressed())
-            _dashAttackBuffered = true;
+        if (_isDashing)
+        {
+            bool pressed = _input.AttackPressed();
+            bool held2 = _input.AttackHeld();
+            if (pressed)
+            {
+                _dashAttackBuffered = true;
+                Debug.Log($"[SwordCombat] BUFFERED via Update! AttackPressed={pressed}, AttackHeld={held2}");
+            }
+        }
 
         bool held = _input.AttackHeld();
 
@@ -90,19 +102,26 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     {
         _isDashing = true;
         _dashAttackBuffered = false;
+        Debug.Log("[SwordCombat] OnDashStarted → _isDashing=true, buffer cleared");
     }
 
     void OnDashFinished(DashFinished _)
     {
+        Debug.Log($"[SwordCombat] OnDashFinished → _dashAttackBuffered={_dashAttackBuffered}, weapon={_weaponManager?.CurrentWeapon}");
         _isDashing = false;
         if (!_dashAttackBuffered) return;
         if (_weaponManager == null || _weaponManager.CurrentWeapon != WeaponType.Sword) return;
 
         _dashAttackBuffered = false;
+        Debug.Log("[SwordCombat] FIRING SwordDashAttack from OnDashFinished!");
         _bus.Fire(new AttackStarted { mode = AttackMode.SwordDashAttack, index = 0 });
     }
 
-    public void BufferDashAttack() => _dashAttackBuffered = true;
+    public void BufferDashAttack()
+    {
+        _dashAttackBuffered = true;
+        Debug.Log("[SwordCombat] BufferDashAttack called from PlayerStateMachine");
+    }
 
     public void OnDashEnd()
     {
