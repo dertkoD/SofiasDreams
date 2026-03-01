@@ -10,11 +10,16 @@ public class Weapon : MonoBehaviour
 
     PlayerWeaponConfig _runtimeConfig;
     readonly HashSet<IDamageable> _hitThisSwing = new();
+    float? _knockbackOverride;
 
     int Damage => _runtimeConfig ? _runtimeConfig.baseDamage : attackDamage;
     LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
     float KnockbackForce => _runtimeConfig ? _runtimeConfig.knockbackForce : -1f;
+    float EffectiveKnockback => _knockbackOverride ?? KnockbackForce;
     float BackstabMultiplier => _runtimeConfig ? _runtimeConfig.backstabMultiplier : 1f;
+
+    public void OverrideKnockback(float force) => _knockbackOverride = force;
+    public void ClearKnockbackOverride() => _knockbackOverride = null;
 
     SignalBus _bus;
 
@@ -70,7 +75,7 @@ public class Weapon : MonoBehaviour
         if (backstab)
             Debug.Log($"[Weapon] Backstab! dmg={dmg} (x{BackstabMultiplier})");
 
-        target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, KnockbackForce);
+        target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, EffectiveKnockback);
         _bus.Fire(new EnemyHit { target = target, isBackstab = backstab });
     }
 

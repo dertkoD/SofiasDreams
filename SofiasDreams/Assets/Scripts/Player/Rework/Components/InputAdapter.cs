@@ -6,13 +6,16 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] float DeadZone = 0.1f;
     [SerializeField] float upAttackBuffer = 0.08f;
+    [SerializeField] float chargeHoldTime = 0.5f;
 
     IInputService _input;
     IPlayerCommands _commands;
     SignalBus _bus;
     bool _isGrounded = true;
+    bool _isDashing;
     bool _attackDownLastFrame;
     float _pendingGroundAttackTimer;
+    float _attackHoldTime;
 
     [Inject]
     public void Construct(IInputService input, IPlayerCommands commands, SignalBus bus)
@@ -25,14 +28,20 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
     public void Initialize()
     {
         _bus.Subscribe<GroundedChanged>(OnGroundedChanged);
+        _bus.Subscribe<DashStarted>(OnDashStarted);
+        _bus.Subscribe<DashFinished>(OnDashFinished);
     }
 
     public void Dispose()
     {
         _bus.TryUnsubscribe<GroundedChanged>(OnGroundedChanged);
+        _bus.TryUnsubscribe<DashStarted>(OnDashStarted);
+        _bus.TryUnsubscribe<DashFinished>(OnDashFinished);
     }
 
     void OnGroundedChanged(GroundedChanged g) => _isGrounded = g.grounded;
+    void OnDashStarted(DashStarted _) => _isDashing = true;
+    void OnDashFinished(DashFinished _) => _isDashing = false;
     
     void Update()
     {
@@ -85,7 +94,18 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         bool attackDown = _input.AttackHeld();
         bool attackPressedThisFrame = attackDown && !_attackDownLastFrame;
+        bool attackReleasedThisFrame = !attackDown && _attackDownLastFrame;
         _attackDownLastFrame = attackDown;
+
+        if (attackDown)
+            _attackHoldTime += Time.deltaTime;
+
+        if (attackReleasedThisFrame)
+        {
+            if (_attackHoldTime >= chargeHoldTime)
+                _commands.ChargedAttack();
+            _attackHoldTime = 0f;
+        }
 
         float y = _input.GetVerticalRaw();
 
@@ -108,7 +128,9 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
         {
             if (attackPressedThisFrame)
             {
-                if (y > 0f)
+                if (_isDashing)
+                    _commands.Attack();
+                else if (y > 0f)
                     _commands.UpAttack();
                 else
                     _pendingGroundAttackTimer = upAttackBuffer;

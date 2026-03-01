@@ -485,6 +485,7 @@ GameObject:
   - component: {fileID: 1573057834305744189}
   - component: {fileID: -1492794088512554747}
   - component: {fileID: 6001317811132243814}
+  - component: {fileID: 457278728729387478}
   m_Layer: 6
   m_Name: PlayerRework
   m_TagString: Player
@@ -659,6 +660,7 @@ MonoBehaviour:
   weaponSO: {fileID: 11400000, guid: 414a6e48e049bda4ba3609a0c1e7d1ce, type: 2}
   shakeSO: {fileID: 11400000, guid: 4c88ee441b819ae4b9d23b35bd03288f, type: 2}
   daggerAttackSO: {fileID: 11400000, guid: 07e1c617fe9a2be45a2d6f5a54fbb941, type: 2}
+  swordAttackSO: {fileID: 11400000, guid: 37098e76497b30147a8142bb86eeafe6, type: 2}
 --- !u!114 &-8336346839882354902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -830,6 +832,18 @@ MonoBehaviour:
   pDagFlyDownBool: DaggerFlyAttackDown
   stDagFlyUp: DaggerFlyAttackUp
   stDagFlyDown: DaggerFlyAttackDown
+  pSwordAtk1: IsSwordAttack1
+  pSwordAtk2: IsSwordAttack2
+  pSwordAtk3Trig: SwordAttack3Trig
+  stSwordAtk1: SwordAttack1
+  stSwordAtk2: SwordAttack2
+  stSwordAtk3: SwordAttack3
+  pSwordFlyFwdTrig: SwordFlyAttackForwardTrig
+  pSwordFlyDownTrig: SwordFlyAttackDownTrig
+  pSwordFlyUpTrig: SwordFlyAttackUpTrig
+  stSwordFlyFwd: SwordFlyAttackForward
+  stSwordFlyDown: SwordFlyAttackDown
+  stSwordFlyUp: SwordFlyAttackUp
   clipEndThreshold: 0.98
   enterTimeout: 0.25
   safetyTimeout: 2
@@ -1045,7 +1059,7 @@ MonoBehaviour:
   m_ShadowGroup: 0
   m_Priority: 0
   m_ComponentVersion: 5
-  m_HasRenderer: 1
+  m_HasRenderer: 0
   m_UseRendererSilhouette: 1
   m_CastsShadows: 1
   m_SelfShadows: 0
@@ -1132,6 +1146,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d3374ca301e2f4c967a183ea0c39f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DaggerMomentum
+--- !u!114 &457278728729387478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2994962202583410689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0affefe59e3b596449c2fd10745c056e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SwordCombat
+  swordWeapon: {fileID: 5707186729748711404}
+  rb: {fileID: 5395965832727822489}
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0

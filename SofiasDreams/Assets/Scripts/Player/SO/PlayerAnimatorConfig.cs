@@ -61,6 +61,32 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string daggerFlyUpState   = "DaggerFlyAttackUp";
     public string daggerFlyDownState = "DaggerFlyAttackDown";
 
+    [Header("Sword combo")]
+    public string swordAttack1Bool  = "IsSwordAttack1";
+    public string swordAttack2Bool  = "IsSwordAttack2";
+    public string swordAttack3Trig  = "SwordAttack3Trig";
+    public string swordAttack1State = "SwordAttack1";
+    public string swordAttack2State = "SwordAttack2";
+    public string swordAttack3State = "SwordAttack3";
+
+    [Header("Sword dash attack")]
+    public string swordDashAttackTrig  = "SwordDashAttackTrig";
+    public string swordDashAttackState = "SwordDashAttack";
+
+    [Header("Sword super (charged)")]
+    public string swordSuperTrig       = "SwordAttackSuperTrig";
+    public string swordSuperState      = "SwordAttackSuper";
+    public string swordSuperAirTrig    = "SwordAttackSuperAirTrig";
+    public string swordSuperAirState   = "SwordAttackSuperAir";
+
+    [Header("Sword air attacks")]
+    public string swordFlyForwardTrig = "SwordFlyAttackForwardTrig";
+    public string swordFlyDownTrig    = "SwordFlyAttackDownTrig";
+    public string swordFlyUpTrig      = "SwordFlyAttackUpTrig";
+    public string swordFlyForwardState = "SwordFlyAttackForward";
+    public string swordFlyDownState    = "SwordFlyAttackDown";
+    public string swordFlyUpState      = "SwordFlyAttackUp";
+
     [Header("Tracking")]
     [Range(0.5f, 1f)] public float clipEndThreshold = 0.98f;
     [Min(0f)] public float enterTimeout  = 0.25f;

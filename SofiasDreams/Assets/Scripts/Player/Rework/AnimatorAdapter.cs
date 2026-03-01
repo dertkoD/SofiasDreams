@@ -70,6 +70,32 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stDagFlyUp      = "DaggerFlyAttackUp";
     [SerializeField] string stDagFlyDown    = "DaggerFlyAttackDown";
 
+    [Header("Sword combo")]
+    [SerializeField] string pSwordAtk1 = "IsSwordAttack1";
+    [SerializeField] string pSwordAtk2 = "IsSwordAttack2";
+    [SerializeField] string pSwordAtk3Trig = "SwordAttack3Trig";
+    [SerializeField] string stSwordAtk1 = "SwordAttack1";
+    [SerializeField] string stSwordAtk2 = "SwordAttack2";
+    [SerializeField] string stSwordAtk3 = "SwordAttack3";
+
+    [Header("Sword dash attack")]
+    [SerializeField] string pSwordDashAtkTrig = "SwordDashAttackTrig";
+    [SerializeField] string stSwordDashAtk    = "SwordDashAttack";
+
+    [Header("Sword super (charged)")]
+    [SerializeField] string pSwordSuperTrig    = "SwordAttackSuperTrig";
+    [SerializeField] string stSwordSuper       = "SwordAttackSuper";
+    [SerializeField] string pSwordSuperAirTrig = "SwordAttackSuperAirTrig";
+    [SerializeField] string stSwordSuperAir    = "SwordAttackSuperAir";
+
+    [Header("Sword air")]
+    [SerializeField] string pSwordFlyFwdTrig  = "SwordFlyAttackForwardTrig";
+    [SerializeField] string pSwordFlyDownTrig = "SwordFlyAttackDownTrig";
+    [SerializeField] string pSwordFlyUpTrig   = "SwordFlyAttackUpTrig";
+    [SerializeField] string stSwordFlyFwd     = "SwordFlyAttackForward";
+    [SerializeField] string stSwordFlyDown    = "SwordFlyAttackDown";
+    [SerializeField] string stSwordFlyUp      = "SwordFlyAttackUp";
+
     [Header("Tracking Settings")]
     [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f;
     [SerializeField] float enterTimeout = 0.25f;
@@ -79,21 +105,28 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     PlayerAnimatorConfig _configOverride;
     DaggerCombat _daggerCombat;
     DaggerMomentum _daggerMomentum;
+    SwordCombat _swordCombat;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
     Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown, _tDagParry;
+    Coroutine _tSwordAtk;
+    Coroutine _tSwordFlyFwd, _tSwordFlyDown, _tSwordFlyUp;
+    Coroutine _tSwordSuper, _tSwordSuperAir;
+    Coroutine _tSwordDashAtk;
 
     [Inject]
     void Construct(
         SignalBus bus,
         [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null,
         [Inject(Optional = true)] DaggerCombat daggerCombat = null,
-        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null)
+        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null,
+        [Inject(Optional = true)] SwordCombat swordCombat = null)
     {
         _bus = bus;
         _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
         _daggerCombat = daggerCombat;
         _daggerMomentum = daggerMomentum;
+        _swordCombat = swordCombat;
     }
 
     public void Initialize()
@@ -135,6 +168,83 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pAtk1, index == 1);
         SetBool(pAtk2, index == 2);
         SetBool(pAtk3, index == 3);
+    }
+
+    public void PlaySwordAttack(int index)
+    {
+        switch (index)
+        {
+            case 1:
+                SetBool(pSwordAtk1, true);
+                SetBool(pSwordAtk2, false);
+                break;
+            case 2:
+                SetBool(pSwordAtk2, true);
+                break;
+        }
+
+        if (!animator) return;
+
+        if (index == 3)
+        {
+            animator.SetTrigger(pSwordAtk3Trig);
+            Restart(ref _tSwordAtk, TrackExitByName(stSwordAtk3, () =>
+                _swordCombat?.FinishFromSwordAnimation()));
+        }
+        else
+        {
+            string state = index == 1 ? stSwordAtk1 : stSwordAtk2;
+            Restart(ref _tSwordAtk, TrackClipEnd(state, () =>
+                _swordCombat?.FinishFromSwordAnimation()));
+        }
+    }
+
+    public void PlaySwordDashAttack()
+    {
+        if (!animator) return;
+        animator.Play(stSwordDashAtk, atkLayer, 0f);
+        Restart(ref _tSwordDashAtk, TrackExitByName(stSwordDashAtk, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordDashAttack, index = 0 })));
+    }
+
+    public void PlaySwordSuperAttack()
+    {
+        if (!animator) return;
+        animator.Play(stSwordSuper, atkLayer, 0f);
+        Restart(ref _tSwordSuper, TrackExitByName(stSwordSuper, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuper, index = 0 })));
+    }
+
+    public void PlaySwordSuperAirAttack()
+    {
+        if (!animator) return;
+        animator.Play(stSwordSuperAir, atkLayer, 0f);
+        Restart(ref _tSwordSuperAir, TrackExitByName(stSwordSuperAir, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuperAir, index = 0 })));
+    }
+
+    public void PlaySwordAirForwardAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordFlyFwdTrig);
+        Restart(ref _tSwordFlyFwd, TrackExitByName(stSwordFlyFwd, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordAirFwd, index = 0 })));
+    }
+
+    public void PlaySwordAirDownAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordFlyDownTrig);
+        Restart(ref _tSwordFlyDown, TrackExitByName(stSwordFlyDown, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordAirDown, index = 0 })));
+    }
+
+    public void PlaySwordAirUpAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordFlyUpTrig);
+        Restart(ref _tSwordFlyUp, TrackExitByName(stSwordFlyUp, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordAirUp, index = 0 })));
     }
 
     public void PlayUpAttack()
@@ -347,6 +457,28 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         stDagFlyUp      = config.daggerFlyUpState;
         stDagFlyDown    = config.daggerFlyDownState;
 
+        pSwordAtk1     = config.swordAttack1Bool;
+        pSwordAtk2     = config.swordAttack2Bool;
+        pSwordAtk3Trig = config.swordAttack3Trig;
+        stSwordAtk1    = config.swordAttack1State;
+        stSwordAtk2    = config.swordAttack2State;
+        stSwordAtk3    = config.swordAttack3State;
+
+        pSwordDashAtkTrig  = config.swordDashAttackTrig;
+        stSwordDashAtk     = config.swordDashAttackState;
+
+        pSwordSuperTrig    = config.swordSuperTrig;
+        stSwordSuper       = config.swordSuperState;
+        pSwordSuperAirTrig = config.swordSuperAirTrig;
+        stSwordSuperAir    = config.swordSuperAirState;
+
+        pSwordFlyFwdTrig  = config.swordFlyForwardTrig;
+        pSwordFlyDownTrig = config.swordFlyDownTrig;
+        pSwordFlyUpTrig   = config.swordFlyUpTrig;
+        stSwordFlyFwd     = config.swordFlyForwardState;
+        stSwordFlyDown    = config.swordFlyDownState;
+        stSwordFlyUp      = config.swordFlyUpState;
+
         clipEndThreshold = config.clipEndThreshold;
         enterTimeout = config.enterTimeout;
         safetyTimeout = config.safetyTimeout;
@@ -373,6 +505,28 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             yield return null;
         }
         onExit?.Invoke();
+    }
+
+    IEnumerator TrackClipEnd(string stateName, Action onEnd)
+    {
+        float t = 0f;
+        while (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName) && t < enterTimeout)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        float safe = 0f;
+        while (safe < safetyTimeout)
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(atkLayer);
+            if (!info.IsName(stateName)) break;
+            if (info.normalizedTime >= clipEndThreshold) break;
+            safe += Time.deltaTime;
+            yield return null;
+        }
+
+        onEnd?.Invoke();
     }
 
     IEnumerator TrackAirBool(string stateName, string boolParam, AttackMode mode)
@@ -427,6 +581,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             SetBool(pAtk3, false);
         }
 
+        if (e.mode == AttackMode.SwordCombo)
+        {
+            SetBool(pSwordAtk1, false);
+            SetBool(pSwordAtk2, false);
+            if (_tSwordAtk != null) { StopCoroutine(_tSwordAtk); _tSwordAtk = null; }
+        }
+
         if (e.mode is AttackMode.DaggerCombo or AttackMode.DaggerSuper)
         {
             SetBool(pDagAtk1, false);
@@ -442,5 +603,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         if (e.mode == AttackMode.DaggerSuper  && _tDagSuper  != null) { StopCoroutine(_tDagSuper);  _tDagSuper  = null; }
         if (e.mode == AttackMode.DaggerFlyUp  && _tDagFlyUp  != null) { StopCoroutine(_tDagFlyUp);  _tDagFlyUp  = null; SetBool(pDagFlyUpBool,   false); }
         if (e.mode == AttackMode.DaggerFlyDown&& _tDagFlyDown!= null) { StopCoroutine(_tDagFlyDown); _tDagFlyDown= null; SetBool(pDagFlyDownBool, false); }
+
+        if (e.mode == AttackMode.SwordAirFwd  && _tSwordFlyFwd  != null) { StopCoroutine(_tSwordFlyFwd);  _tSwordFlyFwd  = null; }
+        if (e.mode == AttackMode.SwordAirDown && _tSwordFlyDown != null) { StopCoroutine(_tSwordFlyDown); _tSwordFlyDown = null; }
+        if (e.mode == AttackMode.SwordAirUp   && _tSwordFlyUp   != null) { StopCoroutine(_tSwordFlyUp);   _tSwordFlyUp   = null; }
+
+        if (e.mode == AttackMode.SwordDashAttack && _tSwordDashAtk   != null) { StopCoroutine(_tSwordDashAtk);   _tSwordDashAtk   = null; }
+        if (e.mode == AttackMode.SwordSuper     && _tSwordSuper    != null) { StopCoroutine(_tSwordSuper);    _tSwordSuper    = null; }
+        if (e.mode == AttackMode.SwordSuperAir  && _tSwordSuperAir != null) { StopCoroutine(_tSwordSuperAir); _tSwordSuperAir = null; }
     }
 }

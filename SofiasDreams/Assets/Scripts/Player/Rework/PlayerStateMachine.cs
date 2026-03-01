@@ -14,6 +14,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly Mover2D        _mover;
     readonly Jumper2D       _jumper;
     readonly ICombat        _combo;
+    readonly SwordCombat    _swordCombat;
     readonly DaggerCombat   _daggerCombat;
     readonly Healer         _healer;
     readonly Health         _health;
@@ -36,7 +37,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public PlayerStateMachine(
         SignalBus bus, IMobilityGate gate,
         Mover2D mover, Jumper2D jumper,
-        ICombat combo, DaggerCombat daggerCombat,
+        ICombat combo, SwordCombat swordCombat, DaggerCombat daggerCombat,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
         Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor,
         IPlayerAbilities abilities, IPlayerAbilityConfigurator abilityConfigurator,
@@ -49,6 +50,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _mover               = mover;
         _jumper              = jumper;
         _combo               = combo;
+        _swordCombat         = swordCombat;
         _daggerCombat        = daggerCombat;
         _healer              = healer;
         _health              = health;
@@ -170,20 +172,37 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _jumper.NotifyJumpReleased();
     }
 
+    bool TryBufferDashAttack()
+    {
+        if (_state != PlayerState.Dash) return false;
+        if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+            _swordCombat.BufferDashAttack();
+        return true;
+    }
+
     public void Attack()
     {
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+        if (TryBufferDashAttack()) return;
 
         if (_jumper.IsGrounded)
             _mover.StopHorizontal();
 
         Block(MobilityBlockReason.Attack);
 
-        if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
-            _daggerCombat.RequestAttack();
-        else
-            _combo.RequestAttack();
+        switch (_weaponManager.CurrentWeapon)
+        {
+            case WeaponType.Dagger:
+                _daggerCombat.RequestAttack();
+                break;
+            case WeaponType.Sword:
+                _swordCombat.RequestAttack();
+                break;
+            default:
+                _combo.RequestAttack();
+                break;
+        }
 
         _state = PlayerState.Attack;
     }
@@ -192,6 +211,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+        if (TryBufferDashAttack()) return;
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
@@ -215,41 +235,59 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         }
         else
         {
-            if (_jumpAttack.Request(AttackMode.AirUp))
+            var mode = _weaponManager.CurrentWeapon == WeaponType.Sword
+                ? AttackMode.SwordAirUp
+                : AttackMode.AirUp;
+            if (_jumpAttack.Request(mode))
                 Block(MobilityBlockReason.Attack);
         }
     }
 
     public void ForwardJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyDown
-            : AttackMode.AirFwd;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyDown,
+            WeaponType.Sword  => AttackMode.SwordAirFwd,
+            _                 => AttackMode.AirFwd
+        };
         _jumpAttack.Request(mode);
     }
 
     public void UpJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyUp
-            : AttackMode.AirUp;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyUp,
+            WeaponType.Sword  => AttackMode.SwordAirUp,
+            _                 => AttackMode.AirUp
+        };
         _jumpAttack.Request(mode);
     }
 
     public void DownJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyDown
-            : AttackMode.AirDown;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyDown,
+            WeaponType.Sword  => AttackMode.SwordAirDown,
+            _                 => AttackMode.AirDown
+        };
         _jumpAttack.Request(mode);
     }
 
@@ -383,13 +421,23 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state is PlayerState.Heal or PlayerState.Hurt
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
 
-        if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
-        if (!_daggerCombat.IsChargedReady) return;
+        switch (_weaponManager.CurrentWeapon)
+        {
+            case WeaponType.Dagger:
+                if (!_daggerCombat.IsChargedReady) return;
+                _mover.StopHorizontal();
+                Block(MobilityBlockReason.Attack);
+                _daggerCombat.RequestChargedAttack();
+                _state = PlayerState.Attack;
+                break;
 
-        _mover.StopHorizontal();
-        Block(MobilityBlockReason.Attack);
-        _daggerCombat.RequestChargedAttack();
-        _state = PlayerState.Attack;
+            case WeaponType.Sword:
+                if (_jumper.IsGrounded) _mover.StopHorizontal();
+                Block(MobilityBlockReason.Attack);
+                _swordCombat.RequestChargedAttack(_jumper.IsGrounded);
+                _state = PlayerState.Attack;
+                break;
+        }
     }
 
     public void SwitchWeapon()
@@ -485,6 +533,28 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             case AttackMode.DaggerFlyDown:
                 _anim.PlayDaggerFlyAttackDown();
                 break;
+            case AttackMode.SwordCombo:
+                _anim.PlaySwordAttack(s.index);
+                break;
+            case AttackMode.SwordAirFwd:
+                _anim.PlaySwordAirForwardAttack();
+                break;
+            case AttackMode.SwordAirDown:
+                _anim.PlaySwordAirDownAttack();
+                break;
+            case AttackMode.SwordAirUp:
+                _anim.PlaySwordAirUpAttack();
+                break;
+            case AttackMode.SwordDashAttack:
+                Block(MobilityBlockReason.Attack);
+                _anim.PlaySwordDashAttack();
+                break;
+            case AttackMode.SwordSuper:
+                _anim.PlaySwordSuperAttack();
+                break;
+            case AttackMode.SwordSuperAir:
+                _anim.PlaySwordSuperAirAttack();
+                break;
         }
     }
 
@@ -544,7 +614,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _activeAttack == AttackMode.AirDown ||
             _activeAttack == AttackMode.AirUp ||
             _activeAttack == AttackMode.DaggerFlyUp ||
-            _activeAttack == AttackMode.DaggerFlyDown)
+            _activeAttack == AttackMode.DaggerFlyDown ||
+            _activeAttack == AttackMode.SwordAirFwd ||
+            _activeAttack == AttackMode.SwordAirDown ||
+            _activeAttack == AttackMode.SwordAirUp)
         {
             _bus.Fire(new AttackFinished { mode = _activeAttack.Value, index = 0 });
         }
@@ -558,6 +631,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnDashFinished(DashFinished s)
     {
         if (_state == PlayerState.Dead || _state == PlayerState.Hurt)
+            return;
+
+        if (_state == PlayerState.Attack)
             return;
 
         if (_jumper.IsGrounded)
@@ -613,6 +689,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _healer.CancelHealing();
 
             _combo?.Interrupt();
+            _swordCombat?.Interrupt();
             _daggerCombat?.Interrupt();
 
             _gate.BlockMovement(MobilityBlockReason.Bonfire);
@@ -647,6 +724,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _state = PlayerState.Hurt;
         _anim.PlayHurt();
         _combo.Interrupt();
+        _swordCombat.Interrupt();
         _daggerCombat.Interrupt();
     }
 
