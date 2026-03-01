@@ -626,7 +626,6 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnDashStarted(DashStarted s)
     {
         _state = PlayerState.Dash;
-        _swordCombat.ClearDashAttackBuffer();
     }
 
     void OnDashFinished(DashFinished s)
