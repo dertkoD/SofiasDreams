@@ -173,17 +173,19 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _jumper.NotifyJumpReleased();
     }
 
+    bool TryBufferDashAttack()
+    {
+        if (_state != PlayerState.Dash) return false;
+        if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+            _dashAttackBuffered = true;
+        return true;
+    }
+
     public void Attack()
     {
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
-
-        if (_state == PlayerState.Dash)
-        {
-            if (_weaponManager.CurrentWeapon == WeaponType.Sword)
-                _dashAttackBuffered = true;
-            return;
-        }
+        if (TryBufferDashAttack()) return;
 
         if (_jumper.IsGrounded)
             _mover.StopHorizontal();
@@ -210,6 +212,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+        if (TryBufferDashAttack()) return;
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
@@ -243,7 +246,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void ForwardJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         var mode = _weaponManager.CurrentWeapon switch
@@ -257,7 +262,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void UpJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         var mode = _weaponManager.CurrentWeapon switch
@@ -271,7 +278,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void DownJumpAttack()
     {
-        if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
+        if (_state == PlayerState.Dead) return;
+        if (TryBufferDashAttack()) return;
+        if (_jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
         var mode = _weaponManager.CurrentWeapon switch
