@@ -5,7 +5,7 @@ public sealed class WeaponManager : IWeaponManager
 {
     readonly SignalBus _bus;
 
-    public WeaponType CurrentWeapon { get; private set; } = WeaponType.Sword;
+    public WeaponType CurrentWeapon { get; private set; } = WeaponType.Default;
 
     public WeaponManager(SignalBus bus)
     {
@@ -14,9 +14,13 @@ public sealed class WeaponManager : IWeaponManager
 
     public void SwitchWeapon()
     {
-        CurrentWeapon = CurrentWeapon == WeaponType.Sword
-            ? WeaponType.Dagger
-            : WeaponType.Sword;
+        CurrentWeapon = CurrentWeapon switch
+        {
+            WeaponType.Default => WeaponType.Sword,
+            WeaponType.Sword   => WeaponType.Dagger,
+            WeaponType.Dagger  => WeaponType.Default,
+            _                  => WeaponType.Default
+        };
 
         Debug.Log($"[Weapon] Оружие сменилось на: {CurrentWeapon}");
         _bus.Fire(new WeaponSwitched { weapon = CurrentWeapon });

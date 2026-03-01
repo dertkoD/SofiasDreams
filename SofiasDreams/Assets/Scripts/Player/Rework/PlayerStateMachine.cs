@@ -14,6 +14,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     readonly Mover2D        _mover;
     readonly Jumper2D       _jumper;
     readonly ICombat        _combo;
+    readonly SwordCombat    _swordCombat;
     readonly DaggerCombat   _daggerCombat;
     readonly Healer         _healer;
     readonly Health         _health;
@@ -36,7 +37,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     public PlayerStateMachine(
         SignalBus bus, IMobilityGate gate,
         Mover2D mover, Jumper2D jumper,
-        ICombat combo, DaggerCombat daggerCombat,
+        ICombat combo, SwordCombat swordCombat, DaggerCombat daggerCombat,
         Healer healer, Health health, Knockback2D knock, IPlayerAnimator anim,
         Dasher2D dasher, Grappler2D grappler, IJumpAttack jumpAttack, PlayerInteractor interactor,
         IPlayerAbilities abilities, IPlayerAbilityConfigurator abilityConfigurator,
@@ -49,6 +50,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _mover               = mover;
         _jumper              = jumper;
         _combo               = combo;
+        _swordCombat         = swordCombat;
         _daggerCombat        = daggerCombat;
         _healer              = healer;
         _health              = health;
@@ -180,10 +182,18 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         Block(MobilityBlockReason.Attack);
 
-        if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
-            _daggerCombat.RequestAttack();
-        else
-            _combo.RequestAttack();
+        switch (_weaponManager.CurrentWeapon)
+        {
+            case WeaponType.Dagger:
+                _daggerCombat.RequestAttack();
+                break;
+            case WeaponType.Sword:
+                _swordCombat.RequestAttack();
+                break;
+            default:
+                _combo.RequestAttack();
+                break;
+        }
 
         _state = PlayerState.Attack;
     }
@@ -485,6 +495,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             case AttackMode.DaggerFlyDown:
                 _anim.PlayDaggerFlyAttackDown();
                 break;
+            case AttackMode.SwordCombo:
+                _anim.PlaySwordAttack(s.index);
+                break;
         }
     }
 
@@ -613,6 +626,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _healer.CancelHealing();
 
             _combo?.Interrupt();
+            _swordCombat?.Interrupt();
             _daggerCombat?.Interrupt();
 
             _gate.BlockMovement(MobilityBlockReason.Bonfire);
@@ -647,6 +661,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         _state = PlayerState.Hurt;
         _anim.PlayHurt();
         _combo.Interrupt();
+        _swordCombat.Interrupt();
         _daggerCombat.Interrupt();
     }
 

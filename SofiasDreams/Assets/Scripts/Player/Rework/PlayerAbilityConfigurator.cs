@@ -14,6 +14,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
     readonly Mover2D _mover;
     readonly Jumper2D _jumper;
     readonly ICombat _combat;
+    readonly SwordCombat _swordCombat;
     readonly Healer _healer;
     readonly Health _health;
     readonly Knockback2D _knockback;
@@ -24,6 +25,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
     readonly PlayerMovementConfig _movementConfig;
     readonly PlayerJumpConfig _jumpConfig;
     readonly PlayerAttackConfig _attackConfig;
+    readonly SwordAttackConfig _swordAttackConfig;
     readonly PlayerHealConfig _healConfig;
     readonly PlayerHealthConfig _healthConfig;
     readonly PlayerDashConfig _dashConfig;
@@ -36,6 +38,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         Mover2D mover,
         Jumper2D jumper,
         ICombat combat,
+        SwordCombat swordCombat,
         Healer healer,
         Health health,
         Knockback2D knockback,
@@ -45,6 +48,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         [Inject(Optional = true)] PlayerMovementConfig movementConfig,
         [Inject(Optional = true)] PlayerJumpConfig jumpConfig,
         [Inject(Optional = true)] PlayerAttackConfig attackConfig,
+        [Inject(Optional = true)] SwordAttackConfig swordAttackConfig,
         [Inject(Optional = true)] PlayerHealConfig healConfig,
         PlayerHealthConfig healthConfig,
         [Inject(Optional = true)] PlayerDashConfig dashConfig,
@@ -56,6 +60,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         _mover = mover;
         _jumper = jumper;
         _combat = combat;
+        _swordCombat = swordCombat;
         _healer = healer;
         _health = health;
         _knockback = knockback;
@@ -65,6 +70,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         _movementConfig = movementConfig;
         _jumpConfig = jumpConfig;
         _attackConfig = attackConfig;
+        _swordAttackConfig = swordAttackConfig;
         _healConfig = healConfig;
         _healthConfig = healthConfig;
         _dashConfig = dashConfig;
@@ -80,6 +86,7 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         ConfigureMovement();
         ConfigureJump();
         ConfigureCombat();
+        ConfigureSwordCombat();
         ConfigureHeal();
         ConfigureDash();
         ConfigureGrapple();
@@ -128,6 +135,14 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
         {
             combo.Configure(BuildAttackSettings(_attackConfig));
         }
+    }
+
+    void ConfigureSwordCombat()
+    {
+        if (_swordAttackConfig == null || _swordCombat == null)
+            return;
+
+        _swordCombat.Configure(BuildAttackSettings(_swordAttackConfig));
     }
 
     void ConfigureHeal()
@@ -207,6 +222,20 @@ public sealed class PlayerAbilityConfigurator : IPlayerAbilityConfigurator
     }
 
     static AttackSettings BuildAttackSettings(PlayerAttackConfig config)
+    {
+        float d1 = (config.damages != null && config.damages.Length > 0) ? config.damages[0] : config.damage;
+        float d2 = (config.damages != null && config.damages.Length > 1) ? config.damages[1] : config.damage;
+        float d3 = (config.damages != null && config.damages.Length > 2) ? config.damages[2] : config.damage;
+
+        return new AttackSettings
+        {
+            a1 = new AttackStep { damage = d1 },
+            a2 = new AttackStep { damage = d2 },
+            a3 = new AttackStep { damage = d3 }
+        };
+    }
+
+    static AttackSettings BuildAttackSettings(SwordAttackConfig config)
     {
         float d1 = (config.damages != null && config.damages.Length > 0) ? config.damages[0] : config.damage;
         float d2 = (config.damages != null && config.damages.Length > 1) ? config.damages[1] : config.damage;

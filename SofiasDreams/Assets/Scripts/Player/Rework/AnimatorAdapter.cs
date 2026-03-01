@@ -70,6 +70,14 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stDagFlyUp      = "DaggerFlyAttackUp";
     [SerializeField] string stDagFlyDown    = "DaggerFlyAttackDown";
 
+    [Header("Sword combo")]
+    [SerializeField] string pSwordAtk1 = "IsSwordAttack1";
+    [SerializeField] string pSwordAtk2 = "IsSwordAttack2";
+    [SerializeField] string pSwordAtk3Trig = "SwordAttack3Trig";
+    [SerializeField] string stSwordAtk1 = "SwordAttack1";
+    [SerializeField] string stSwordAtk2 = "SwordAttack2";
+    [SerializeField] string stSwordAtk3 = "SwordAttack3";
+
     [Header("Tracking Settings")]
     [SerializeField, Range(0.8f, 1.0f)] float clipEndThreshold = 0.98f;
     [SerializeField] float enterTimeout = 0.25f;
@@ -79,21 +87,25 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     PlayerAnimatorConfig _configOverride;
     DaggerCombat _daggerCombat;
     DaggerMomentum _daggerMomentum;
+    SwordCombat _swordCombat;
 
     Coroutine _tUp, _tAirFwd, _tAirDown, _tAirUp, _tHealEnd;
     Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown, _tDagParry;
+    Coroutine _tSwordAtk;
 
     [Inject]
     void Construct(
         SignalBus bus,
         [Inject(Optional = true)] PlayerAnimatorConfig injectedConfig = null,
         [Inject(Optional = true)] DaggerCombat daggerCombat = null,
-        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null)
+        [Inject(Optional = true)] DaggerMomentum daggerMomentum = null,
+        [Inject(Optional = true)] SwordCombat swordCombat = null)
     {
         _bus = bus;
         _configOverride = injectedConfig != null ? injectedConfig : defaultConfig;
         _daggerCombat = daggerCombat;
         _daggerMomentum = daggerMomentum;
+        _swordCombat = swordCombat;
     }
 
     public void Initialize()
@@ -135,6 +147,27 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pAtk1, index == 1);
         SetBool(pAtk2, index == 2);
         SetBool(pAtk3, index == 3);
+    }
+
+    public void PlaySwordAttack(int index)
+    {
+        SetBool(pSwordAtk1, index == 1);
+        SetBool(pSwordAtk2, index == 2);
+
+        if (!animator) return;
+
+        if (index == 3)
+        {
+            animator.SetTrigger(pSwordAtk3Trig);
+            Restart(ref _tSwordAtk, TrackExitByName(stSwordAtk3, () =>
+                _swordCombat?.FinishFromAnimation()));
+        }
+        else
+        {
+            string state = index == 1 ? stSwordAtk1 : stSwordAtk2;
+            Restart(ref _tSwordAtk, TrackClipEnd(state, () =>
+                _swordCombat?.FinishFromAnimation()));
+        }
     }
 
     public void PlayUpAttack()
@@ -347,6 +380,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         stDagFlyUp      = config.daggerFlyUpState;
         stDagFlyDown    = config.daggerFlyDownState;
 
+        pSwordAtk1     = config.swordAttack1Bool;
+        pSwordAtk2     = config.swordAttack2Bool;
+        pSwordAtk3Trig = config.swordAttack3Trig;
+        stSwordAtk1    = config.swordAttack1State;
+        stSwordAtk2    = config.swordAttack2State;
+        stSwordAtk3    = config.swordAttack3State;
+
         clipEndThreshold = config.clipEndThreshold;
         enterTimeout = config.enterTimeout;
         safetyTimeout = config.safetyTimeout;
@@ -373,6 +413,28 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             yield return null;
         }
         onExit?.Invoke();
+    }
+
+    IEnumerator TrackClipEnd(string stateName, Action onEnd)
+    {
+        float t = 0f;
+        while (!animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName) && t < enterTimeout)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        float safe = 0f;
+        while (safe < safetyTimeout)
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(atkLayer);
+            if (!info.IsName(stateName)) break;
+            if (info.normalizedTime >= clipEndThreshold) break;
+            safe += Time.deltaTime;
+            yield return null;
+        }
+
+        onEnd?.Invoke();
     }
 
     IEnumerator TrackAirBool(string stateName, string boolParam, AttackMode mode)
@@ -425,6 +487,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             SetBool(pAtk1, false);
             SetBool(pAtk2, false);
             SetBool(pAtk3, false);
+        }
+
+        if (e.mode == AttackMode.SwordCombo)
+        {
+            SetBool(pSwordAtk1, false);
+            SetBool(pSwordAtk2, false);
+            if (_tSwordAtk != null) { StopCoroutine(_tSwordAtk); _tSwordAtk = null; }
         }
 
         if (e.mode is AttackMode.DaggerCombo or AttackMode.DaggerSuper)
