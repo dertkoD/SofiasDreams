@@ -210,7 +210,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     public void PlaySwordSuperAttack()
     {
         if (!animator) return;
-        animator.SetTrigger(pSwordSuperTrig);
+        animator.Play(stSwordSuper, atkLayer, 0f);
         Restart(ref _tSwordSuper, TrackExitByName(stSwordSuper, () =>
             _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuper, index = 0 })));
     }
@@ -218,7 +218,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     public void PlaySwordSuperAirAttack()
     {
         if (!animator) return;
-        animator.SetTrigger(pSwordSuperAirTrig);
+        animator.Play(stSwordSuperAir, atkLayer, 0f);
         Restart(ref _tSwordSuperAir, TrackExitByName(stSwordSuperAir, () =>
             _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuperAir, index = 0 })));
     }
