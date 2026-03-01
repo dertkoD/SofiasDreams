@@ -20,6 +20,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     float _chargeProgress;
     bool _wasHeld;
     bool _dashAttackBuffered;
+    bool _isDashing;
 
     [Inject]
     void Construct(SignalBus bus,
@@ -46,6 +47,8 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Subscribe<AttackStarted>(OnAttackStarted);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
+        _bus.Subscribe<DashStarted>(OnDashStarted);
+        _bus.Subscribe<DashFinished>(OnDashFinished);
     }
 
     public void Dispose()
@@ -53,12 +56,17 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
         _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
+        _bus.TryUnsubscribe<DashStarted>(OnDashStarted);
+        _bus.TryUnsubscribe<DashFinished>(OnDashFinished);
     }
 
     void Update()
     {
         if (_input == null || _weaponManager == null) return;
         if (_weaponManager.CurrentWeapon != WeaponType.Sword) return;
+
+        if (_isDashing && _input.AttackPressed())
+            _dashAttackBuffered = true;
 
         bool held = _input.AttackHeld();
 
@@ -76,16 +84,26 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         }
     }
 
-    // ───── Dash attack (animation event) ─────
+    // ───── Dash attack ─────
+
+    void OnDashStarted(DashStarted _)
+    {
+        _isDashing = true;
+        _dashAttackBuffered = false;
+    }
+
+    void OnDashFinished(DashFinished _)
+    {
+        _isDashing = false;
+        if (!_dashAttackBuffered) return;
+        if (_weaponManager == null || _weaponManager.CurrentWeapon != WeaponType.Sword) return;
+
+        _dashAttackBuffered = false;
+        _bus.Fire(new AttackStarted { mode = AttackMode.SwordDashAttack, index = 0 });
+    }
 
     public void BufferDashAttack() => _dashAttackBuffered = true;
-    public void ClearDashAttackBuffer() => _dashAttackBuffered = false;
-    public bool HasDashAttackBuffered => _dashAttackBuffered;
 
-    /// <summary>
-    /// Call from Dash animation clip event at the end of the clip.
-    /// If attack was pressed during dash, fires SwordDashAttack.
-    /// </summary>
     public void OnDashEnd()
     {
         if (!_dashAttackBuffered) return;

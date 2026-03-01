@@ -634,6 +634,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _state == PlayerState.Hurt)
             return;
 
+        if (_state == PlayerState.Attack)
+            return;
+
         if (_jumper.IsGrounded)
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
         else
