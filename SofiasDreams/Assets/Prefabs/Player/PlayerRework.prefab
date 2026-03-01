@@ -838,6 +838,12 @@ MonoBehaviour:
   stSwordAtk1: SwordAttack1
   stSwordAtk2: SwordAttack2
   stSwordAtk3: SwordAttack3
+  pSwordFlyFwdTrig: SwordFlyAttackForwardTrig
+  pSwordFlyDownTrig: SwordFlyAttackDownTrig
+  pSwordFlyUpTrig: SwordFlyAttackUpTrig
+  stSwordFlyFwd: SwordFlyAttackForward
+  stSwordFlyDown: SwordFlyAttackDown
+  stSwordFlyUp: SwordFlyAttackUp
   clipEndThreshold: 0.98
   enterTimeout: 0.25
   safetyTimeout: 2
@@ -1152,6 +1158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0affefe59e3b596449c2fd10745c056e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordCombat
+  swordWeapon: {fileID: 5707186729748711404}
+  rb: {fileID: 5395965832727822489}
 --- !u!1 &3640130793069787687
 GameObject:
   m_ObjectHideFlags: 0
