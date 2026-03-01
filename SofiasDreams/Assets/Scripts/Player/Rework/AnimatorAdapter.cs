@@ -151,8 +151,16 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
 
     public void PlaySwordAttack(int index)
     {
-        SetBool(pSwordAtk1, index == 1);
-        SetBool(pSwordAtk2, index == 2);
+        switch (index)
+        {
+            case 1:
+                SetBool(pSwordAtk1, true);
+                SetBool(pSwordAtk2, false);
+                break;
+            case 2:
+                SetBool(pSwordAtk2, true);
+                break;
+        }
 
         if (!animator) return;
 

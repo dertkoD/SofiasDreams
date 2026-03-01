@@ -4,6 +4,8 @@ using Zenject;
 
 public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 {
+    [SerializeField] Weapon swordWeapon;
+
     SignalBus _bus;
     AttackSettings _s;
     int _step;
@@ -30,6 +32,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = true;
         _queued = false;
         _step = (_step % 3) + 1;
+        ApplyKnockbackForStep();
         _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
     }
 
@@ -39,6 +42,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = false;
         _queued = false;
         _step = 0;
+        ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = 0 });
     }
 
@@ -52,12 +56,28 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             _attacking = false;
             _step++;
             _attacking = true;
+            ApplyKnockbackForStep();
             _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
             return;
         }
 
         _attacking = false;
+        ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = _step });
         _step = 0;
+    }
+
+    void ApplyKnockbackForStep()
+    {
+        if (!swordWeapon) return;
+        if (_step < 3)
+            swordWeapon.OverrideKnockback(0f);
+        else
+            swordWeapon.ClearKnockbackOverride();
+    }
+
+    void ResetKnockback()
+    {
+        if (swordWeapon) swordWeapon.ClearKnockbackOverride();
     }
 }
