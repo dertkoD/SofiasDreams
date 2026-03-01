@@ -78883,11 +78883,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 26.386776
+      value: 23.7
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -21.15244
+      value: 1.27
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.z
@@ -82903,7 +82903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d5579472a33444cbcc2791b02b903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: 8.78, y: -20, z: 0}
+  startPos: {x: 12.46, y: 2.43, z: 0}
   _enemySpawnPoints:
   - {fileID: 783268736}
   - {fileID: 767699206}
