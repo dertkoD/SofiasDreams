@@ -69,6 +69,14 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string swordAttack2State = "SwordAttack2";
     public string swordAttack3State = "SwordAttack3";
 
+    [Header("Sword air attacks")]
+    public string swordFlyForwardTrig = "SwordFlyAttackForwardTrig";
+    public string swordFlyDownTrig    = "SwordFlyAttackDownTrig";
+    public string swordFlyUpTrig      = "SwordFlyAttackUpTrig";
+    public string swordFlyForwardState = "SwordFlyAttackForward";
+    public string swordFlyDownState    = "SwordFlyAttackDown";
+    public string swordFlyUpState      = "SwordFlyAttackUp";
+
     [Header("Tracking")]
     [Range(0.5f, 1f)] public float clipEndThreshold = 0.98f;
     [Min(0f)] public float enterTimeout  = 0.25f;

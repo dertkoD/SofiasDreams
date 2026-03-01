@@ -1,19 +1,25 @@
-using System;
 using UnityEngine;
 using Zenject;
 
 public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] Weapon swordWeapon;
+    [SerializeField] Rigidbody2D rb;
 
     SignalBus _bus;
+    SwordAttackConfig _cfg;
     AttackSettings _s;
     int _step;
     bool _attacking;
     bool _queued;
+    AttackMode? _activeAirMode;
 
     [Inject]
-    void Construct(SignalBus bus) => _bus = bus;
+    void Construct(SignalBus bus, [Inject(Optional = true)] SwordAttackConfig cfg = null)
+    {
+        _bus = bus;
+        _cfg = cfg;
+    }
 
     public void Configure(AttackSettings s) => _s = s;
 
@@ -22,8 +28,20 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     public float CurrentDamage() =>
         _step == 1 ? _s.a1.damage : _step == 2 ? _s.a2.damage : _s.a3.damage;
 
-    public void Initialize() { }
-    public void Dispose() { }
+    public void Initialize()
+    {
+        if (!rb) rb = GetComponent<Rigidbody2D>();
+        _bus.Subscribe<AttackStarted>(OnAttackStarted);
+        _bus.Subscribe<AttackFinished>(OnAttackFinished);
+        _bus.Subscribe<EnemyHit>(OnEnemyHit);
+    }
+
+    public void Dispose()
+    {
+        _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
+        _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
+        _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
+    }
 
     public void RequestAttack()
     {
@@ -79,5 +97,34 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     void ResetKnockback()
     {
         if (swordWeapon) swordWeapon.ClearKnockbackOverride();
+    }
+
+    // ───── Pogo (down-air bounce) ─────
+
+    static bool IsSwordAir(AttackMode m) =>
+        m is AttackMode.SwordAirFwd or AttackMode.SwordAirDown or AttackMode.SwordAirUp;
+
+    void OnAttackStarted(AttackStarted s)
+    {
+        if (IsSwordAir(s.mode))
+            _activeAirMode = s.mode;
+    }
+
+    void OnAttackFinished(AttackFinished s)
+    {
+        if (_activeAirMode.HasValue && s.mode == _activeAirMode.Value)
+            _activeAirMode = null;
+    }
+
+    void OnEnemyHit(EnemyHit e)
+    {
+        if (_activeAirMode != AttackMode.SwordAirDown) return;
+        if (!rb) return;
+
+        float force = _cfg != null ? _cfg.pogoForce : 12f;
+        var vel = rb.linearVelocity;
+        vel.y = 0f;
+        rb.linearVelocity = vel;
+        rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
     }
 }

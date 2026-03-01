@@ -10,6 +10,9 @@ public interface IPlayerAnimator
     void PlayAirUpAttack();
 
     void PlaySwordAttack(int index);
+    void PlaySwordAirForwardAttack();
+    void PlaySwordAirDownAttack();
+    void PlaySwordAirUpAttack();
 
     void PlayDaggerAttack(int index);
     void PlayDaggerSuperAttack();

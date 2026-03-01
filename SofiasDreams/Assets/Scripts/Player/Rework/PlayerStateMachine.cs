@@ -225,7 +225,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         }
         else
         {
-            if (_jumpAttack.Request(AttackMode.AirUp))
+            var mode = _weaponManager.CurrentWeapon == WeaponType.Sword
+                ? AttackMode.SwordAirUp
+                : AttackMode.AirUp;
+            if (_jumpAttack.Request(mode))
                 Block(MobilityBlockReason.Attack);
         }
     }
@@ -235,9 +238,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyDown
-            : AttackMode.AirFwd;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyDown,
+            WeaponType.Sword  => AttackMode.SwordAirFwd,
+            _                 => AttackMode.AirFwd
+        };
         _jumpAttack.Request(mode);
     }
 
@@ -246,9 +252,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyUp
-            : AttackMode.AirUp;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyUp,
+            WeaponType.Sword  => AttackMode.SwordAirUp,
+            _                 => AttackMode.AirUp
+        };
         _jumpAttack.Request(mode);
     }
 
@@ -257,9 +266,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state == PlayerState.Dead || _jumper.IsGrounded) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
 
-        var mode = _weaponManager.CurrentWeapon == WeaponType.Dagger
-            ? AttackMode.DaggerFlyDown
-            : AttackMode.AirDown;
+        var mode = _weaponManager.CurrentWeapon switch
+        {
+            WeaponType.Dagger => AttackMode.DaggerFlyDown,
+            WeaponType.Sword  => AttackMode.SwordAirDown,
+            _                 => AttackMode.AirDown
+        };
         _jumpAttack.Request(mode);
     }
 
@@ -498,6 +510,15 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             case AttackMode.SwordCombo:
                 _anim.PlaySwordAttack(s.index);
                 break;
+            case AttackMode.SwordAirFwd:
+                _anim.PlaySwordAirForwardAttack();
+                break;
+            case AttackMode.SwordAirDown:
+                _anim.PlaySwordAirDownAttack();
+                break;
+            case AttackMode.SwordAirUp:
+                _anim.PlaySwordAirUpAttack();
+                break;
         }
     }
 
@@ -557,7 +578,10 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             _activeAttack == AttackMode.AirDown ||
             _activeAttack == AttackMode.AirUp ||
             _activeAttack == AttackMode.DaggerFlyUp ||
-            _activeAttack == AttackMode.DaggerFlyDown)
+            _activeAttack == AttackMode.DaggerFlyDown ||
+            _activeAttack == AttackMode.SwordAirFwd ||
+            _activeAttack == AttackMode.SwordAirDown ||
+            _activeAttack == AttackMode.SwordAirUp)
         {
             _bus.Fire(new AttackFinished { mode = _activeAttack.Value, index = 0 });
         }
