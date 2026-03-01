@@ -12,6 +12,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
     IPlayerCommands _commands;
     SignalBus _bus;
     bool _isGrounded = true;
+    bool _isDashing;
     bool _attackDownLastFrame;
     float _pendingGroundAttackTimer;
     float _attackHoldTime;
@@ -27,14 +28,20 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
     public void Initialize()
     {
         _bus.Subscribe<GroundedChanged>(OnGroundedChanged);
+        _bus.Subscribe<DashStarted>(OnDashStarted);
+        _bus.Subscribe<DashFinished>(OnDashFinished);
     }
 
     public void Dispose()
     {
         _bus.TryUnsubscribe<GroundedChanged>(OnGroundedChanged);
+        _bus.TryUnsubscribe<DashStarted>(OnDashStarted);
+        _bus.TryUnsubscribe<DashFinished>(OnDashFinished);
     }
 
     void OnGroundedChanged(GroundedChanged g) => _isGrounded = g.grounded;
+    void OnDashStarted(DashStarted _) => _isDashing = true;
+    void OnDashFinished(DashFinished _) => _isDashing = false;
     
     void Update()
     {
@@ -121,7 +128,9 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
         {
             if (attackPressedThisFrame)
             {
-                if (y > 0f)
+                if (_isDashing)
+                    _commands.Attack();
+                else if (y > 0f)
                     _commands.UpAttack();
                 else
                     _pendingGroundAttackTimer = upAttackBuffer;
