@@ -78,6 +78,10 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stSwordAtk2 = "SwordAttack2";
     [SerializeField] string stSwordAtk3 = "SwordAttack3";
 
+    [Header("Sword dash attack")]
+    [SerializeField] string pSwordDashAtkTrig = "SwordDashAttackTrig";
+    [SerializeField] string stSwordDashAtk    = "SwordDashAttack";
+
     [Header("Sword super (charged)")]
     [SerializeField] string pSwordSuperTrig    = "SwordAttackSuperTrig";
     [SerializeField] string stSwordSuper       = "SwordAttackSuper";
@@ -108,6 +112,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     Coroutine _tSwordAtk;
     Coroutine _tSwordFlyFwd, _tSwordFlyDown, _tSwordFlyUp;
     Coroutine _tSwordSuper, _tSwordSuperAir;
+    Coroutine _tSwordDashAtk;
 
     [Inject]
     void Construct(
@@ -192,6 +197,14 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             Restart(ref _tSwordAtk, TrackClipEnd(state, () =>
                 _swordCombat?.FinishFromSwordAnimation()));
         }
+    }
+
+    public void PlaySwordDashAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordDashAtkTrig);
+        Restart(ref _tSwordDashAtk, TrackExitByName(stSwordDashAtk, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordDashAttack, index = 0 })));
     }
 
     public void PlaySwordSuperAttack()
@@ -451,6 +464,9 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         stSwordAtk2    = config.swordAttack2State;
         stSwordAtk3    = config.swordAttack3State;
 
+        pSwordDashAtkTrig  = config.swordDashAttackTrig;
+        stSwordDashAtk     = config.swordDashAttackState;
+
         pSwordSuperTrig    = config.swordSuperTrig;
         stSwordSuper       = config.swordSuperState;
         pSwordSuperAirTrig = config.swordSuperAirTrig;
@@ -592,7 +608,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         if (e.mode == AttackMode.SwordAirDown && _tSwordFlyDown != null) { StopCoroutine(_tSwordFlyDown); _tSwordFlyDown = null; }
         if (e.mode == AttackMode.SwordAirUp   && _tSwordFlyUp   != null) { StopCoroutine(_tSwordFlyUp);   _tSwordFlyUp   = null; }
 
-        if (e.mode == AttackMode.SwordSuper    && _tSwordSuper    != null) { StopCoroutine(_tSwordSuper);    _tSwordSuper    = null; }
-        if (e.mode == AttackMode.SwordSuperAir && _tSwordSuperAir != null) { StopCoroutine(_tSwordSuperAir); _tSwordSuperAir = null; }
+        if (e.mode == AttackMode.SwordDashAttack && _tSwordDashAtk   != null) { StopCoroutine(_tSwordDashAtk);   _tSwordDashAtk   = null; }
+        if (e.mode == AttackMode.SwordSuper     && _tSwordSuper    != null) { StopCoroutine(_tSwordSuper);    _tSwordSuper    = null; }
+        if (e.mode == AttackMode.SwordSuperAir  && _tSwordSuperAir != null) { StopCoroutine(_tSwordSuperAir); _tSwordSuperAir = null; }
     }
 }

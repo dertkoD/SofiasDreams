@@ -33,6 +33,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     float       _moveX;
     AttackMode? _activeAttack;
+    bool        _dashAttackBuffered;
 
     public PlayerStateMachine(
         SignalBus bus, IMobilityGate gate,
@@ -176,6 +177,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.BonfireRest or PlayerState.ChangeWeapon) return;
+
+        if (_state == PlayerState.Dash)
+        {
+            if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+                _dashAttackBuffered = true;
+            return;
+        }
 
         if (_jumper.IsGrounded)
             _mover.StopHorizontal();
@@ -529,6 +537,9 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             case AttackMode.SwordAirUp:
                 _anim.PlaySwordAirUpAttack();
                 break;
+            case AttackMode.SwordDashAttack:
+                _anim.PlaySwordDashAttack();
+                break;
             case AttackMode.SwordSuper:
                 _anim.PlaySwordSuperAttack();
                 break;
@@ -606,12 +617,22 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     void OnDashStarted(DashStarted s)
     {
         _state = PlayerState.Dash;
+        _dashAttackBuffered = false;
     }
 
     void OnDashFinished(DashFinished s)
     {
         if (_state == PlayerState.Dead || _state == PlayerState.Hurt)
             return;
+
+        if (_dashAttackBuffered && _weaponManager.CurrentWeapon == WeaponType.Sword)
+        {
+            _dashAttackBuffered = false;
+            Block(MobilityBlockReason.Attack);
+            _state = PlayerState.Attack;
+            _bus.Fire(new AttackStarted { mode = AttackMode.SwordDashAttack, index = 0 });
+            return;
+        }
 
         if (_jumper.IsGrounded)
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
