@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using Zenject;
 
@@ -9,18 +8,27 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     SignalBus _bus;
     SwordAttackConfig _cfg;
+    IInputService _input;
+    IWeaponManager _weaponManager;
     AttackSettings _s;
     int _step;
     bool _attacking;
     bool _queued;
     AttackMode? _activeAirMode;
     AttackMode? _activeSuperMode;
+    float _chargeProgress;
+    bool _wasHeld;
 
     [Inject]
-    void Construct(SignalBus bus, [Inject(Optional = true)] SwordAttackConfig cfg = null)
+    void Construct(SignalBus bus,
+        [Inject(Optional = true)] SwordAttackConfig cfg = null,
+        [Inject(Optional = true)] IInputService input = null,
+        [Inject(Optional = true)] IWeaponManager weaponManager = null)
     {
         _bus = bus;
         _cfg = cfg;
+        _input = input;
+        _weaponManager = weaponManager;
     }
 
     public void Configure(AttackSettings s) => _s = s;
@@ -43,6 +51,27 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
         _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
+    }
+
+    void Update()
+    {
+        if (_input == null || _weaponManager == null) return;
+        if (_weaponManager.CurrentWeapon != WeaponType.Sword) return;
+
+        bool held = _input.AttackHeld();
+
+        if (held)
+        {
+            _chargeProgress = Mathf.Clamp01(_chargeProgress + Time.deltaTime / ChargeTime);
+            _bus.Fire(new SwordChargeChanged { progress = _chargeProgress });
+            _wasHeld = true;
+        }
+        else if (_wasHeld)
+        {
+            _chargeProgress = 0f;
+            _bus.Fire(new SwordChargeChanged { progress = 0f });
+            _wasHeld = false;
+        }
     }
 
     public void RequestAttack()

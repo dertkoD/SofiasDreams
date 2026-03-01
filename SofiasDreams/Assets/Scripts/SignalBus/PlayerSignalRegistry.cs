@@ -27,6 +27,7 @@ public static class PlayerSignalRegistry
         container.DeclareSignal<WeaponSwitched>();
         container.DeclareSignal<MomentumChanged>();
         container.DeclareSignal<ParryFinished>();
+        container.DeclareSignal<SwordChargeChanged>();
     }
 
     public static void DeclarePlayerSignals(DiContainer container)
