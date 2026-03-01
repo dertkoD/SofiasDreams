@@ -14,6 +14,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     bool _attacking;
     bool _queued;
     AttackMode? _activeAirMode;
+    AttackMode? _activeSuperMode;
 
     [Inject]
     void Construct(SignalBus bus, [Inject(Optional = true)] SwordAttackConfig cfg = null)
@@ -57,12 +58,33 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     public void Interrupt()
     {
+        if (_activeSuperMode.HasValue)
+        {
+            var mode = _activeSuperMode.Value;
+            _activeSuperMode = null;
+            ResetKnockback();
+            _bus.Fire(new AttackFinished { mode = mode, index = 0 });
+            return;
+        }
+
         if (!_attacking && _step == 0) return;
         _attacking = false;
         _queued = false;
         _step = 0;
         ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = 0 });
+    }
+
+    // ───── Charged (super) attack ─────
+
+    public float ChargeTime => _cfg != null ? _cfg.chargeTime : 0.6f;
+
+    public void RequestChargedAttack(bool grounded)
+    {
+        if (_attacking) Interrupt();
+
+        _activeSuperMode = grounded ? AttackMode.SwordSuper : AttackMode.SwordSuperAir;
+        _bus.Fire(new AttackStarted { mode = _activeSuperMode.Value, index = 0 });
     }
 
     public void FinishFromSwordAnimation()
@@ -115,6 +137,8 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (_activeAirMode.HasValue && s.mode == _activeAirMode.Value)
             _activeAirMode = null;
+        if (_activeSuperMode.HasValue && s.mode == _activeSuperMode.Value)
+            _activeSuperMode = null;
     }
 
     void OnEnemyHit(EnemyHit e)

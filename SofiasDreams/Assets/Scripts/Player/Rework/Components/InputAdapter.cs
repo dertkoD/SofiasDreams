@@ -6,6 +6,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 {
     [SerializeField] float DeadZone = 0.1f;
     [SerializeField] float upAttackBuffer = 0.08f;
+    [SerializeField] float chargeHoldTime = 0.5f;
 
     IInputService _input;
     IPlayerCommands _commands;
@@ -13,6 +14,7 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
     bool _isGrounded = true;
     bool _attackDownLastFrame;
     float _pendingGroundAttackTimer;
+    float _attackHoldTime;
 
     [Inject]
     public void Construct(IInputService input, IPlayerCommands commands, SignalBus bus)
@@ -85,7 +87,18 @@ public class InputAdapter : MonoBehaviour, IInitializable, IDisposable
 
         bool attackDown = _input.AttackHeld();
         bool attackPressedThisFrame = attackDown && !_attackDownLastFrame;
+        bool attackReleasedThisFrame = !attackDown && _attackDownLastFrame;
         _attackDownLastFrame = attackDown;
+
+        if (attackDown)
+            _attackHoldTime += Time.deltaTime;
+
+        if (attackReleasedThisFrame)
+        {
+            if (_attackHoldTime >= chargeHoldTime)
+                _commands.ChargedAttack();
+            _attackHoldTime = 0f;
+        }
 
         float y = _input.GetVerticalRaw();
 

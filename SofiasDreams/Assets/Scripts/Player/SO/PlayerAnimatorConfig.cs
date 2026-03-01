@@ -69,6 +69,12 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string swordAttack2State = "SwordAttack2";
     public string swordAttack3State = "SwordAttack3";
 
+    [Header("Sword super (charged)")]
+    public string swordSuperTrig       = "SwordAttackSuperTrig";
+    public string swordSuperState      = "SwordAttackSuper";
+    public string swordSuperAirTrig    = "SwordAttackSuperAirTrig";
+    public string swordSuperAirState   = "SwordAttackSuperAir";
+
     [Header("Sword air attacks")]
     public string swordFlyForwardTrig = "SwordFlyAttackForwardTrig";
     public string swordFlyDownTrig    = "SwordFlyAttackDownTrig";

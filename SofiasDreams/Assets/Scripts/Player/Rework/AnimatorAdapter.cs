@@ -78,6 +78,12 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stSwordAtk2 = "SwordAttack2";
     [SerializeField] string stSwordAtk3 = "SwordAttack3";
 
+    [Header("Sword super (charged)")]
+    [SerializeField] string pSwordSuperTrig    = "SwordAttackSuperTrig";
+    [SerializeField] string stSwordSuper       = "SwordAttackSuper";
+    [SerializeField] string pSwordSuperAirTrig = "SwordAttackSuperAirTrig";
+    [SerializeField] string stSwordSuperAir    = "SwordAttackSuperAir";
+
     [Header("Sword air")]
     [SerializeField] string pSwordFlyFwdTrig  = "SwordFlyAttackForwardTrig";
     [SerializeField] string pSwordFlyDownTrig = "SwordFlyAttackDownTrig";
@@ -101,6 +107,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     Coroutine _tChangeWeapon, _tDagSuper, _tDagFlyUp, _tDagFlyDown, _tDagParry;
     Coroutine _tSwordAtk;
     Coroutine _tSwordFlyFwd, _tSwordFlyDown, _tSwordFlyUp;
+    Coroutine _tSwordSuper, _tSwordSuperAir;
 
     [Inject]
     void Construct(
@@ -185,6 +192,22 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
             Restart(ref _tSwordAtk, TrackClipEnd(state, () =>
                 _swordCombat?.FinishFromSwordAnimation()));
         }
+    }
+
+    public void PlaySwordSuperAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordSuperTrig);
+        Restart(ref _tSwordSuper, TrackExitByName(stSwordSuper, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuper, index = 0 })));
+    }
+
+    public void PlaySwordSuperAirAttack()
+    {
+        if (!animator) return;
+        animator.SetTrigger(pSwordSuperAirTrig);
+        Restart(ref _tSwordSuperAir, TrackExitByName(stSwordSuperAir, () =>
+            _bus?.Fire(new AttackFinished { mode = AttackMode.SwordSuperAir, index = 0 })));
     }
 
     public void PlaySwordAirForwardAttack()
@@ -428,6 +451,11 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         stSwordAtk2    = config.swordAttack2State;
         stSwordAtk3    = config.swordAttack3State;
 
+        pSwordSuperTrig    = config.swordSuperTrig;
+        stSwordSuper       = config.swordSuperState;
+        pSwordSuperAirTrig = config.swordSuperAirTrig;
+        stSwordSuperAir    = config.swordSuperAirState;
+
         pSwordFlyFwdTrig  = config.swordFlyForwardTrig;
         pSwordFlyDownTrig = config.swordFlyDownTrig;
         pSwordFlyUpTrig   = config.swordFlyUpTrig;
@@ -563,5 +591,8 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         if (e.mode == AttackMode.SwordAirFwd  && _tSwordFlyFwd  != null) { StopCoroutine(_tSwordFlyFwd);  _tSwordFlyFwd  = null; }
         if (e.mode == AttackMode.SwordAirDown && _tSwordFlyDown != null) { StopCoroutine(_tSwordFlyDown); _tSwordFlyDown = null; }
         if (e.mode == AttackMode.SwordAirUp   && _tSwordFlyUp   != null) { StopCoroutine(_tSwordFlyUp);   _tSwordFlyUp   = null; }
+
+        if (e.mode == AttackMode.SwordSuper    && _tSwordSuper    != null) { StopCoroutine(_tSwordSuper);    _tSwordSuper    = null; }
+        if (e.mode == AttackMode.SwordSuperAir && _tSwordSuperAir != null) { StopCoroutine(_tSwordSuperAir); _tSwordSuperAir = null; }
     }
 }

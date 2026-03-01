@@ -10,4 +10,8 @@ public class SwordAttackConfig : ScriptableObject
     [Header("Pogo (down-air bounce)")]
     [Tooltip("Upward impulse applied when down-air hits an enemy")]
     public float pogoForce = 12f;
+
+    [Header("Charged attack")]
+    [Tooltip("How long the attack button must be held to charge")]
+    public float chargeTime = 0.6f;
 }

@@ -405,13 +405,23 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (_state is PlayerState.Heal or PlayerState.Hurt
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
 
-        if (_weaponManager.CurrentWeapon != WeaponType.Dagger) return;
-        if (!_daggerCombat.IsChargedReady) return;
+        switch (_weaponManager.CurrentWeapon)
+        {
+            case WeaponType.Dagger:
+                if (!_daggerCombat.IsChargedReady) return;
+                _mover.StopHorizontal();
+                Block(MobilityBlockReason.Attack);
+                _daggerCombat.RequestChargedAttack();
+                _state = PlayerState.Attack;
+                break;
 
-        _mover.StopHorizontal();
-        Block(MobilityBlockReason.Attack);
-        _daggerCombat.RequestChargedAttack();
-        _state = PlayerState.Attack;
+            case WeaponType.Sword:
+                if (_jumper.IsGrounded) _mover.StopHorizontal();
+                Block(MobilityBlockReason.Attack);
+                _swordCombat.RequestChargedAttack(_jumper.IsGrounded);
+                _state = PlayerState.Attack;
+                break;
+        }
     }
 
     public void SwitchWeapon()
@@ -518,6 +528,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 break;
             case AttackMode.SwordAirUp:
                 _anim.PlaySwordAirUpAttack();
+                break;
+            case AttackMode.SwordSuper:
+                _anim.PlaySwordSuperAttack();
+                break;
+            case AttackMode.SwordSuperAir:
+                _anim.PlaySwordSuperAirAttack();
                 break;
         }
     }
