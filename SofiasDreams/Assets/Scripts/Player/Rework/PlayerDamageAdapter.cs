@@ -22,7 +22,7 @@ public class PlayerDamageAdapter : MonoBehaviour, IDamageable
 
     public bool IsAlive => _health != null && _health.IsAlive;
 
-    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f)
+    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f, bool bypassInvuln = false)
     {
         if (_commands == null || !IsAlive)
             return;

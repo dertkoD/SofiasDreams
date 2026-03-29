@@ -35,7 +35,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
             _facade = facade ?? GetComponentInParent<EnemyFacade>();
     }
 
-    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f)
+    public void ApplyDamage(int amount, Vector2 hitPoint, Vector2 hitNormal, GameObject source, float knockbackOverride = -1f, bool bypassInvuln = false)
     {
         if (_health == null)
         {
@@ -45,7 +45,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
         {
             return;
         }
-        if (_health.IsInvincible)
+        if (_health.IsInvincible && !bypassInvuln)
         {
             return;
         }
@@ -62,7 +62,7 @@ public class EnemyDamageReceiver : MonoBehaviour, IDamageable
                 ? hitNormal.normalized * kbForce
                 : Vector2.zero,
             stunSeconds = _hitConfig.hitStun,
-            bypassInvuln = false
+            bypassInvuln = bypassInvuln
         };
 
         if (_facade != null)
