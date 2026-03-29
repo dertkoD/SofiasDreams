@@ -838,6 +838,12 @@ MonoBehaviour:
   stSwordAtk1: SwordAttack1
   stSwordAtk2: SwordAttack2
   stSwordAtk3: SwordAttack3
+  pSwordDashAtkTrig: SwordDashAttackTrig
+  stSwordDashAtk: SwordDashAttack
+  pSwordSuperTrig: SwordAttackSuperTrig
+  stSwordSuper: SwordAttackSuper
+  pSwordSuperAirTrig: SwordAttackSuperAirTrig
+  stSwordSuperAir: SwordAttackSuperAir
   pSwordFlyFwdTrig: SwordFlyAttackForwardTrig
   pSwordFlyDownTrig: SwordFlyAttackDownTrig
   pSwordFlyUpTrig: SwordFlyAttackUpTrig
@@ -874,6 +880,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeadZone: 0.1
   upAttackBuffer: 0.08
+  chargeHoldTime: 0.5
 --- !u!114 &4717383369296729062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1770,7 +1777,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1798,7 +1805,7 @@ MonoBehaviour:
   _shockWaveTimeReverseHealing: 0.4
   _shockWaveTimeInterruptedHealing: 0.15
   _shockWaveSizeHealing: 0.01
-  _shockWaveStrengthHealing: 0.15
+  _shockWaveStrengthHealing: 5
   _waveDistanceEndHealing: 0.03
   _shockWaveTimeDashing: 0.65
   _shockWaveSizeDashing: 0.03
