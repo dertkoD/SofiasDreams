@@ -33,6 +33,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     float       _moveX;
     AttackMode? _activeAttack;
+    bool        _isCharging;
 
     public PlayerStateMachine(
         SignalBus bus, IMobilityGate gate,
@@ -417,6 +418,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     public void ChargedAttack()
     {
+        CancelCharging();
+
         if (_state == PlayerState.Dead) return;
         if (_state is PlayerState.Heal or PlayerState.Hurt
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple) return;
@@ -438,6 +441,29 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _state = PlayerState.Attack;
                 break;
         }
+    }
+
+    public void ChargeBegin()
+    {
+        if (_state == PlayerState.Dead) return;
+        if (_state is PlayerState.Heal or PlayerState.Hurt or PlayerState.Attack
+            or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple or PlayerState.Dash) return;
+
+        _isCharging = true;
+        if (_jumper.IsGrounded) _mover.StopHorizontal();
+        Block(MobilityBlockReason.Charge);
+    }
+
+    public void ChargeCancelled()
+    {
+        CancelCharging();
+    }
+
+    void CancelCharging()
+    {
+        if (!_isCharging) return;
+        _isCharging = false;
+        Unblock(MobilityBlockReason.Charge);
     }
 
     public void SwitchWeapon()
@@ -601,6 +627,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     void OnDied(Died _)
     {
+        CancelCharging();
         _state = PlayerState.Dead;
         _anim.PlayDeath();
         _gate.BlockMovement(MobilityBlockReason.Hurt);
@@ -680,7 +707,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (s.IsResting)
         {
-            // lock player completely
+            CancelCharging();
+
             _state = PlayerState.BonfireRest;
 
             _mover.SetInput(0f);
@@ -717,6 +745,8 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
     {
         if (_state == PlayerState.Dead)
             return;
+
+        CancelCharging();
 
         if (_healer != null && _healer.IsHealing)
             _healer.CancelHealing();
