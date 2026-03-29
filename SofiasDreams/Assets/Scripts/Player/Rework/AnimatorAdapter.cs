@@ -189,13 +189,13 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         {
             animator.SetTrigger(pSwordAtk3Trig);
             Restart(ref _tSwordAtk, TrackExitByName(stSwordAtk3, () =>
-                _swordCombat?.FinishFromSwordAnimation()));
+                _swordCombat?.FinishSwordStep()));
         }
         else
         {
             string state = index == 1 ? stSwordAtk1 : stSwordAtk2;
             Restart(ref _tSwordAtk, TrackClipEnd(state, () =>
-                _swordCombat?.FinishFromSwordAnimation()));
+                _swordCombat?.FinishSwordStep()));
         }
     }
 

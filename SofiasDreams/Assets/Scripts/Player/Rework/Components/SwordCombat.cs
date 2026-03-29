@@ -175,15 +175,18 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     public void FinishFromSwordAnimation()
     {
         if (!_attacking) return;
+        if (!_queued || _step >= 3) return;
+
+        AdvanceComboStep();
+    }
+
+    public void FinishSwordStep()
+    {
+        if (!_attacking) return;
 
         if (_queued && _step < 3)
         {
-            _queued = false;
-            _attacking = false;
-            _step++;
-            _attacking = true;
-            ApplyKnockbackForStep();
-            _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
+            AdvanceComboStep();
             return;
         }
 
@@ -191,6 +194,16 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = _step });
         _step = 0;
+    }
+
+    void AdvanceComboStep()
+    {
+        _queued = false;
+        _attacking = false;
+        _step++;
+        _attacking = true;
+        ApplyKnockbackForStep();
+        _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
     }
 
     void ApplyKnockbackForStep()
