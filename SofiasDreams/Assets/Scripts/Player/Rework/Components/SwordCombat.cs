@@ -24,10 +24,9 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     bool _dashAttackBuffered;
     bool _isDashing;
 
-    // ───── Multi-hit state (runs on SwordCombat, not Weapon) ─────
-    Coroutine _multiHitCo;
-    readonly Dictionary<IDamageable, int> _multiHitCounts = new();
-    readonly List<Collider2D> _overlapResults = new();
+    // ───── Multi-hit (charged attack extra ticks) ─────
+    bool _superActive;
+    readonly Dictionary<IDamageable, Coroutine> _extraHitRoutines = new();
 
     [Inject]
     void Construct(SignalBus bus,
@@ -155,7 +154,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             var mode = _activeSuperMode.Value;
             _activeSuperMode = null;
             ResetKnockback();
-            StopMultiHit();
+            StopAllExtraHits();
             _bus.Fire(new AttackFinished { mode = mode, index = 0 });
             return;
         }
@@ -177,8 +176,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_attacking) Interrupt();
 
         _activeSuperMode = grounded ? AttackMode.SwordSuper : AttackMode.SwordSuperAir;
-
-        StartMultiHit();
+        _superActive = true;
 
         _bus.Fire(new AttackStarted { mode = _activeSuperMode.Value, index = 0 });
     }
@@ -249,67 +247,45 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_activeSuperMode.HasValue && s.mode == _activeSuperMode.Value)
         {
             _activeSuperMode = null;
-            StopMultiHit();
+            StopAllExtraHits();
         }
     }
 
-    void StartMultiHit()
+    void StopAllExtraHits()
     {
-        StopMultiHit();
-        if (!swordWeapon) return;
-        int maxHits = _cfg != null ? _cfg.chargedMaxHits : 3;
-        float duration = _cfg != null ? _cfg.chargedHitDuration : 4f;
-        _multiHitCo = StartCoroutine(MultiHitRoutine(maxHits, duration));
+        _superActive = false;
+        foreach (var co in _extraHitRoutines.Values)
+            if (co != null) StopCoroutine(co);
+        _extraHitRoutines.Clear();
     }
 
-    void StopMultiHit()
+    IEnumerator ExtraHitsRoutine(IDamageable target, Collider2D hurtboxCol)
     {
-        if (_multiHitCo != null)
+        int extraHits = (_cfg != null ? _cfg.chargedMaxHits : 3) - 1;
+        float interval = (_cfg != null ? _cfg.chargedHitDuration : 4f) / (_cfg != null ? _cfg.chargedMaxHits : 3);
+
+        for (int i = 0; i < extraHits; i++)
         {
-            StopCoroutine(_multiHitCo);
-            _multiHitCo = null;
-        }
-        _multiHitCounts.Clear();
-    }
-
-    IEnumerator MultiHitRoutine(int maxHits, float duration)
-    {
-        float interval = duration / maxHits;
-        var col = swordWeapon.WeaponCollider;
-        var filter = new ContactFilter2D();
-        filter.SetLayerMask(swordWeapon.TargetLayers);
-        filter.useTriggers = true;
-
-        for (int tick = 0; tick < maxHits; tick++)
-        {
-            if (col && col.enabled && col.gameObject.activeInHierarchy)
-            {
-                _overlapResults.Clear();
-                col.Overlap(filter, _overlapResults);
-
-                for (int i = 0; i < _overlapResults.Count; i++)
-                {
-                    var other = _overlapResults[i];
-                    var hb = other.GetComponent<Hurtbox2D>();
-                    var target = hb ? hb.Owner : null;
-                    if (target == null || !target.IsAlive) continue;
-
-                    _multiHitCounts.TryGetValue(target, out int hits);
-                    if (hits >= maxHits) continue;
-
-                    _multiHitCounts[target] = hits + 1;
-                    swordWeapon.DealDamage(target, other, bypassInvuln: true);
-                }
-            }
-
             yield return new WaitForSeconds(interval);
+
+            if (!_superActive) yield break;
+            if (!target.IsAlive) yield break;
+
+            swordWeapon.DealDamage(target, hurtboxCol, bypassInvuln: true);
         }
 
-        _multiHitCo = null;
+        _extraHitRoutines.Remove(target);
     }
 
     void OnEnemyHit(EnemyHit e)
     {
+        if (_superActive && e.target != null && !_extraHitRoutines.ContainsKey(e.target))
+        {
+            var hurtboxCol = FindHurtboxCollider(e.target);
+            if (hurtboxCol)
+                _extraHitRoutines[e.target] = StartCoroutine(ExtraHitsRoutine(e.target, hurtboxCol));
+        }
+
         if (_activeAirMode != AttackMode.SwordAirDown) return;
         if (!rb) return;
 
@@ -318,5 +294,15 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         vel.y = 0f;
         rb.linearVelocity = vel;
         rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
+    }
+
+    static Collider2D FindHurtboxCollider(IDamageable target)
+    {
+        if (target is MonoBehaviour mb)
+        {
+            var hb = mb.GetComponentInChildren<Hurtbox2D>();
+            if (hb) return hb.GetComponent<Collider2D>();
+        }
+        return null;
     }
 }
