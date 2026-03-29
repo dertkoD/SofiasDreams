@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -14,7 +13,7 @@ public class Weapon : MonoBehaviour
     float? _knockbackOverride;
 
     int Damage => _runtimeConfig ? _runtimeConfig.baseDamage : attackDamage;
-    LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
+    public LayerMask TargetLayers => _runtimeConfig ? _runtimeConfig.targetLayers : enemyHurtboxLayers;
     float KnockbackForce => _runtimeConfig ? _runtimeConfig.knockbackForce : -1f;
     float EffectiveKnockback => _knockbackOverride ?? KnockbackForce;
     float BackstabMultiplier => _runtimeConfig ? _runtimeConfig.backstabMultiplier : 1f;
@@ -22,74 +21,10 @@ public class Weapon : MonoBehaviour
     public void OverrideKnockback(float force) => _knockbackOverride = force;
     public void ClearKnockbackOverride() => _knockbackOverride = null;
 
+    public Collider2D WeaponCollider => _col ? _col : (_col = GetComponent<Collider2D>());
+    Collider2D _col;
+
     SignalBus _bus;
-
-    // ───── Multi-hit (charged attacks) ─────
-    bool _multiHit;
-    int _multiHitMax;
-    float _multiHitInterval;
-    Collider2D _selfCollider;
-    Coroutine _multiHitCo;
-    readonly Dictionary<IDamageable, int> _multiHitCounts = new();
-    readonly List<Collider2D> _overlapResults = new();
-    ContactFilter2D _multiHitFilter;
-
-    public void EnableMultiHit(int maxHits, float duration)
-    {
-        _multiHit = true;
-        _multiHitMax = Mathf.Max(maxHits, 1);
-        _multiHitInterval = duration / _multiHitMax;
-        _multiHitCounts.Clear();
-
-        if (!_selfCollider)
-            _selfCollider = GetComponent<Collider2D>();
-
-        _multiHitFilter = new ContactFilter2D();
-        _multiHitFilter.SetLayerMask(TargetLayers);
-        _multiHitFilter.useTriggers = true;
-
-        if (_multiHitCo != null)
-            StopCoroutine(_multiHitCo);
-        _multiHitCo = StartCoroutine(MultiHitRoutine());
-    }
-
-    public void DisableMultiHit()
-    {
-        _multiHit = false;
-        _multiHitCounts.Clear();
-        if (_multiHitCo != null)
-        {
-            StopCoroutine(_multiHitCo);
-            _multiHitCo = null;
-        }
-    }
-
-    IEnumerator MultiHitRoutine()
-    {
-        while (_multiHit && _selfCollider)
-        {
-            _overlapResults.Clear();
-            int count = _selfCollider.Overlap(_multiHitFilter, _overlapResults);
-
-            for (int i = 0; i < count; i++)
-            {
-                var other = _overlapResults[i];
-                var hb = other.GetComponent<Hurtbox2D>();
-                var target = hb ? hb.Owner : null;
-                if (target == null || !target.IsAlive) continue;
-
-                _multiHitCounts.TryGetValue(target, out int hits);
-                if (hits >= _multiHitMax) continue;
-
-                _multiHitCounts[target] = hits + 1;
-                DealDamage(target, other, bypassInvuln: true);
-            }
-
-            yield return new WaitForSeconds(_multiHitInterval);
-        }
-
-        _multiHitCo = null;
-    }
 
     [Inject]
     void Construct(SignalBus bus, [Inject(Optional = true)] PlayerWeaponConfig injectedConfig = null)
@@ -107,13 +42,10 @@ public class Weapon : MonoBehaviour
     private void OnDisable()
     {
         _hitThisSwing.Clear();
-        DisableMultiHit();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (_multiHit) return;
-
         if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
             return;
 
@@ -135,12 +67,11 @@ public class Weapon : MonoBehaviour
 
         var hb = other.GetComponent<Hurtbox2D>();
         var target = hb ? hb.Owner : null;
-        if (target == null) return;
-
-        _hitThisSwing.Remove(target);
+        if (target != null)
+            _hitThisSwing.Remove(target);
     }
 
-    void DealDamage(IDamageable target, Collider2D other, bool bypassInvuln)
+    public void DealDamage(IDamageable target, Collider2D other, bool bypassInvuln)
     {
         Vector2 hitPoint  = other.ClosestPoint(transform.position);
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;

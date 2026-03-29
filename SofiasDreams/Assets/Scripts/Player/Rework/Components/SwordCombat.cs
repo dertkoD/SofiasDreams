@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -21,6 +23,11 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     bool _wasHeld;
     bool _dashAttackBuffered;
     bool _isDashing;
+
+    // ───── Multi-hit state (runs on SwordCombat, not Weapon) ─────
+    Coroutine _multiHitCo;
+    readonly Dictionary<IDamageable, int> _multiHitCounts = new();
+    readonly List<Collider2D> _overlapResults = new();
 
     [Inject]
     void Construct(SignalBus bus,
@@ -148,7 +155,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             var mode = _activeSuperMode.Value;
             _activeSuperMode = null;
             ResetKnockback();
-            DisableMultiHit();
+            StopMultiHit();
             _bus.Fire(new AttackFinished { mode = mode, index = 0 });
             return;
         }
@@ -171,12 +178,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
         _activeSuperMode = grounded ? AttackMode.SwordSuper : AttackMode.SwordSuperAir;
 
-        if (swordWeapon)
-        {
-            int maxHits = _cfg != null ? _cfg.chargedMaxHits : 3;
-            float duration = _cfg != null ? _cfg.chargedHitDuration : 4f;
-            swordWeapon.EnableMultiHit(maxHits, duration);
-        }
+        StartMultiHit();
 
         _bus.Fire(new AttackStarted { mode = _activeSuperMode.Value, index = 0 });
     }
@@ -247,13 +249,63 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_activeSuperMode.HasValue && s.mode == _activeSuperMode.Value)
         {
             _activeSuperMode = null;
-            DisableMultiHit();
+            StopMultiHit();
         }
     }
 
-    void DisableMultiHit()
+    void StartMultiHit()
     {
-        if (swordWeapon) swordWeapon.DisableMultiHit();
+        StopMultiHit();
+        if (!swordWeapon) return;
+        int maxHits = _cfg != null ? _cfg.chargedMaxHits : 3;
+        float duration = _cfg != null ? _cfg.chargedHitDuration : 4f;
+        _multiHitCo = StartCoroutine(MultiHitRoutine(maxHits, duration));
+    }
+
+    void StopMultiHit()
+    {
+        if (_multiHitCo != null)
+        {
+            StopCoroutine(_multiHitCo);
+            _multiHitCo = null;
+        }
+        _multiHitCounts.Clear();
+    }
+
+    IEnumerator MultiHitRoutine(int maxHits, float duration)
+    {
+        float interval = duration / maxHits;
+        var col = swordWeapon.WeaponCollider;
+        var filter = new ContactFilter2D();
+        filter.SetLayerMask(swordWeapon.TargetLayers);
+        filter.useTriggers = true;
+
+        for (int tick = 0; tick < maxHits; tick++)
+        {
+            if (col && col.enabled && col.gameObject.activeInHierarchy)
+            {
+                _overlapResults.Clear();
+                col.Overlap(filter, _overlapResults);
+
+                for (int i = 0; i < _overlapResults.Count; i++)
+                {
+                    var other = _overlapResults[i];
+                    var hb = other.GetComponent<Hurtbox2D>();
+                    var target = hb ? hb.Owner : null;
+                    if (target == null || !target.IsAlive) continue;
+
+                    _multiHitCounts.TryGetValue(target, out int hits);
+                    if (hits >= maxHits) continue;
+
+                    _multiHitCounts[target] = hits + 1;
+                    swordWeapon.DealDamage(target, other, bypassInvuln: true);
+                }
+            }
+
+            yield return new WaitForSeconds(interval);
+        }
+
+        _multiHitCo = null;
     }
 
     void OnEnemyHit(EnemyHit e)
