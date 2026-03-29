@@ -14,4 +14,10 @@ public class SwordAttackConfig : ScriptableObject
     [Header("Charged attack")]
     [Tooltip("How long the attack button must be held to charge")]
     public float chargeTime = 0.6f;
+
+    [Tooltip("Max hits a single enemy can take during charged attack")]
+    [Min(1)] public int chargedMaxHits = 3;
+
+    [Tooltip("Total active hitbox duration of the charged attack (seconds)")]
+    public float chargedHitDuration = 4f;
 }

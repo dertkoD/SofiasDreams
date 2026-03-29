@@ -148,6 +148,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             var mode = _activeSuperMode.Value;
             _activeSuperMode = null;
             ResetKnockback();
+            DisableMultiHit();
             _bus.Fire(new AttackFinished { mode = mode, index = 0 });
             return;
         }
@@ -169,6 +170,14 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_attacking) Interrupt();
 
         _activeSuperMode = grounded ? AttackMode.SwordSuper : AttackMode.SwordSuperAir;
+
+        if (swordWeapon)
+        {
+            int maxHits = _cfg != null ? _cfg.chargedMaxHits : 3;
+            float duration = _cfg != null ? _cfg.chargedHitDuration : 4f;
+            swordWeapon.EnableMultiHit(maxHits, duration);
+        }
+
         _bus.Fire(new AttackStarted { mode = _activeSuperMode.Value, index = 0 });
     }
 
@@ -236,7 +245,15 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_activeAirMode.HasValue && s.mode == _activeAirMode.Value)
             _activeAirMode = null;
         if (_activeSuperMode.HasValue && s.mode == _activeSuperMode.Value)
+        {
             _activeSuperMode = null;
+            DisableMultiHit();
+        }
+    }
+
+    void DisableMultiHit()
+    {
+        if (swordWeapon) swordWeapon.DisableMultiHit();
     }
 
     void OnEnemyHit(EnemyHit e)
