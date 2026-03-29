@@ -546,6 +546,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _anim.PlaySwordAirUpAttack();
                 break;
             case AttackMode.SwordDashAttack:
+                _mover.StopHorizontal();
                 Block(MobilityBlockReason.Attack);
                 _anim.PlaySwordDashAttack();
                 break;
