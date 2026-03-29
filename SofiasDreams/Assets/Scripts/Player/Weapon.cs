@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -27,27 +28,67 @@ public class Weapon : MonoBehaviour
     bool _multiHit;
     int _multiHitMax;
     float _multiHitInterval;
-    readonly Dictionary<IDamageable, MultiHitEntry> _multiHitData = new();
-
-    struct MultiHitEntry
-    {
-        public int hits;
-        public float nextTime;
-        public Collider2D collider;
-    }
+    Collider2D _selfCollider;
+    Coroutine _multiHitCo;
+    readonly Dictionary<IDamageable, int> _multiHitCounts = new();
+    readonly List<Collider2D> _overlapResults = new();
+    ContactFilter2D _multiHitFilter;
 
     public void EnableMultiHit(int maxHits, float duration)
     {
         _multiHit = true;
         _multiHitMax = Mathf.Max(maxHits, 1);
         _multiHitInterval = duration / _multiHitMax;
-        _multiHitData.Clear();
+        _multiHitCounts.Clear();
+
+        if (!_selfCollider)
+            _selfCollider = GetComponent<Collider2D>();
+
+        _multiHitFilter = new ContactFilter2D();
+        _multiHitFilter.SetLayerMask(TargetLayers);
+        _multiHitFilter.useTriggers = true;
+
+        if (_multiHitCo != null)
+            StopCoroutine(_multiHitCo);
+        _multiHitCo = StartCoroutine(MultiHitRoutine());
     }
 
     public void DisableMultiHit()
     {
         _multiHit = false;
-        _multiHitData.Clear();
+        _multiHitCounts.Clear();
+        if (_multiHitCo != null)
+        {
+            StopCoroutine(_multiHitCo);
+            _multiHitCo = null;
+        }
+    }
+
+    IEnumerator MultiHitRoutine()
+    {
+        while (_multiHit && _selfCollider)
+        {
+            _overlapResults.Clear();
+            int count = _selfCollider.Overlap(_multiHitFilter, _overlapResults);
+
+            for (int i = 0; i < count; i++)
+            {
+                var other = _overlapResults[i];
+                var hb = other.GetComponent<Hurtbox2D>();
+                var target = hb ? hb.Owner : null;
+                if (target == null || !target.IsAlive) continue;
+
+                _multiHitCounts.TryGetValue(target, out int hits);
+                if (hits >= _multiHitMax) continue;
+
+                _multiHitCounts[target] = hits + 1;
+                DealDamage(target, other, bypassInvuln: true);
+            }
+
+            yield return new WaitForSeconds(_multiHitInterval);
+        }
+
+        _multiHitCo = null;
     }
 
     [Inject]
@@ -66,11 +107,13 @@ public class Weapon : MonoBehaviour
     private void OnDisable()
     {
         _hitThisSwing.Clear();
-        _multiHitData.Clear();
+        DisableMultiHit();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (_multiHit) return;
+
         if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
             return;
 
@@ -78,40 +121,11 @@ public class Weapon : MonoBehaviour
         var target = hb ? hb.Owner : null;
         if (target == null || !target.IsAlive)
             return;
-
-        if (_multiHit)
-        {
-            if (!_multiHitData.ContainsKey(target))
-            {
-                _multiHitData[target] = new MultiHitEntry
-                {
-                    hits = 0,
-                    nextTime = Time.time,
-                    collider = other
-                };
-            }
-            TryMultiHit(target, other);
-            return;
-        }
 
         if (!_hitThisSwing.Add(target))
             return;
 
-        DealDamage(target, other);
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (!_multiHit) return;
-        if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
-            return;
-
-        var hb = other.GetComponent<Hurtbox2D>();
-        var target = hb ? hb.Owner : null;
-        if (target == null || !target.IsAlive)
-            return;
-
-        TryMultiHit(target, other);
+        DealDamage(target, other, bypassInvuln: false);
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -126,22 +140,7 @@ public class Weapon : MonoBehaviour
         _hitThisSwing.Remove(target);
     }
 
-    void TryMultiHit(IDamageable target, Collider2D other)
-    {
-        if (!_multiHitData.TryGetValue(target, out var entry))
-            return;
-        if (entry.hits >= _multiHitMax) return;
-        if (Time.time < entry.nextTime) return;
-
-        entry.hits++;
-        entry.nextTime = Time.time + _multiHitInterval;
-        entry.collider = other;
-        _multiHitData[target] = entry;
-
-        DealDamage(target, other);
-    }
-
-    void DealDamage(IDamageable target, Collider2D other)
+    void DealDamage(IDamageable target, Collider2D other, bool bypassInvuln)
     {
         Vector2 hitPoint  = other.ClosestPoint(transform.position);
         Vector2 hitNormal = ((Vector2)other.transform.position - (Vector2)transform.position).normalized;
@@ -164,7 +163,7 @@ public class Weapon : MonoBehaviour
         if (backstab)
             Debug.Log($"[Weapon] Backstab! dmg={dmg} (x{BackstabMultiplier})");
 
-        target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, EffectiveKnockback, bypassInvuln: _multiHit);
+        target.ApplyDamage(dmg, hitPoint, hitNormal, gameObject, EffectiveKnockback, bypassInvuln: bypassInvuln);
         _bus.Fire(new EnemyHit { target = target, isBackstab = backstab });
     }
 }
