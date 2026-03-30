@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -21,6 +23,10 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     bool _wasHeld;
     bool _dashAttackBuffered;
     bool _isDashing;
+
+    // ───── Multi-hit (charged attack extra ticks) ─────
+    bool _superActive;
+    readonly Dictionary<IDamageable, Coroutine> _extraHitRoutines = new();
 
     [Inject]
     void Construct(SignalBus bus,
@@ -148,6 +154,7 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             var mode = _activeSuperMode.Value;
             _activeSuperMode = null;
             ResetKnockback();
+            StopAllExtraHits();
             _bus.Fire(new AttackFinished { mode = mode, index = 0 });
             return;
         }
@@ -169,21 +176,26 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_attacking) Interrupt();
 
         _activeSuperMode = grounded ? AttackMode.SwordSuper : AttackMode.SwordSuperAir;
+        _superActive = true;
+
         _bus.Fire(new AttackStarted { mode = _activeSuperMode.Value, index = 0 });
     }
 
     public void FinishFromSwordAnimation()
     {
         if (!_attacking) return;
+        if (!_queued || _step >= 3) return;
+
+        AdvanceComboStep();
+    }
+
+    public void FinishSwordStep()
+    {
+        if (!_attacking) return;
 
         if (_queued && _step < 3)
         {
-            _queued = false;
-            _attacking = false;
-            _step++;
-            _attacking = true;
-            ApplyKnockbackForStep();
-            _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
+            AdvanceComboStep();
             return;
         }
 
@@ -191,6 +203,16 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = _step });
         _step = 0;
+    }
+
+    void AdvanceComboStep()
+    {
+        _queued = false;
+        _attacking = false;
+        _step++;
+        _attacking = true;
+        ApplyKnockbackForStep();
+        _bus.Fire(new AttackStarted { mode = AttackMode.SwordCombo, index = _step });
     }
 
     void ApplyKnockbackForStep()
@@ -223,11 +245,47 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         if (_activeAirMode.HasValue && s.mode == _activeAirMode.Value)
             _activeAirMode = null;
         if (_activeSuperMode.HasValue && s.mode == _activeSuperMode.Value)
+        {
             _activeSuperMode = null;
+            StopAllExtraHits();
+        }
+    }
+
+    void StopAllExtraHits()
+    {
+        _superActive = false;
+        foreach (var co in _extraHitRoutines.Values)
+            if (co != null) StopCoroutine(co);
+        _extraHitRoutines.Clear();
+    }
+
+    IEnumerator ExtraHitsRoutine(IDamageable target, Collider2D hurtboxCol)
+    {
+        int extraHits = (_cfg != null ? _cfg.chargedMaxHits : 3) - 1;
+        float interval = (_cfg != null ? _cfg.chargedHitDuration : 4f) / (_cfg != null ? _cfg.chargedMaxHits : 3);
+
+        for (int i = 0; i < extraHits; i++)
+        {
+            yield return new WaitForSeconds(interval);
+
+            if (!_superActive) yield break;
+            if (!target.IsAlive) yield break;
+
+            swordWeapon.DealDamage(target, hurtboxCol, bypassInvuln: true);
+        }
+
+        _extraHitRoutines.Remove(target);
     }
 
     void OnEnemyHit(EnemyHit e)
     {
+        if (_superActive && e.target != null && !_extraHitRoutines.ContainsKey(e.target))
+        {
+            var hurtboxCol = FindHurtboxCollider(e.target);
+            if (hurtboxCol)
+                _extraHitRoutines[e.target] = StartCoroutine(ExtraHitsRoutine(e.target, hurtboxCol));
+        }
+
         if (_activeAirMode != AttackMode.SwordAirDown) return;
         if (!rb) return;
 
@@ -236,5 +294,15 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
         vel.y = 0f;
         rb.linearVelocity = vel;
         rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
+    }
+
+    static Collider2D FindHurtboxCollider(IDamageable target)
+    {
+        if (target is MonoBehaviour mb)
+        {
+            var hb = mb.GetComponentInChildren<Hurtbox2D>();
+            if (hb) return hb.GetComponent<Collider2D>();
+        }
+        return null;
     }
 }

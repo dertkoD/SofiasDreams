@@ -1,4 +1,4 @@
 public enum MobilityBlockReason
 {
-    Attack, Heal, Hurt, Dash, UI, Cutscene, Grapple, Bonfire, WeaponSwitch, Parry
+    Attack, Heal, Hurt, Dash, UI, Cutscene, Grapple, Bonfire, WeaponSwitch, Parry, Charge
 }
