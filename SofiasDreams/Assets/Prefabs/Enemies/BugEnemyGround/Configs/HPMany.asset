@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: HPMany
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthConfig
   maxHP: 1000000
-  invulnTime: 0.3
+  invulnTime: 0.1

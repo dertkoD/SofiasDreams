@@ -462,15 +462,6 @@ AnimationClip:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.8333333
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -505,8 +496,6 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: -4657982678098596846, guid: b1e573dbbf452fe4ca6b3eaf52827893, type: 3}
-    - time: 0.8333333
-      value: {fileID: -825058499676766306, guid: 266d41e242bf8d44496c821cf23425e0, type: 3}
     attribute: m_Sprite
     path: Rendering
     classID: 212
@@ -543,8 +532,6 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: 21300000, guid: d662b27c27ffb6c4c95752c6bbbc6fa8, type: 3}
-    - time: 0.85
-      value: {fileID: 0}
     attribute: m_Sprite
     path: GhostTrailDash/Circle
     classID: 212
@@ -748,18 +735,16 @@ AnimationClip:
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
     - {fileID: -4657982678098596846, guid: b1e573dbbf452fe4ca6b3eaf52827893, type: 3}
-    - {fileID: -825058499676766306, guid: 266d41e242bf8d44496c821cf23425e0, type: 3}
     - {fileID: 2293632338452132413, guid: f5eb794a785f4e14c88028422c497e41, type: 3}
     - {fileID: -1842623358976718372, guid: f5eb794a785f4e14c88028422c497e41, type: 3}
     - {fileID: -7390689115399976897, guid: f5eb794a785f4e14c88028422c497e41, type: 3}
     - {fileID: 21300000, guid: d662b27c27ffb6c4c95752c6bbbc6fa8, type: 3}
-    - {fileID: 0}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.8666667
+    m_StopTime: 0.75
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -1361,15 +1346,6 @@ AnimationClip:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.8333333
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -1438,15 +1414,15 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.85
-    functionName: FinishFromAnimationDash
+  - time: 0.73333335
+    functionName: OnDashEnd
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.85
-    functionName: OnDashEnd
+  - time: 0.73333335
+    functionName: FinishFromAnimationDash
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
