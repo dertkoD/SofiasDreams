@@ -216,13 +216,19 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
-            if (_jumper.IsGrounded)
-            {
-                ChargedAttack();
-            }
-            else
+            if (!_jumper.IsGrounded)
             {
                 if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
+                    Block(MobilityBlockReason.Attack);
+            }
+            return;
+        }
+
+        if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+        {
+            if (!_jumper.IsGrounded)
+            {
+                if (_jumpAttack.Request(AttackMode.SwordAirUp))
                     Block(MobilityBlockReason.Attack);
             }
             return;
@@ -236,10 +242,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         }
         else
         {
-            var mode = _weaponManager.CurrentWeapon == WeaponType.Sword
-                ? AttackMode.SwordAirUp
-                : AttackMode.AirUp;
-            if (_jumpAttack.Request(mode))
+            if (_jumpAttack.Request(AttackMode.AirUp))
                 Block(MobilityBlockReason.Attack);
         }
     }
