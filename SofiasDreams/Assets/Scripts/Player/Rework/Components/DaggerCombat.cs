@@ -21,6 +21,9 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     float _chargedCooldownTimer;
     float _parryCooldownTimer;
 
+    bool _airHoverUsedThisJump;
+    bool _airHoverActiveNow;
+
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
 
@@ -47,12 +50,14 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _origGravity = rb ? rb.gravityScale : 1f;
         _bus.Subscribe<AttackStarted>(OnAttackStarted);
         _bus.Subscribe<AttackFinished>(OnAttackFinished);
+        _bus.Subscribe<GroundedChanged>(OnGroundedChanged);
     }
 
     public void Dispose()
     {
         _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
         _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
+        _bus.TryUnsubscribe<GroundedChanged>(OnGroundedChanged);
     }
 
     // ───── Combo (2 hits) ─────
@@ -214,7 +219,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         kb.Apply(info);
     }
 
-    // ───── Air attack hover ─────
+    // ───── Air attack hover (once per jump) ─────
 
     static bool IsDaggerAirMode(AttackMode m) =>
         m is AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
@@ -222,6 +227,13 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     void OnAttackStarted(AttackStarted s)
     {
         if (!IsDaggerAirMode(s.mode) || !rb) return;
+
+        if (_airHoverUsedThisJump) return;
+
+        _airHoverUsedThisJump = true;
+        _airHoverActiveNow = true;
+
+        StopFloatCoroutine();
 
         if (!_gravityOverridden)
         {
@@ -238,6 +250,22 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     void OnAttackFinished(AttackFinished s)
     {
         if (!IsDaggerAirMode(s.mode)) return;
+
+        if (_airHoverActiveNow)
+        {
+            _airHoverActiveNow = false;
+            RestoreGravity();
+        }
+    }
+
+    void OnGroundedChanged(GroundedChanged g)
+    {
+        if (!g.grounded) return;
+
+        _airHoverUsedThisJump = false;
+        _airHoverActiveNow = false;
+
+        StopFloatCoroutine();
         RestoreGravity();
     }
 
