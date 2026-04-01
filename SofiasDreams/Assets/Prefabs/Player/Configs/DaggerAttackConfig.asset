@@ -19,7 +19,7 @@ MonoBehaviour:
   playerLaunchForce: 12
   floatGravityScale: 0.1
   floatGravityDuration: 0.3
-  airHoverGravityScale: 0
+  airAttackGravityScale: 0
   segmentsPerLevel: 5
   maxLevels: 3
   speedBonusPerLevel: 0.2

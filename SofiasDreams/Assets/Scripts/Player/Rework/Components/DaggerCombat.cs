@@ -145,7 +145,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
             _origGravity = rb.gravityScale;
             _gravityOverridden = true;
         }
-        rb.gravityScale = _cfg.floatGravityScale;
 
         yield return new WaitForFixedUpdate();
 
@@ -154,6 +153,14 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
 
         Debug.Log($"[DaggerCombat] Launch applied! vel={rb.linearVelocity}, gravity={rb.gravityScale}");
+
+        while (rb && rb.linearVelocity.y > 0f)
+            yield return null;
+
+        if (!rb) yield break;
+
+        rb.gravityScale = _cfg.floatGravityScale;
+        Debug.Log($"[DaggerCombat] Slow-fall started, gravity={rb.gravityScale}");
 
         yield return new WaitForSeconds(_cfg.floatGravityDuration);
 
@@ -241,7 +248,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
             _gravityOverridden = true;
         }
 
-        rb.gravityScale = _cfg != null ? _cfg.airHoverGravityScale : 0f;
+        rb.gravityScale = _cfg != null ? _cfg.airAttackGravityScale : 0f;
         var v = rb.linearVelocity;
         v.y = 0f;
         rb.linearVelocity = v;

@@ -453,8 +453,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple or PlayerState.Dash) return;
 
         _isCharging = true;
-        if (_jumper.IsGrounded) _mover.StopHorizontal();
-        Block(MobilityBlockReason.Charge);
+
+        if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+        {
+            if (_jumper.IsGrounded) _mover.StopHorizontal();
+            Block(MobilityBlockReason.Charge);
+        }
     }
 
     public void ChargeCancelled()
