@@ -44,7 +44,10 @@ public class Weapon : MonoBehaviour
         _hitThisSwing.Clear();
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other) => TryHit(other);
+    private void OnTriggerStay2D(Collider2D other) => TryHit(other);
+
+    private void TryHit(Collider2D other)
     {
         if ((TargetLayers.value & (1 << other.gameObject.layer)) == 0)
             return;
