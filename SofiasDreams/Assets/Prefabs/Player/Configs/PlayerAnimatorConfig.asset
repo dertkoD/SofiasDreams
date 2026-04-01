@@ -45,6 +45,7 @@ MonoBehaviour:
   daggerSuperState: DaggerAttackSuper
   daggerParryBool: IsDaggerParry
   daggerParryState: DaggerParry
+  daggerParryFlyingState: DaggerParryFlying
   daggerFlyUpBool: IsDaggerFlyAttackUp
   daggerFlyDownBool: IsDaggerFlyAttackDown
   daggerFlyUpState: DaggerFlyAttackUp

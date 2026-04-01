@@ -61,8 +61,9 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stDagSuper    = "DaggerAttackSuper";
 
     [Header("Dagger parry")]
-    [SerializeField] string pDagParryBool = "IsDaggerParry";
-    [SerializeField] string stDagParry    = "DaggerParry";
+    [SerializeField] string pDagParryBool    = "IsDaggerParry";
+    [SerializeField] string stDagParry       = "DaggerParry";
+    [SerializeField] string stDagParryFlying = "DaggerParryFlying";
 
     [Header("Dagger air")]
     [SerializeField] string pDagFlyUpBool   = "DaggerFlyAttackUp";
@@ -311,7 +312,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     {
         if (!animator) return;
         SetBool(pDagParryBool, true);
-        Restart(ref _tDagParry, TrackExitByName(stDagParry, () =>
+        Restart(ref _tDagParry, TrackExitByEitherName(stDagParry, stDagParryFlying, () =>
         {
             SetBool(pDagParryBool, false);
             _daggerCombat?.ParryFinishFromAnimation();
@@ -462,8 +463,9 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         pDagSuperTrig   = config.daggerSuperTrigger;
         stDagSuper      = config.daggerSuperState;
 
-        pDagParryBool   = config.daggerParryBool;
-        stDagParry      = config.daggerParryState;
+        pDagParryBool    = config.daggerParryBool;
+        stDagParry       = config.daggerParryState;
+        stDagParryFlying = config.daggerParryFlyingState;
 
         pDagFlyUpBool   = config.daggerFlyUpBool;
         pDagFlyDownBool = config.daggerFlyDownBool;
@@ -513,6 +515,30 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         }
         float safe = 0f;
         while (animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(stateName) && safe < safetyTimeout)
+        {
+            safe += Time.deltaTime;
+            yield return null;
+        }
+        onExit?.Invoke();
+    }
+
+    IEnumerator TrackExitByEitherName(string stateA, string stateB, Action onExit)
+    {
+        float t = 0f;
+        bool found = false;
+        string active = null;
+        while (t < enterTimeout)
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(atkLayer);
+            if (info.IsName(stateA)) { active = stateA; found = true; break; }
+            if (info.IsName(stateB)) { active = stateB; found = true; break; }
+            t += Time.deltaTime;
+            yield return null;
+        }
+        if (!found) { onExit?.Invoke(); yield break; }
+
+        float safe = 0f;
+        while (animator.GetCurrentAnimatorStateInfo(atkLayer).IsName(active) && safe < safetyTimeout)
         {
             safe += Time.deltaTime;
             yield return null;
