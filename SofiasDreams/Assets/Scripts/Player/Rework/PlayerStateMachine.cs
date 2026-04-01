@@ -414,6 +414,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     void OnParryFinished(ParryFinished _)
     {
+        _anim.StopDaggerParry();
         Unblock(MobilityBlockReason.Parry);
         if (_state == PlayerState.Attack)
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;

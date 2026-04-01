@@ -826,7 +826,7 @@ MonoBehaviour:
   stDagAtk2: DaggerAttack2
   pDagSuperTrig: DaggerAttackSuperTrig
   stDagSuper: DaggerAttackSuper
-  pDagParryTrig: DaggerParryTrig
+  pDagParryBool: IsDaggerParry
   stDagParry: DaggerParry
   pDagFlyUpBool: DaggerFlyAttackUp
   pDagFlyDownBool: DaggerFlyAttackDown

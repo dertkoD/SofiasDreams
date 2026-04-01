@@ -52,8 +52,8 @@ public class PlayerAnimatorConfig : ScriptableObject
     public string daggerSuperState   = "DaggerAttackSuper";
 
     [Header("Dagger parry")]
-    public string daggerParryTrigger = "DaggerParryTrig";
-    public string daggerParryState   = "DaggerParry";
+    public string daggerParryBool   = "IsDaggerParry";
+    public string daggerParryState  = "DaggerParry";
 
     [Header("Dagger air attacks")]
     public string daggerFlyUpBool    = "DaggerFlyAttackUp";

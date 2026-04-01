@@ -61,7 +61,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     [SerializeField] string stDagSuper    = "DaggerAttackSuper";
 
     [Header("Dagger parry")]
-    [SerializeField] string pDagParryTrig = "DaggerParryTrig";
+    [SerializeField] string pDagParryBool = "IsDaggerParry";
     [SerializeField] string stDagParry    = "DaggerParry";
 
     [Header("Dagger air")]
@@ -310,9 +310,22 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
     public void PlayDaggerParry()
     {
         if (!animator) return;
-        animator.SetTrigger(pDagParryTrig);
+        SetBool(pDagParryBool, true);
         Restart(ref _tDagParry, TrackExitByName(stDagParry, () =>
-            _daggerCombat?.ParryFinishFromAnimation()));
+        {
+            SetBool(pDagParryBool, false);
+            _daggerCombat?.ParryFinishFromAnimation();
+        }));
+    }
+
+    public void StopDaggerParry()
+    {
+        if (_tDagParry != null)
+        {
+            StopCoroutine(_tDagParry);
+            _tDagParry = null;
+        }
+        SetBool(pDagParryBool, false);
     }
 
     public void PlayDaggerFlyAttackUp()
@@ -449,7 +462,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         pDagSuperTrig   = config.daggerSuperTrigger;
         stDagSuper      = config.daggerSuperState;
 
-        pDagParryTrig   = config.daggerParryTrigger;
+        pDagParryBool   = config.daggerParryBool;
         stDagParry      = config.daggerParryState;
 
         pDagFlyUpBool   = config.daggerFlyUpBool;
