@@ -212,7 +212,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _parrying = false;
         EndParryFreeze();
 
-        TeleportBehind(attacker);
+        TeleportToOtherSide(attacker);
         StunEnemy(attacker);
         _momentum?.OnParrySuccess();
         _bus.Fire(new ParryFinished());
@@ -229,18 +229,26 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         Debug.Log($"[DaggerCombat] Parry air-freeze OFF, gravityScale={_origGravity}");
     }
 
-    void TeleportBehind(Transform enemy)
+    void TeleportToOtherSide(Transform enemy)
     {
         if (!rb) return;
 
-        float enemyFacing = Mathf.Sign(enemy.localScale.x);
-        float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
-        float behindX = enemy.position.x - enemyFacing * offset;
-
-        rb.position = new Vector2(behindX, rb.position.y);
-
+        float diff = rb.position.x - enemy.position.x;
         var mover = GetComponent<Mover2D>();
-        if (mover) mover.ForceFacing((int)enemyFacing);
+
+        float playerSide;
+        if (Mathf.Abs(diff) > 0.01f)
+            playerSide = Mathf.Sign(diff);
+        else
+            playerSide = mover ? mover.FacingDir : 1f;
+
+        float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
+        float targetX = enemy.position.x - playerSide * offset;
+
+        rb.position = new Vector2(targetX, rb.position.y);
+
+        int faceTowardEnemy = (int)Mathf.Sign(enemy.position.x - targetX);
+        if (mover) mover.ForceFacing(faceTowardEnemy);
     }
 
     void StunEnemy(Transform enemy)
