@@ -52,12 +52,24 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
             return;
         }
 
+        bool instant = _cfg && _cfg.instantFullDecay;
+
+        if (instant)
+        {
+            int prevLevel = Level;
+            _segments = 0f;
+            _decayTimer = 0f;
+            Debug.Log($"[Momentum] Instant decay → Level 0 (0/{MaxSegments}) was Level {prevLevel}");
+            FireChanged();
+            return;
+        }
+
         float rate = _cfg ? _cfg.decayRate : 1f;
         float prev = _segments;
         _segments = Mathf.Max(0f, _segments - rate * Time.deltaTime);
 
-        int prevLevel = Mathf.FloorToInt(prev) / SegmentsPerLevel;
-        if (Level < prevLevel)
+        int prevLvl = Mathf.FloorToInt(prev) / SegmentsPerLevel;
+        if (Level < prevLvl)
             Debug.Log($"[Momentum] Decay → Level {Level} ({Segments}/{MaxSegments})");
 
         FireChanged();

@@ -37,6 +37,8 @@ public class DaggerAttackConfig : ScriptableObject
     public float decayDelay = 5f;
     [Tooltip("Segments lost per second during decay")]
     public float decayRate = 1f;
+    [Tooltip("If true, all segments are wiped instantly when decayDelay expires")]
+    public bool instantFullDecay = false;
 
     [Header("Parry")]
     [Tooltip("Cooldown between parries (seconds)")]
