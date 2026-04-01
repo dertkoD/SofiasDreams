@@ -24,6 +24,7 @@ public interface IPlayerAnimator
 
     void PlayChangeWeapon(System.Action onComplete = null);
     void PlayDaggerParry();
+    void StopDaggerParry();
 
     void PlayHealStart();
     void PlayHealEnd(bool interrupted, System.Action onComplete = null);

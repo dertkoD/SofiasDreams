@@ -22,10 +22,6 @@ public class DaggerAttackConfig : ScriptableObject
     [Tooltip("How long the reduced gravity lasts (seconds)")]
     [Min(0)] public float floatGravityDuration = 0.3f;
 
-    [Header("Air attack hover")]
-    [Tooltip("Gravity scale while performing dagger air attacks (0 = full freeze)")]
-    [Range(0f, 1f)] public float airHoverGravityScale = 0f;
-
     [Header("Momentum")]
     public int segmentsPerLevel = 5;
     public int maxLevels = 3;
@@ -41,6 +37,8 @@ public class DaggerAttackConfig : ScriptableObject
     public float decayDelay = 5f;
     [Tooltip("Segments lost per second during decay")]
     public float decayRate = 1f;
+    [Tooltip("If true, all segments are wiped instantly when decayDelay expires")]
+    public bool instantFullDecay = false;
 
     [Header("Parry")]
     [Tooltip("Cooldown between parries (seconds)")]

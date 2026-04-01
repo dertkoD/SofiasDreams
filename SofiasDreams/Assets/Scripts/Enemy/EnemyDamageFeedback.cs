@@ -50,10 +50,6 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
     {
         InHitStun = true;
 
-        foreach (var h in hurtboxes)
-            if (h)
-                h.enabled = false;
-
         float prevAnimSpeed = animator ? animator.speed : 1f;
         if (animator) animator.speed = 0f;
 
@@ -79,9 +75,6 @@ public class EnemyDamageFeedback : MonoBehaviour, IEnemyDamageFeedback
 
         if (animator) animator.speed = prevAnimSpeed;
         if (rb) rb.linearDamping = _savedDrag;
-        foreach (var h in hurtboxes)
-            if (h)
-                h.enabled = true;
 
         if (stunHost != null)
             stunHost.ExternalHitStunActive = false;

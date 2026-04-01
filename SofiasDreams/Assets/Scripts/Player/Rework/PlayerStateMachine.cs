@@ -414,6 +414,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
     void OnParryFinished(ParryFinished _)
     {
+        _anim.StopDaggerParry();
         Unblock(MobilityBlockReason.Parry);
         if (_state == PlayerState.Attack)
             _state = Mathf.Abs(_moveX) > 0.01f ? PlayerState.Move : PlayerState.Idle;
@@ -453,8 +454,12 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             or PlayerState.BonfireRest or PlayerState.ChangeWeapon or PlayerState.Grapple or PlayerState.Dash) return;
 
         _isCharging = true;
-        if (_jumper.IsGrounded) _mover.StopHorizontal();
-        Block(MobilityBlockReason.Charge);
+
+        if (_weaponManager.CurrentWeapon == WeaponType.Sword)
+        {
+            if (_jumper.IsGrounded) _mover.StopHorizontal();
+            Block(MobilityBlockReason.Charge);
+        }
     }
 
     public void ChargeCancelled()

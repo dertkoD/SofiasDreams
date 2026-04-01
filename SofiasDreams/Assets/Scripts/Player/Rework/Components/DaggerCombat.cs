@@ -14,12 +14,17 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     int _step;
     bool _attacking;
     bool _queued;
-    Coroutine _floatCo;
-    float _origGravity;
-    bool _gravityOverridden;
     bool _parrying;
     float _chargedCooldownTimer;
     float _parryCooldownTimer;
+
+    float _origGravity;
+    Coroutine _slowFallCo;
+    bool _slowFallActive;
+
+    bool _airFreezeUsedThisJump;
+    bool _airFreezeActiveNow;
+    bool _parryFreezeActive;
 
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
@@ -45,14 +50,16 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!rb) rb = GetComponent<Rigidbody2D>();
         _origGravity = rb ? rb.gravityScale : 1f;
-        _bus.Subscribe<AttackStarted>(OnAttackStarted);
-        _bus.Subscribe<AttackFinished>(OnAttackFinished);
+        _bus.Subscribe<AttackStarted>(OnAirAttackStarted);
+        _bus.Subscribe<AttackFinished>(OnAirAttackFinished);
+        _bus.Subscribe<GroundedChanged>(OnGroundedChanged);
     }
 
     public void Dispose()
     {
-        _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
-        _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
+        _bus.TryUnsubscribe<AttackStarted>(OnAirAttackStarted);
+        _bus.TryUnsubscribe<AttackFinished>(OnAirAttackFinished);
+        _bus.TryUnsubscribe<GroundedChanged>(OnGroundedChanged);
     }
 
     // ───── Combo (2 hits) ─────
@@ -85,7 +92,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = false;
         _bus.Fire(new AttackFinished { mode = mode, index = _step });
         _step = 0;
-        RestoreGravity();
     }
 
     // ───── Charged attack (independent) ─────
@@ -109,8 +115,8 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _attacking = true;
         _step = 3;
         _chargedCooldownTimer = _cfg ? _cfg.chargedCooldown : 1.5f;
-        StopFloatCoroutine();
-        _floatCo = StartCoroutine(LaunchPlayerRoutine());
+        StopSlowFall();
+        _slowFallCo = StartCoroutine(ChargedLaunchRoutine());
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
         Debug.Log($"[DaggerCombat] ChargedAttack fired! force={(_cfg ? _cfg.playerLaunchForce : 0)}");
     }
@@ -119,8 +125,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!_attacking && _step == 0) return;
 
-        StopFloatCoroutine();
-        RestoreGravity();
+        StopSlowFall();
 
         var mode = _step == 3 ? AttackMode.DaggerSuper : AttackMode.DaggerCombo;
         _attacking = false;
@@ -129,18 +134,11 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _bus.Fire(new AttackFinished { mode = mode, index = 0 });
     }
 
-    // ───── Player launch on charged attack ─────
+    // ───── Charged attack launch + slow-fall ─────
 
-    IEnumerator LaunchPlayerRoutine()
+    IEnumerator ChargedLaunchRoutine()
     {
         if (!rb || _cfg == null) yield break;
-
-        if (!_gravityOverridden)
-        {
-            _origGravity = rb.gravityScale;
-            _gravityOverridden = true;
-        }
-        rb.gravityScale = _cfg.floatGravityScale;
 
         yield return new WaitForFixedUpdate();
 
@@ -148,12 +146,39 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         rb.linearVelocity = new Vector2(0f, 0f);
         rb.AddForce(Vector2.up * (force * rb.mass), ForceMode2D.Impulse);
 
-        Debug.Log($"[DaggerCombat] Launch applied! vel={rb.linearVelocity}, gravity={rb.gravityScale}");
+        Debug.Log($"[DaggerCombat] Launch applied! vel={rb.linearVelocity}");
+
+        while (rb && rb.linearVelocity.y > 0f)
+            yield return null;
+
+        if (!rb) yield break;
+
+        rb.gravityScale = _cfg.floatGravityScale;
+        _slowFallActive = true;
+        Debug.Log($"[DaggerCombat] Slow-fall ON, gravityScale={rb.gravityScale}");
 
         yield return new WaitForSeconds(_cfg.floatGravityDuration);
 
-        RestoreGravity();
-        _floatCo = null;
+        EndSlowFall();
+        _slowFallCo = null;
+    }
+
+    void StopSlowFall()
+    {
+        if (_slowFallCo != null)
+        {
+            StopCoroutine(_slowFallCo);
+            _slowFallCo = null;
+        }
+        EndSlowFall();
+    }
+
+    void EndSlowFall()
+    {
+        if (!_slowFallActive) return;
+        _slowFallActive = false;
+        if (rb) rb.gravityScale = _origGravity;
+        Debug.Log($"[DaggerCombat] Slow-fall OFF, gravityScale={_origGravity}");
     }
 
     // ───── Parry ─────
@@ -162,11 +187,21 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         _parrying = true;
         _parryCooldownTimer = _cfg ? _cfg.parryCooldown : 1f;
+
+        if (rb && rb.linearVelocity.y != 0f)
+        {
+            StopSlowFall();
+            _parryFreezeActive = true;
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            Debug.Log("[DaggerCombat] Parry air-freeze ON");
+        }
     }
 
     public void ParryFinishFromAnimation()
     {
         _parrying = false;
+        EndParryFreeze();
         _bus.Fire(new ParryFinished());
     }
 
@@ -175,8 +210,9 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         if (attacker == null) return false;
 
         _parrying = false;
+        EndParryFreeze();
 
-        TeleportBehind(attacker);
+        TeleportToOtherSide(attacker);
         StunEnemy(attacker);
         _momentum?.OnParrySuccess();
         _bus.Fire(new ParryFinished());
@@ -185,18 +221,34 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         return true;
     }
 
-    void TeleportBehind(Transform enemy)
+    void EndParryFreeze()
+    {
+        if (!_parryFreezeActive) return;
+        _parryFreezeActive = false;
+        if (rb) rb.gravityScale = _origGravity;
+        Debug.Log($"[DaggerCombat] Parry air-freeze OFF, gravityScale={_origGravity}");
+    }
+
+    void TeleportToOtherSide(Transform enemy)
     {
         if (!rb) return;
 
-        float enemyFacing = Mathf.Sign(enemy.lossyScale.x);
-        float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
-        float behindX = enemy.position.x - enemyFacing * offset;
-
-        rb.position = new Vector2(behindX, rb.position.y);
-
+        float diff = rb.position.x - enemy.position.x;
         var mover = GetComponent<Mover2D>();
-        if (mover) mover.ForceFacing((int)enemyFacing);
+
+        float playerSide;
+        if (Mathf.Abs(diff) > 0.01f)
+            playerSide = Mathf.Sign(diff);
+        else
+            playerSide = mover ? mover.FacingDir : 1f;
+
+        float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
+        float targetX = enemy.position.x - playerSide * offset;
+
+        rb.position = new Vector2(targetX, rb.position.y);
+
+        int faceTowardEnemy = (int)Mathf.Sign(enemy.position.x - targetX);
+        if (mover) mover.ForceFacing(faceTowardEnemy);
     }
 
     void StunEnemy(Transform enemy)
@@ -214,46 +266,60 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         kb.Apply(info);
     }
 
-    // ───── Air attack hover ─────
+    // ───── Air attack freeze (once per jump) ─────
 
     static bool IsDaggerAirMode(AttackMode m) =>
         m is AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
 
-    void OnAttackStarted(AttackStarted s)
+    void OnAirAttackStarted(AttackStarted s)
     {
         if (!IsDaggerAirMode(s.mode) || !rb) return;
 
-        if (!_gravityOverridden)
-        {
-            _origGravity = rb.gravityScale;
-            _gravityOverridden = true;
-        }
+        if (_airFreezeUsedThisJump) return;
 
-        rb.gravityScale = _cfg != null ? _cfg.airHoverGravityScale : 0f;
-        var v = rb.linearVelocity;
-        v.y = 0f;
-        rb.linearVelocity = v;
+        _airFreezeUsedThisJump = true;
+        _airFreezeActiveNow = true;
+
+        StopSlowFall();
+
+        rb.gravityScale = 0f;
+        rb.linearVelocity = Vector2.zero;
+
+        Debug.Log("[DaggerCombat] Air-freeze ON (first air attack this jump)");
     }
 
-    void OnAttackFinished(AttackFinished s)
+    void OnAirAttackFinished(AttackFinished s)
     {
         if (!IsDaggerAirMode(s.mode)) return;
-        RestoreGravity();
-    }
 
-    void RestoreGravity()
-    {
-        if (!_gravityOverridden || !rb) return;
-        rb.gravityScale = _origGravity;
-        _gravityOverridden = false;
-    }
-
-    void StopFloatCoroutine()
-    {
-        if (_floatCo != null)
+        if (_airFreezeActiveNow)
         {
-            StopCoroutine(_floatCo);
-            _floatCo = null;
+            _airFreezeActiveNow = false;
+            rb.gravityScale = _origGravity;
+            Debug.Log($"[DaggerCombat] Air-freeze OFF, gravityScale={_origGravity}");
         }
+    }
+
+    void OnGroundedChanged(GroundedChanged g)
+    {
+        if (!g.grounded) return;
+
+        _airFreezeUsedThisJump = false;
+        _airFreezeActiveNow = false;
+        _parryFreezeActive = false;
+
+        if (_slowFallCo != null)
+        {
+            StopCoroutine(_slowFallCo);
+            _slowFallCo = null;
+        }
+
+        if (_slowFallActive)
+        {
+            _slowFallActive = false;
+            Debug.Log("[DaggerCombat] Landed — slow-fall cancelled");
+        }
+
+        if (rb) rb.gravityScale = _origGravity;
     }
 }

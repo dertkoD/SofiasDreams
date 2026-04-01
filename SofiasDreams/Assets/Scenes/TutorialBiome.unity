@@ -73663,6 +73663,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 4437927043523848983, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 169.7996
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437927043523848983, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -136.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6781324807160493134, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 169.7996
+      objectReference: {fileID: 0}
+    - target: {fileID: 6781324807160493134, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 50.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922081072013112000, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: segments.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6922081072013112000, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: levelContainers.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8137457193171409655, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -73751,12 +73775,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8710213934332538210, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 183.1
+      objectReference: {fileID: 0}
     - target: {fileID: 8742185502671656327, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1798774597634097026, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 944905afcd83ed2408e6a6c03783842f, type: 3}
@@ -78883,11 +78912,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.7
+      value: 31.5
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.27
+      value: 5.2
       objectReference: {fileID: 0}
     - target: {fileID: 656527531570036318, guid: c2da2992a427ea64ba4815410e739d88, type: 3}
       propertyPath: m_LocalPosition.z

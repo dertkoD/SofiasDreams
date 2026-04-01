@@ -9,7 +9,10 @@ public class DaggerParryTrigger : MonoBehaviour
         _combat = GetComponentInParent<DaggerCombat>();
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other) => TryParry(other);
+    void OnTriggerStay2D(Collider2D other)  => TryParry(other);
+
+    void TryParry(Collider2D other)
     {
         if (!_combat || !_combat.IsParrying) return;
 
