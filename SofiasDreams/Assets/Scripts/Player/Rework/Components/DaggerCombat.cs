@@ -24,6 +24,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     bool _airFreezeUsedThisJump;
     bool _airFreezeActiveNow;
+    bool _parryFreezeActive;
 
     public bool IsAttacking => _attacking;
     public bool IsParrying => _parrying;
@@ -186,11 +187,21 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         _parrying = true;
         _parryCooldownTimer = _cfg ? _cfg.parryCooldown : 1f;
+
+        if (rb && rb.linearVelocity.y != 0f)
+        {
+            StopSlowFall();
+            _parryFreezeActive = true;
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            Debug.Log("[DaggerCombat] Parry air-freeze ON");
+        }
     }
 
     public void ParryFinishFromAnimation()
     {
         _parrying = false;
+        EndParryFreeze();
         _bus.Fire(new ParryFinished());
     }
 
@@ -199,6 +210,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         if (attacker == null) return false;
 
         _parrying = false;
+        EndParryFreeze();
 
         TeleportBehind(attacker);
         StunEnemy(attacker);
@@ -209,19 +221,26 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         return true;
     }
 
+    void EndParryFreeze()
+    {
+        if (!_parryFreezeActive) return;
+        _parryFreezeActive = false;
+        if (rb) rb.gravityScale = _origGravity;
+        Debug.Log($"[DaggerCombat] Parry air-freeze OFF, gravityScale={_origGravity}");
+    }
+
     void TeleportBehind(Transform enemy)
     {
         if (!rb) return;
 
-        float dirFromEnemy = Mathf.Sign(rb.position.x - enemy.position.x);
+        float enemyFacing = Mathf.Sign(enemy.localScale.x);
         float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
-        float targetX = enemy.position.x - dirFromEnemy * offset;
+        float behindX = enemy.position.x - enemyFacing * offset;
 
-        rb.position = new Vector2(targetX, rb.position.y);
+        rb.position = new Vector2(behindX, rb.position.y);
 
-        int faceDir = (int)Mathf.Sign(enemy.position.x - targetX);
         var mover = GetComponent<Mover2D>();
-        if (mover) mover.ForceFacing(faceDir);
+        if (mover) mover.ForceFacing((int)enemyFacing);
     }
 
     void StunEnemy(Transform enemy)
@@ -279,6 +298,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         _airFreezeUsedThisJump = false;
         _airFreezeActiveNow = false;
+        _parryFreezeActive = false;
 
         if (_slowFallCo != null)
         {
