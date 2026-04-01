@@ -213,14 +213,15 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!rb) return;
 
-        float enemyFacing = Mathf.Sign(enemy.lossyScale.x);
+        float dirFromEnemy = Mathf.Sign(rb.position.x - enemy.position.x);
         float offset = _cfg != null ? _cfg.parryTeleportOffset : 1.5f;
-        float behindX = enemy.position.x - enemyFacing * offset;
+        float targetX = enemy.position.x - dirFromEnemy * offset;
 
-        rb.position = new Vector2(behindX, rb.position.y);
+        rb.position = new Vector2(targetX, rb.position.y);
 
+        int faceDir = (int)Mathf.Sign(enemy.position.x - targetX);
         var mover = GetComponent<Mover2D>();
-        if (mover) mover.ForceFacing((int)enemyFacing);
+        if (mover) mover.ForceFacing(faceDir);
     }
 
     void StunEnemy(Transform enemy)
