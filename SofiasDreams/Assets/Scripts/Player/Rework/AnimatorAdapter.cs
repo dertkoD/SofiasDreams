@@ -305,7 +305,7 @@ public class AnimatorAdapter : MonoBehaviour, IPlayerAnimator, IInitializable, I
         SetBool(pDagAtk2, false);
         animator.SetTrigger(pDagSuperTrig);
         Restart(ref _tDagSuper, TrackExitByName(stDagSuper, () =>
-            _daggerCombat?.DaggerFinishFromAnimation()));
+            _daggerCombat?.LaunchCharged()));
     }
 
     public void PlayDaggerParry()
