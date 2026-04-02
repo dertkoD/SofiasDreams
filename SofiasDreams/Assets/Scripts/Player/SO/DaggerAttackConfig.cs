@@ -31,6 +31,10 @@ public class DaggerAttackConfig : ScriptableObject
     public int normalHitSegments = 1;
     [Tooltip("Segments added by a backstab hit")]
     public int backstabSegments = 1;
+    [Tooltip("Segments added by a successful air attack hit")]
+    public int airHitSegments = 1;
+    [Tooltip("Segments added by a successful charged attack hit")]
+    public int chargedHitSegments = 1;
     [Tooltip("Segments added by a successful parry (= 1 full level)")]
     public int parrySegments = 5;
     [Tooltip("Seconds before segments start decaying")]
