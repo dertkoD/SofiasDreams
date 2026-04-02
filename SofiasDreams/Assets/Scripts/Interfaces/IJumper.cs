@@ -2,6 +2,6 @@ public interface IJumper
 {
     bool IsGrounded { get; }
     void RequestJump();
-    void RequestDropThrough();
+    bool RequestDropThrough();
     void NotifyJumpReleased();
 }

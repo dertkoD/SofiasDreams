@@ -322,10 +322,13 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         if (!_jumper.IsGrounded)
             return;
 
-        _jumper.RequestDropThrough();
+        if (_jumper.RequestDropThrough())
+        {
+            _state = PlayerState.Jump;
+            return;
+        }
 
-        // Treat as airborne for logic until grounded signal fires
-        _state = PlayerState.Jump;
+        Jump();
     }
 
     void OnInteractPressed(InteractPressed _)
