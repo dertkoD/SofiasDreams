@@ -116,9 +116,15 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         _step = 3;
         _chargedCooldownTimer = _cfg ? _cfg.chargedCooldown : 1.5f;
         StopSlowFall();
-        _slowFallCo = StartCoroutine(ChargedLaunchRoutine());
         _bus.Fire(new AttackStarted { mode = AttackMode.DaggerSuper, index = 3 });
         Debug.Log($"[DaggerCombat] ChargedAttack fired! force={(_cfg ? _cfg.playerLaunchForce : 0)}");
+    }
+
+    public void LaunchCharged()
+    {
+        if (!_attacking || _step != 3) return;
+        _slowFallCo = StartCoroutine(ChargedLaunchRoutine());
+        Debug.Log("[DaggerCombat] ChargedAttack — animation done, launching player");
     }
 
     public void Interrupt()
@@ -138,7 +144,11 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
     IEnumerator ChargedLaunchRoutine()
     {
-        if (!rb || _cfg == null) yield break;
+        if (!rb || _cfg == null)
+        {
+            DaggerFinishFromAnimation();
+            yield break;
+        }
 
         yield return new WaitForFixedUpdate();
 
@@ -151,7 +161,11 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         while (rb && rb.linearVelocity.y > 0f)
             yield return null;
 
-        if (!rb) yield break;
+        if (!rb)
+        {
+            DaggerFinishFromAnimation();
+            yield break;
+        }
 
         rb.gravityScale = _cfg.floatGravityScale;
         _slowFallActive = true;
@@ -161,6 +175,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
 
         EndSlowFall();
         _slowFallCo = null;
+        DaggerFinishFromAnimation();
     }
 
     void StopSlowFall()

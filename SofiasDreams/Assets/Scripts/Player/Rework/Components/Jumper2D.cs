@@ -37,13 +37,43 @@ public class Jumper2D : MonoBehaviour, IJumper
 
     public void RequestJump() => _buffer = _s.jumpBufferTime;
 
-    public void RequestDropThrough()
+    public bool RequestDropThrough()
     {
-        if (_isDropping) return;
-        if (!IsGrounded) return;
-        if (!rb)         return;
+        if (_isDropping) return false;
+        if (!IsGrounded) return false;
+        if (!rb)         return false;
+
+        if (!HasPlatformEffectorBelow()) return false;
 
         StartCoroutine(DropRoutine());
+        return true;
+    }
+
+    bool HasPlatformEffectorBelow()
+    {
+        if (!playerCollider)
+            playerCollider = GetComponent<Collider2D>();
+
+        if (playerCollider == null || playerCollider.attachedRigidbody == null)
+            return false;
+
+        _contactBuffer.Clear();
+        var filter = new ContactFilter2D
+        {
+            useTriggers    = false,
+            useLayerMask   = false,
+            useNormalAngle = false,
+        };
+        playerCollider.attachedRigidbody.GetContacts(filter, _contactBuffer);
+
+        foreach (var col in _contactBuffer)
+        {
+            if (col == null) continue;
+            var eff = col.GetComponent<PlatformEffector2D>()
+                   ?? col.GetComponentInParent<PlatformEffector2D>();
+            if (eff != null) return true;
+        }
+        return false;
     }
 
     void Reset()

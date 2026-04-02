@@ -11,6 +11,9 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
     float _segments;
     float _decayTimer;
 
+    AttackMode _currentAttackMode;
+    bool _inDaggerAttack;
+
     int MaxSegments => _cfg ? _cfg.segmentsPerLevel * _cfg.maxLevels : 15;
     int SegmentsPerLevel => _cfg ? _cfg.segmentsPerLevel : 5;
 
@@ -32,12 +35,16 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
     {
         _bus.Subscribe<EnemyHit>(OnEnemyHit);
         _bus.Subscribe<TookDamage>(OnTookDamage);
+        _bus.Subscribe<AttackStarted>(OnAttackStarted);
+        _bus.Subscribe<AttackFinished>(OnAttackFinished);
     }
 
     public void Dispose()
     {
         _bus.TryUnsubscribe<EnemyHit>(OnEnemyHit);
         _bus.TryUnsubscribe<TookDamage>(OnTookDamage);
+        _bus.TryUnsubscribe<AttackStarted>(OnAttackStarted);
+        _bus.TryUnsubscribe<AttackFinished>(OnAttackFinished);
     }
 
     public void Tick()
@@ -81,15 +88,56 @@ public class DaggerMomentum : MonoBehaviour, IInitializable, IDisposable, ITicka
         AddSegments(add, "Parry");
     }
 
+    static bool IsDaggerAirMode(AttackMode m) =>
+        m is AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
+
+    void OnAttackStarted(AttackStarted e)
+    {
+        if (IsDaggerMode(e.mode))
+        {
+            _currentAttackMode = e.mode;
+            _inDaggerAttack = true;
+        }
+    }
+
+    void OnAttackFinished(AttackFinished e)
+    {
+        if (IsDaggerMode(e.mode))
+            _inDaggerAttack = false;
+    }
+
+    static bool IsDaggerMode(AttackMode m) =>
+        m is AttackMode.DaggerCombo or AttackMode.DaggerSuper
+            or AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
+
     void OnEnemyHit(EnemyHit e)
     {
         if (_weapon.CurrentWeapon != WeaponType.Dagger) return;
 
-        int add = e.isBackstab
-            ? (_cfg ? _cfg.backstabSegments : 1)
-            : (_cfg ? _cfg.normalHitSegments : 1);
+        int add;
+        string src;
 
-        string src = e.isBackstab ? "Backstab" : "Hit";
+        if (_inDaggerAttack && IsDaggerAirMode(_currentAttackMode))
+        {
+            add = _cfg ? _cfg.airHitSegments : 1;
+            src = "AirHit";
+        }
+        else if (_inDaggerAttack && _currentAttackMode == AttackMode.DaggerSuper)
+        {
+            add = _cfg ? _cfg.chargedHitSegments : 1;
+            src = "ChargedHit";
+        }
+        else if (e.isBackstab)
+        {
+            add = _cfg ? _cfg.backstabSegments : 1;
+            src = "Backstab";
+        }
+        else
+        {
+            add = _cfg ? _cfg.normalHitSegments : 1;
+            src = "Hit";
+        }
+
         AddSegments(add, src);
     }
 
