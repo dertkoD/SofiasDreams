@@ -24,11 +24,12 @@ public class LazyMiniBossBrain : BaseEnemyBrain
     public IEnemyPersistenceService Persist { get; private set; }
     
     // States
-    public LazyPatrolState PatrolState { get; private set; }
+    public LazySleepState SleepState { get; private set; }
     public LazyTriggerAgroState TriggerAgroState { get; private set; }
     public LazyAgroState AgroState { get; private set; }
     public LazyAttackMeleeState AttackMeleeState { get; private set; }
     public LazyAttackShootState AttackShootState { get; private set; }
+    public LazyAttackRanged3State AttackRanged3State { get; private set; }
     public LazyTriggerPatrolState TriggerPatrolState { get; private set; }
     public LazyDeadState DeadState { get; private set; }
 
@@ -50,6 +51,7 @@ public class LazyMiniBossBrain : BaseEnemyBrain
     // Combat
     public float NextMeleeAttackTime { get; set; }
     public float NextShootAttackTime { get; set; }
+    public bool UseAttack3Next { get; set; }
 
     // Spawn Meta
     public EnemySpawnMeta SpawnMeta { get; private set; }
@@ -74,11 +76,12 @@ public class LazyMiniBossBrain : BaseEnemyBrain
         if (!_health) _health = GetComponent<Health>();
         if (IHealth == null && _health) IHealth = _health;
         
-        PatrolState = new LazyPatrolState(this);
+        SleepState = new LazySleepState(this);
         TriggerAgroState = new LazyTriggerAgroState(this);
         AgroState = new LazyAgroState(this);
         AttackMeleeState = new LazyAttackMeleeState(this);
         AttackShootState = new LazyAttackShootState(this);
+        AttackRanged3State = new LazyAttackRanged3State(this);
         TriggerPatrolState = new LazyTriggerPatrolState(this);
         DeadState = new LazyDeadState(this);
         
@@ -98,7 +101,7 @@ public class LazyMiniBossBrain : BaseEnemyBrain
         
         RecalcZoneBoundsFromPath();
         
-        ChangeState(PatrolState);
+        ChangeState(SleepState);
     }
     
     void OnEnable()
@@ -145,12 +148,15 @@ public class LazyMiniBossBrain : BaseEnemyBrain
         Anim.SetXVelocity(Mathf.Abs(Motor.Velocity.x));
     }
     
-    // Delegate to State
     public void AnimationEvent_SpawnProjectile()
     {
         if (CurrentState == AttackShootState)
         {
             AttackShootState.SpawnProjectile();
+        }
+        else if (CurrentState == AttackRanged3State)
+        {
+            AttackRanged3State.SpawnProjectile();
         }
     }
     
@@ -202,7 +208,7 @@ public class LazyMiniBossBrain : BaseEnemyBrain
         
         if (current < _lastHp)
         {
-            if (CurrentState == PatrolState)
+            if (CurrentState == SleepState)
             {
                 if (Health.LastHit != null && Health.LastHit.source != null)
                 {
@@ -288,12 +294,15 @@ public class LazyMiniBossBrain : BaseEnemyBrain
 
 // --- States ---
 
-public class LazyPatrolState : IEnemyState
+public class LazySleepState : IEnemyState
 {
     LazyMiniBossBrain _brain;
-    public LazyPatrolState(LazyMiniBossBrain brain) { _brain = brain; }
+    public LazySleepState(LazyMiniBossBrain brain) { _brain = brain; }
 
-    public void Enter() { }
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+    }
 
     public void Tick()
     {
@@ -302,28 +311,6 @@ public class LazyPatrolState : IEnemyState
              _brain.ChangeState(_brain.TriggerAgroState);
              return;
         }
-
-        if (_brain.CurrentPath == null || _brain.CurrentPath.Count == 0) return;
-
-        Vector3 targetPos = _brain.CurrentPath.GetPoint(_brain.PathIndex);
-        float dist = Vector2.Distance(_brain.transform.position, targetPos);
-        
-        if (dist <= _brain.Config.waypointArriveDistance)
-        {
-            _brain.AdvancePathIndex();
-            _brain.Motor.Stop(); 
-            return;
-        }
-
-        float dx = targetPos.x - _brain.transform.position.x;
-        if (Mathf.Abs(dx) < 0.1f) 
-        {
-             _brain.AdvancePathIndex();
-             _brain.Motor.Stop();
-             return;
-        }
-
-        _brain.Motor.Move(Mathf.Sign(dx) * _brain.Config.patrolSpeed);
     }
 
     public void Exit() { }
@@ -364,10 +351,9 @@ public class LazyTriggerPatrolState : IEnemyState
 
     public void Tick()
     {
-        if (_brain.Anim.IsInPatrolMovement())
+        if (_brain.Anim.IsInSleep())
         {
-            _brain.PathIndex = _brain.FindNearestWaypointIndex(_brain.transform.position);
-            _brain.ChangeState(_brain.PatrolState);
+            _brain.ChangeState(_brain.SleepState);
         }
     }
     public void Exit() { }
@@ -430,7 +416,14 @@ public class LazyAgroState : IEnemyState
         {
             if (Time.time >= _brain.NextShootAttackTime)
             {
-                _brain.ChangeState(_brain.AttackShootState);
+                if (_brain.UseAttack3Next)
+                {
+                    _brain.ChangeState(_brain.AttackRanged3State);
+                }
+                else
+                {
+                    _brain.ChangeState(_brain.AttackShootState);
+                }
                 return;
             }
         }
@@ -516,6 +509,7 @@ public class LazyAttackShootState : IEnemyState
         _brain.Motor.Stop();
         _brain.Anim.TriggerShoot();
         _brain.NextShootAttackTime = Time.time + _brain.Config.shootAttackCooldown;
+        _brain.UseAttack3Next = true;
     }
 
     public void Tick()
@@ -546,6 +540,53 @@ public class LazyAttackShootState : IEnemyState
     }
 
     public void Exit() { }
+}
+
+public class LazyAttackRanged3State : IEnemyState
+{
+    LazyMiniBossBrain _brain;
+    public LazyAttackRanged3State(LazyMiniBossBrain brain) { _brain = brain; }
+
+    public void Enter()
+    {
+        _brain.Motor.Stop();
+        _brain.Anim.SetAttack3(true);
+        _brain.NextShootAttackTime = Time.time + _brain.Config.shootAttackCooldown;
+        _brain.UseAttack3Next = false;
+    }
+
+    public void Tick()
+    {
+        if (_brain.Anim.IsInAgroMovement())
+        {
+            _brain.Anim.SetAttack3(false);
+            _brain.ChangeState(_brain.AgroState);
+        }
+    }
+
+    public void SpawnProjectile()
+    {
+        if (_brain.Config.projectilePrefab)
+        {
+            Vector3 spawnPos = _brain.ProjectileSpawnPoint ? _brain.ProjectileSpawnPoint.position : _brain.transform.position;
+            GameObject go = Object.Instantiate(_brain.Config.projectilePrefab, spawnPos, Quaternion.identity);
+            var proj = go.GetComponent<FistProjectile>();
+
+            int dir = _brain.Motor.IsFacingRight ? 1 : -1;
+            Vector2 direction = new Vector2(dir, 0);
+
+            if (proj)
+            {
+                proj.Setup(_brain.Config.projectileDamage);
+                proj.Fire(direction, _brain.Config.projectileSpeed);
+            }
+        }
+    }
+
+    public void Exit()
+    {
+        _brain.Anim.SetAttack3(false);
+    }
 }
 
 public class LazyDeadState : IEnemyState
