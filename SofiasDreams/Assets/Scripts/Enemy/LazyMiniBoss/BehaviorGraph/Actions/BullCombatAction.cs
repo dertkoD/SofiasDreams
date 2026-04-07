@@ -71,6 +71,13 @@ public partial class BullCombatAction : Action
         if (Mathf.Abs(dx) > 0.1f)
             bridge.Motor.Face(dx > 0 ? 1 : -1);
 
+        if (bridge.ZoneReady)
+        {
+            float myX = bridge.transform.position.x;
+            if (myX < bridge.ZoneMinX) { bridge.Motor.Move(config.agroRunSpeed); return Status.Running; }
+            if (myX > bridge.ZoneMaxX) { bridge.Motor.Move(-config.agroRunSpeed); return Status.Running; }
+        }
+
         if (dist <= config.closeRangeThreshold && Time.time >= bridge.NextMeleeAttackTime)
         {
             bridge.Motor.Stop();
@@ -96,12 +103,29 @@ public partial class BullCombatAction : Action
             return Status.Running;
         }
 
-        if (dist > config.closeRangeThreshold * 0.8f)
+        Vector3 clampedTarget = targetPos;
+        if (bridge.ZoneReady)
+            clampedTarget.x = Mathf.Clamp(targetPos.x, bridge.ZoneMinX, bridge.ZoneMaxX);
+
+        float dxClamped = clampedTarget.x - bridge.transform.position.x;
+        float distClamped = Vector2.Distance(bridge.transform.position, clampedTarget);
+
+        if (distClamped > config.closeRangeThreshold * 0.8f)
         {
-            if (Mathf.Abs(dx) > 0.05f)
-                bridge.Motor.Move(Mathf.Sign(dx) * config.agroRunSpeed);
-            else
+            if (seesPlayer && dist >= config.shootRangeMin &&
+                dist <= config.shootRangeMin + 2f &&
+                Time.time < bridge.NextShootAttackTime)
+            {
                 bridge.Motor.Stop();
+            }
+            else if (Mathf.Abs(dxClamped) > 0.05f)
+            {
+                bridge.Motor.Move(Mathf.Sign(dxClamped) * config.agroRunSpeed);
+            }
+            else
+            {
+                bridge.Motor.Stop();
+            }
         }
         else
         {

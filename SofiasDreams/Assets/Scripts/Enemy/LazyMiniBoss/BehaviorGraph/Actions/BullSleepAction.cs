@@ -40,6 +40,33 @@ public partial class BullSleepAction : Action
             return Status.Success;
         }
 
+        if (bridge.Config.canWalkInPatrol)
+        {
+            var brain = bridge.Brain;
+            if (brain != null && brain.CurrentPath != null && brain.CurrentPath.Count > 0)
+            {
+                Vector3 wp = brain.CurrentPath.GetPoint(brain.PathIndex);
+                float dist = Vector2.Distance(bridge.transform.position, wp);
+
+                if (dist <= bridge.Config.waypointArriveDistance)
+                {
+                    brain.AdvancePathIndex();
+                    bridge.Motor.Stop();
+                    return Status.Running;
+                }
+
+                float dx = wp.x - bridge.transform.position.x;
+                if (Mathf.Abs(dx) < 0.1f)
+                {
+                    brain.AdvancePathIndex();
+                    bridge.Motor.Stop();
+                    return Status.Running;
+                }
+
+                bridge.Motor.Move(Mathf.Sign(dx) * bridge.Config.patrolSpeed);
+            }
+        }
+
         return Status.Running;
     }
 }

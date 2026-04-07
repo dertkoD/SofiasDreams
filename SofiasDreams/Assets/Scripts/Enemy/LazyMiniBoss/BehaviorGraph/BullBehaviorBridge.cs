@@ -8,7 +8,9 @@ public class BullBehaviorBridge : MonoBehaviour
     [SerializeField] VisionCone2D _vision;
     [SerializeField] Health _health;
     [SerializeField] LazyMiniBossConfigSO _config;
-    [SerializeField] Transform _projectileSpawnPoint;
+    [SerializeField] Transform _shootMuzzle;
+    [SerializeField] Transform _attack3MuzzleHorns;
+    [SerializeField] bool _startFacingLeft = true;
 
     public LazyMiniBossBrain Brain => _brain;
     public LazyMiniBossMotor2D Motor => _motor;
@@ -16,7 +18,6 @@ public class BullBehaviorBridge : MonoBehaviour
     public VisionCone2D Vision => _vision;
     public Health HealthComponent => _health;
     public LazyMiniBossConfigSO Config => _config;
-    public Transform ProjectileSpawnPoint => _projectileSpawnPoint;
 
     public Transform Player { get; set; }
     public Vector2 LastSeenPos { get; set; }
@@ -25,6 +26,14 @@ public class BullBehaviorBridge : MonoBehaviour
     public bool UseAttack3Next { get; set; }
     public float NextMeleeAttackTime { get; set; }
     public float NextShootAttackTime { get; set; }
+
+    // Zone
+    public float ZoneMinX { get; private set; }
+    public float ZoneMaxX { get; private set; }
+    public bool ZoneReady { get; private set; }
+
+    ProjectilePool _shootPool;
+    ProjectilePool _attack3Pool;
 
     void Awake()
     {
@@ -35,22 +44,56 @@ public class BullBehaviorBridge : MonoBehaviour
         if (!_health) _health = GetComponent<Health>();
     }
 
+    void Start()
+    {
+        if (_startFacingLeft) _motor.Face(-1);
+
+        if (_config != null)
+        {
+            if (_config.projectilePrefab)
+                _shootPool = new ProjectilePool(_config.projectilePrefab, _config.projectilePoolSize);
+            if (_config.attack3ProjectilePrefab)
+                _attack3Pool = new ProjectilePool(_config.attack3ProjectilePrefab, _config.attack3ProjectilePoolSize);
+        }
+
+        RecalcZoneBounds();
+    }
+
     void Update()
     {
         if (_anim.IsInAttack1())
-        {
             _anim.SetAttack2(true);
-        }
+
         if (_anim.IsInAttack2())
         {
             _anim.SetAttack1(false);
             _anim.SetAttack2(false);
         }
+
         if (_anim.IsInAgroMovement())
-        {
             _anim.SetAttack3(false);
-        }
+
         Anim.SetXVelocity(Mathf.Abs(Motor.Velocity.x));
+    }
+
+    void RecalcZoneBounds()
+    {
+        ZoneReady = false;
+        if (_brain == null) return;
+        var path = _brain.PatrolPath;
+        if (path == null || path.Count == 0) return;
+
+        float minX = float.PositiveInfinity;
+        float maxX = float.NegativeInfinity;
+        for (int i = 0; i < path.Count; i++)
+        {
+            float x = path.GetPoint(i).x;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+        }
+        ZoneMinX = minX - 0.05f;
+        ZoneMaxX = maxX + 0.05f;
+        ZoneReady = true;
     }
 
     public bool TrySense(out Transform target)
@@ -84,21 +127,29 @@ public class BullBehaviorBridge : MonoBehaviour
             Motor.Face(dx > 0 ? 1 : -1);
     }
 
-    public void SpawnProjectile()
+    public void SpawnShootProjectile()
     {
-        if (Config == null || Config.projectilePrefab == null) return;
-
-        Vector3 spawnPos = _projectileSpawnPoint ? _projectileSpawnPoint.position : transform.position;
-        GameObject go = Instantiate(Config.projectilePrefab, spawnPos, Quaternion.identity);
-        var proj = go.GetComponent<FistProjectile>();
-
+        if (_shootPool == null) return;
+        Vector3 pos = _shootMuzzle ? _shootMuzzle.position : transform.position;
+        var proj = _shootPool.Get(pos, Quaternion.identity);
         int dir = Motor.IsFacingRight ? 1 : -1;
-        Vector2 direction = new Vector2(dir, 0);
+        proj.Setup(Config.projectileDamage);
+        proj.Fire(new Vector2(dir, 0), Config.projectileSpeed);
+    }
 
-        if (proj)
-        {
-            proj.Setup(Config.projectileDamage);
-            proj.Fire(direction, Config.projectileSpeed);
-        }
+    public void SpawnAttack3Projectile()
+    {
+        if (_attack3Pool == null) return;
+        Vector3 pos = _attack3MuzzleHorns ? _attack3MuzzleHorns.position : transform.position;
+        var proj = _attack3Pool.Get(pos, Quaternion.identity);
+        int dir = Motor.IsFacingRight ? 1 : -1;
+        proj.Setup(Config.attack3ProjectileDamage);
+        proj.Fire(new Vector2(dir, 0), Config.attack3ProjectileSpeed);
+    }
+
+    public float ClampXToZone(float x)
+    {
+        if (!ZoneReady) return x;
+        return Mathf.Clamp(x, ZoneMinX, ZoneMaxX);
     }
 }

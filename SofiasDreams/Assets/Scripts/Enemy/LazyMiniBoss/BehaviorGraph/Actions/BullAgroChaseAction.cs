@@ -54,11 +54,24 @@ public partial class BullAgroChaseAction : Action
         if (Mathf.Abs(dxToPlayer) > 0.1f)
             bridge.Motor.Face(dxToPlayer > 0 ? 1 : -1);
 
+        if (bridge.ZoneReady)
+        {
+            float myX = bridge.transform.position.x;
+            if (myX < bridge.ZoneMinX) { bridge.Motor.Move(config.agroRunSpeed); return Status.Running; }
+            if (myX > bridge.ZoneMaxX) { bridge.Motor.Move(-config.agroRunSpeed); return Status.Running; }
+        }
+
         if (distToPlayer <= config.closeRangeThreshold)
         {
             bridge.Motor.Stop();
             return Status.Running;
         }
+
+        Vector3 clampedTarget = rawTargetPos;
+        if (bridge.ZoneReady)
+            clampedTarget.x = Mathf.Clamp(rawTargetPos.x, bridge.ZoneMinX, bridge.ZoneMaxX);
+
+        float dxClamped = clampedTarget.x - bridge.transform.position.x;
 
         if (seesPlayer && distToPlayer >= config.shootRangeMin &&
             distToPlayer <= config.shootRangeMin + 2f &&
@@ -68,9 +81,8 @@ public partial class BullAgroChaseAction : Action
             return Status.Running;
         }
 
-        float dxToMove = rawTargetPos.x - bridge.transform.position.x;
-        if (Mathf.Abs(dxToMove) > 0.05f)
-            bridge.Motor.Move(Mathf.Sign(dxToMove) * config.agroRunSpeed);
+        if (Mathf.Abs(dxClamped) > 0.05f)
+            bridge.Motor.Move(Mathf.Sign(dxClamped) * config.agroRunSpeed);
         else
             bridge.Motor.Stop();
 

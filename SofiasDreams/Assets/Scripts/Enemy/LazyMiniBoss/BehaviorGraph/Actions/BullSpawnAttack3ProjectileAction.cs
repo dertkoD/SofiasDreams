@@ -6,11 +6,11 @@ using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
-    name: "Bull Spawn Shoot Projectile",
-    story: "[Agent] spawns shoot projectile from Muzzle",
+    name: "Bull Spawn Attack3 Projectile",
+    story: "[Agent] spawns attack3 projectile from MuzzleHorns",
     category: "Action/BullEnemy",
-    id: "b0e1a001-0009-4000-8000-000000000009")]
-public partial class BullSpawnProjectileAction : Action
+    id: "b0e1a001-0011-4000-8000-000000000011")]
+public partial class BullSpawnAttack3ProjectileAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
 
@@ -21,7 +21,7 @@ public partial class BullSpawnProjectileAction : Action
         var bridge = Agent.Value.GetComponent<BullBehaviorBridge>();
         if (bridge == null) return Status.Failure;
 
-        bridge.SpawnShootProjectile();
+        bridge.SpawnAttack3Projectile();
         return Status.Success;
     }
 }
