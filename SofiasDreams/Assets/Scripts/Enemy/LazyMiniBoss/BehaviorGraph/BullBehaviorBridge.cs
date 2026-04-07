@@ -1,10 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Bridges LazyMiniBossBrain data to the Unity Behavior Graph blackboard.
-/// Attach this alongside BehaviorGraphAgent on the enemy prefab.
-/// Blackboard variables reference this component to read/write runtime state.
-/// </summary>
 public class BullBehaviorBridge : MonoBehaviour
 {
     [SerializeField] LazyMiniBossBrain _brain;
@@ -38,6 +33,24 @@ public class BullBehaviorBridge : MonoBehaviour
         if (!_anim) _anim = GetComponent<LazyMiniBossAnimatorAdapter>();
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>();
         if (!_health) _health = GetComponent<Health>();
+    }
+
+    void Update()
+    {
+        if (_anim.IsInAttack1())
+        {
+            _anim.SetAttack2(true);
+        }
+        if (_anim.IsInAttack2())
+        {
+            _anim.SetAttack1(false);
+            _anim.SetAttack2(false);
+        }
+        if (_anim.IsInAgroMovement())
+        {
+            _anim.SetAttack3(false);
+        }
+        Anim.SetXVelocity(Mathf.Abs(Motor.Velocity.x));
     }
 
     public bool TrySense(out Transform target)
