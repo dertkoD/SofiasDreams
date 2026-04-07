@@ -61387,7 +61387,7 @@ MonoBehaviour:
   jumpingEnemyPrefab: {fileID: 5534651348796208987, guid: 6a6c1d8faf105de4d99923c4e9a8eb7a, type: 3}
   wormEnemyPrefab: {fileID: 6210117844752786583, guid: b4ea3f3e04b570948aad35d13cfddfc3, type: 3}
   swarmEnemyPrefab: {fileID: 8125583343641682487, guid: 23bbc0fee2dc8b741ae3fd97a9334a7e, type: 3}
-  lazyMiniBossPrefab: {fileID: 973517408187533830, guid: 5fee84c3f51146c498e67015ed8bfe28, type: 3}
+  lazyMiniBossPrefab: {fileID: 973517408187533830, guid: b1ced6966e98574499ce4c17440f2198, type: 3}
 --- !u!114 &562734850
 MonoBehaviour:
   m_ObjectHideFlags: 0
