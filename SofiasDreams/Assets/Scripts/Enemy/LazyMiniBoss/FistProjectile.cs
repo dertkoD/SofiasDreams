@@ -6,7 +6,7 @@ public class FistProjectile : MonoBehaviour
     [SerializeField] float lifetime = 5f;
     [SerializeField] int damage = 1;
     [SerializeField] LayerMask groundLayers;
-    
+
     [Header("VFX")]
     [SerializeField] DissolveVfxSettingsSO _dissolveSettings;
 
@@ -16,7 +16,7 @@ public class FistProjectile : MonoBehaviour
     float _dieAt;
     bool _isDissolving;
     bool _hasHitPlayer;
-    
+
     void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -30,6 +30,7 @@ public class FistProjectile : MonoBehaviour
         _isDissolving = false;
         _hasHitPlayer = false;
         if (_col) _col.enabled = true;
+        if (_rb) _rb.simulated = true;
     }
 
     public void Setup(int dmg)
@@ -53,7 +54,7 @@ public class FistProjectile : MonoBehaviour
 
         if (Time.time >= _dieAt)
         {
-            DissolveAndDestroy();
+            DissolveAndReturn();
         }
     }
 
@@ -61,12 +62,11 @@ public class FistProjectile : MonoBehaviour
     {
         if (_isDissolving) return;
 
-        // Check for player hurtbox or damageable
         IDamageable target = other.GetComponent<IDamageable>();
         if (target == null)
         {
-             var hurtbox = other.GetComponent<Hurtbox2D>();
-             if (hurtbox != null) target = hurtbox.GetComponentInParent<IDamageable>();
+            var hurtbox = other.GetComponent<Hurtbox2D>();
+            if (hurtbox != null) target = hurtbox.GetComponentInParent<IDamageable>();
         }
 
         if (target != null)
@@ -85,28 +85,39 @@ public class FistProjectile : MonoBehaviour
 
         if (((1 << col.gameObject.layer) & groundLayers.value) != 0)
         {
-            DissolveAndDestroy();
+            DissolveAndReturn();
         }
     }
 
-    void DissolveAndDestroy()
+    void DissolveAndReturn()
     {
         if (_isDissolving) return;
         _isDissolving = true;
 
-        // Stop movement
-        if (_rb) _rb.linearVelocity = Vector2.zero;
-        
-        // Disable collider to prevent further hits
+        if (_rb)
+        {
+            _rb.linearVelocity = Vector2.zero;
+            _rb.simulated = false;
+        }
+
         if (_col) _col.enabled = false;
 
         if (_dissolveController && _dissolveSettings)
         {
-            _dissolveController.Play(_dissolveSettings, () => Destroy(gameObject));
+            _dissolveController.Play(_dissolveSettings, ReturnToPoolOrDestroy);
         }
         else
         {
-            Destroy(gameObject);
+            ReturnToPoolOrDestroy();
         }
+    }
+
+    void ReturnToPoolOrDestroy()
+    {
+        var pe = GetComponent<PooledEntity>();
+        if (pe != null)
+            pe.ReturnToPool();
+        else
+            Destroy(gameObject);
     }
 }
