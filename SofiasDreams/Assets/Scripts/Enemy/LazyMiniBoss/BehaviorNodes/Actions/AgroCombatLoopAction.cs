@@ -4,18 +4,6 @@ using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 
-/// <summary>
-/// Full agro combat loop as a single Behavior Graph action.
-///
-/// Cycle:
-///   1. If player in melee range → melee (Attack1+Attack2)
-///   2. Else → Shoot, then check melee again, then Attack3
-///   3. After one ranged cycle (Shoot + Attack3) → walk a few steps toward player
-///   4. Go to 1.
-///
-/// Every frame checks forget timer. Returns Failure when timer expires → exits agro.
-/// Stays within EnemyPatrolPath zone at all times.
-/// </summary>
 [Serializable, GeneratePropertyBag]
 [NodeDescription(
     name: "Agro Combat Loop",
@@ -35,11 +23,13 @@ public partial class AgroCombatLoopAction : Action
         Shoot,
         PreAttack3MeleeCheck,
         Attack3,
+        Attack3WaitTransition,
         Approach,
     }
 
     Phase _phase;
     float _approachUntil;
+    bool _attack3BoolReset;
 
     protected override Status OnStart()
     {
@@ -48,6 +38,7 @@ public partial class AgroCombatLoopAction : Action
         if (b == null) return Status.Failure;
 
         _phase = Phase.Decide;
+        _attack3BoolReset = false;
         return Status.Running;
     }
 
@@ -64,22 +55,15 @@ public partial class AgroCombatLoopAction : Action
 
         switch (_phase)
         {
-            case Phase.Decide:
-                return TickDecide(b);
-            case Phase.MeleeAttack1:
-                return TickMeleeAttack1(b);
-            case Phase.MeleeAttack2:
-                return TickMeleeAttack2(b);
-            case Phase.MeleeWaitEnd:
-                return TickMeleeWaitEnd(b);
-            case Phase.Shoot:
-                return TickShoot(b);
-            case Phase.PreAttack3MeleeCheck:
-                return TickPreAttack3MeleeCheck(b);
-            case Phase.Attack3:
-                return TickAttack3(b);
-            case Phase.Approach:
-                return TickApproach(b);
+            case Phase.Decide:              return TickDecide(b);
+            case Phase.MeleeAttack1:        return TickMeleeAttack1(b);
+            case Phase.MeleeAttack2:        return TickMeleeAttack2(b);
+            case Phase.MeleeWaitEnd:        return TickMeleeWaitEnd(b);
+            case Phase.Shoot:               return TickShoot(b);
+            case Phase.PreAttack3MeleeCheck:return TickPreAttack3MeleeCheck(b);
+            case Phase.Attack3:             return TickAttack3(b);
+            case Phase.Attack3WaitTransition:return TickAttack3WaitTransition(b);
+            case Phase.Approach:            return TickApproach(b);
         }
 
         return Status.Running;
@@ -96,15 +80,13 @@ public partial class AgroCombatLoopAction : Action
         b.Anim.SetAttack3(false);
     }
 
-    // ------------------------------------------------------------------
+    // --- Decide ---
 
     Status TickDecide(LazyMiniBossGraphBridge b)
     {
         b.Motor.Stop();
 
-        float dist = b.DistanceToPlayer();
-
-        if (dist <= b.Config.closeRangeThreshold)
+        if (b.DistanceToPlayer() <= b.Config.closeRangeThreshold)
         {
             StartMelee(b);
             return Status.Running;
@@ -147,9 +129,7 @@ public partial class AgroCombatLoopAction : Action
     Status TickMeleeWaitEnd(LazyMiniBossGraphBridge b)
     {
         if (b.Anim.IsInAgroMovement())
-        {
             _phase = Phase.Decide;
-        }
         return Status.Running;
     }
 
@@ -165,9 +145,7 @@ public partial class AgroCombatLoopAction : Action
     Status TickShoot(LazyMiniBossGraphBridge b)
     {
         if (b.Anim.IsInAgroMovement())
-        {
             _phase = Phase.PreAttack3MeleeCheck;
-        }
         return Status.Running;
     }
 
@@ -175,8 +153,7 @@ public partial class AgroCombatLoopAction : Action
 
     Status TickPreAttack3MeleeCheck(LazyMiniBossGraphBridge b)
     {
-        float dist = b.DistanceToPlayer();
-        if (dist <= b.Config.closeRangeThreshold)
+        if (b.DistanceToPlayer() <= b.Config.closeRangeThreshold)
         {
             StartMelee(b);
             return Status.Running;
@@ -184,19 +161,36 @@ public partial class AgroCombatLoopAction : Action
 
         b.Motor.Stop();
         b.Anim.SetAttack3(true);
+        _attack3BoolReset = false;
         _phase = Phase.Attack3;
         return Status.Running;
     }
 
-    // --- Attack3 ---
+    // --- Attack3: wait for clip to finish playing ---
 
     Status TickAttack3(LazyMiniBossGraphBridge b)
     {
-        if (b.Anim.IsInAgroMovement())
+        if (!_attack3BoolReset && b.Anim.IsInAttack3())
         {
             b.Anim.SetAttack3(false);
-            StartApproach(b);
+            _attack3BoolReset = true;
         }
+
+        if (_attack3BoolReset)
+            _phase = Phase.Attack3WaitTransition;
+
+        return Status.Running;
+    }
+
+    // --- Attack3: wait for animator to reach AgroMovement ---
+
+    Status TickAttack3WaitTransition(LazyMiniBossGraphBridge b)
+    {
+        b.Anim.SetAttack3(false);
+
+        if (b.Anim.IsInAgroMovement())
+            StartApproach(b);
+
         return Status.Running;
     }
 
@@ -210,22 +204,8 @@ public partial class AgroCombatLoopAction : Action
 
     Status TickApproach(LazyMiniBossGraphBridge b)
     {
-        if (Time.time >= _approachUntil)
-        {
-            b.Motor.Stop();
-            _phase = Phase.Decide;
-            return Status.Running;
-        }
-
-        if (b.Player == null)
-        {
-            b.Motor.Stop();
-            _phase = Phase.Decide;
-            return Status.Running;
-        }
-
-        float dist = b.DistanceToPlayer();
-        if (dist <= b.Config.closeRangeThreshold)
+        if (Time.time >= _approachUntil || b.Player == null ||
+            b.DistanceToPlayer() <= b.Config.closeRangeThreshold)
         {
             b.Motor.Stop();
             _phase = Phase.Decide;

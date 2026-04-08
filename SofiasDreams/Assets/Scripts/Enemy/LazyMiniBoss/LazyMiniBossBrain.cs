@@ -635,6 +635,7 @@ public class LazyAttackShootState : IEnemyState
 public class LazyAttackThreeState : IEnemyState
 {
     LazyMiniBossBrain _brain;
+    bool _boolReset;
     public LazyAttackThreeState(LazyMiniBossBrain brain) { _brain = brain; }
 
     public void Enter()
@@ -643,13 +644,19 @@ public class LazyAttackThreeState : IEnemyState
         _brain.Anim.SetAttack3(true);
         _brain.NextAttack3Time = Time.time + _brain.Config.attack3Cooldown;
         _brain.LastRangedWasShoot = false;
+        _boolReset = false;
     }
 
     public void Tick()
     {
-        if (_brain.Anim.IsInAgroMovement())
+        if (!_boolReset && _brain.Anim.IsInAttack3())
         {
             _brain.Anim.SetAttack3(false);
+            _boolReset = true;
+        }
+
+        if (_boolReset && _brain.Anim.IsInAgroMovement())
+        {
             _brain.ChangeState(_brain.AgroState);
         }
     }

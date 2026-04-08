@@ -14,6 +14,8 @@ public partial class Attack3Action : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
 
+    bool _boolReset;
+
     protected override Status OnStart()
     {
         if (Self.Value == null) return Status.Failure;
@@ -24,6 +26,7 @@ public partial class Attack3Action : Action
         bridge.Anim.SetAttack3(true);
         bridge.NextAttack3Time = Time.time + bridge.Config.attack3Cooldown;
         bridge.LastRangedWasShoot = false;
+        _boolReset = false;
         return Status.Running;
     }
 
@@ -32,11 +35,14 @@ public partial class Attack3Action : Action
         var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (bridge == null) return Status.Failure;
 
-        if (bridge.Anim.IsInAgroMovement())
+        if (!_boolReset && bridge.Anim.IsInAttack3())
         {
             bridge.Anim.SetAttack3(false);
-            return Status.Success;
+            _boolReset = true;
         }
+
+        if (_boolReset && bridge.Anim.IsInAgroMovement())
+            return Status.Success;
 
         return Status.Running;
     }
