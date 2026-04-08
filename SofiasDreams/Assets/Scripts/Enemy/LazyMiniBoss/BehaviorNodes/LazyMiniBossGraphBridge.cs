@@ -134,19 +134,33 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
 
     public void SpawnAttack3Projectile()
     {
+        Vector2 direction;
+        Vector3 spawnPos = _attack3Muzzle ? _attack3Muzzle.position : transform.position;
+
+        if (_config.attack3AimAtPlayer && Player != null)
+        {
+            direction = ((Vector2)Player.position - (Vector2)spawnPos).normalized;
+            if (direction.sqrMagnitude < 1e-6f)
+                direction = new Vector2(_motor.IsFacingRight ? 1 : -1, 0);
+        }
+        else
+        {
+            direction = new Vector2(_motor.IsFacingRight ? 1 : -1, 0);
+        }
+
         SpawnProjectileInternal(
             _attack3Muzzle, _attack3Pool,
-            _config.attack3ProjectilePrefab, _config.attack3ProjectileDamage, _config.attack3ProjectileSpeed);
+            _config.attack3ProjectilePrefab, _config.attack3ProjectileDamage, _config.attack3ProjectileSpeed,
+            direction);
     }
 
     void SpawnProjectileInternal(Transform muzzle, GameObjectPooler pool,
-        GameObject prefab, int damage, float speed)
+        GameObject prefab, int damage, float speed, Vector2? directionOverride = null)
     {
         if (prefab == null && pool == null) return;
 
         Vector3 spawnPos = muzzle ? muzzle.position : transform.position;
-        int dir = _motor.IsFacingRight ? 1 : -1;
-        Vector2 direction = new Vector2(dir, 0);
+        Vector2 direction = directionOverride ?? new Vector2(_motor.IsFacingRight ? 1 : -1, 0);
         Quaternion rot = Quaternion.FromToRotation(Vector3.right, (Vector3)direction);
 
         GameObject go = pool != null

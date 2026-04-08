@@ -21,7 +21,7 @@ public partial class Attack3Action : Action
         if (bridge == null) return Status.Failure;
 
         bridge.Motor.Stop();
-        bridge.Anim.TriggerAttack3();
+        bridge.Anim.SetAttack3(true);
         bridge.NextAttack3Time = Time.time + bridge.Config.attack3Cooldown;
         bridge.LastRangedWasShoot = false;
         return Status.Running;
@@ -33,8 +33,18 @@ public partial class Attack3Action : Action
         if (bridge == null) return Status.Failure;
 
         if (bridge.Anim.IsInAgroMovement())
+        {
+            bridge.Anim.SetAttack3(false);
             return Status.Success;
+        }
 
         return Status.Running;
+    }
+
+    protected override void OnEnd()
+    {
+        if (Self.Value == null) return;
+        var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
+        if (bridge != null) bridge.Anim.SetAttack3(false);
     }
 }

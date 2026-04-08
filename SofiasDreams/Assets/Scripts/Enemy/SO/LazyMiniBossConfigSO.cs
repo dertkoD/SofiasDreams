@@ -32,4 +32,6 @@ public class LazyMiniBossConfigSO : ScriptableObject
     [Min(0f)] public float attack3ProjectileSpeed = 10f;
     [Min(0)] public int attack3ProjectileDamage = 1;
     public GameObject attack3ProjectilePrefab;
+    [Tooltip("true = летит к последней позиции игрока, false = летит параллельно земле")]
+    public bool attack3AimAtPlayer = false;
 }

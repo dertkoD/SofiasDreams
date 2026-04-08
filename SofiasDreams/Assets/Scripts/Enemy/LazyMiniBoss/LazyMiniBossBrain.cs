@@ -640,7 +640,7 @@ public class LazyAttackThreeState : IEnemyState
     public void Enter()
     {
         _brain.Motor.Stop();
-        _brain.Anim.TriggerAttack3();
+        _brain.Anim.SetAttack3(true);
         _brain.NextAttack3Time = Time.time + _brain.Config.attack3Cooldown;
         _brain.LastRangedWasShoot = false;
     }
@@ -649,6 +649,7 @@ public class LazyAttackThreeState : IEnemyState
     {
         if (_brain.Anim.IsInAgroMovement())
         {
+            _brain.Anim.SetAttack3(false);
             _brain.ChangeState(_brain.AgroState);
         }
     }
@@ -661,19 +662,25 @@ public class LazyAttackThreeState : IEnemyState
         if (cfg.attack3ProjectilePrefab == null && pool == null) return;
 
         Vector3 spawnPos = muzzle ? muzzle.position : _brain.transform.position;
-        int dir = _brain.Motor.IsFacingRight ? 1 : -1;
-        Vector2 direction = new Vector2(dir, 0);
-        Quaternion rot = Quaternion.FromToRotation(Vector3.right, (Vector3)direction);
 
-        GameObject go = null;
-        if (pool != null)
+        Vector2 direction;
+        if (cfg.attack3AimAtPlayer && _brain.Player != null)
         {
-            go = pool.Get(spawnPos, rot);
+            direction = ((Vector2)_brain.Player.position - (Vector2)spawnPos).normalized;
+            if (direction.sqrMagnitude < 1e-6f)
+                direction = new Vector2(_brain.Motor.IsFacingRight ? 1 : -1, 0);
         }
         else
         {
-            go = Object.Instantiate(cfg.attack3ProjectilePrefab, spawnPos, rot);
+            int dir = _brain.Motor.IsFacingRight ? 1 : -1;
+            direction = new Vector2(dir, 0);
         }
+
+        Quaternion rot = Quaternion.FromToRotation(Vector3.right, (Vector3)direction);
+
+        GameObject go = pool != null
+            ? pool.Get(spawnPos, rot)
+            : Object.Instantiate(cfg.attack3ProjectilePrefab, spawnPos, rot);
 
         if (go)
         {
@@ -686,7 +693,10 @@ public class LazyAttackThreeState : IEnemyState
         }
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        _brain.Anim.SetAttack3(false);
+    }
 }
 
 public class LazyDeadState : IEnemyState

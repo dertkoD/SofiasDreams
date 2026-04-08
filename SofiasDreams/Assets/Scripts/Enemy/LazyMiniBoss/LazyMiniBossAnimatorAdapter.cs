@@ -12,7 +12,7 @@ public class LazyMiniBossAnimatorAdapter : MonoBehaviour
     [SerializeField] string _attack1Bool = "Attack1";
     [SerializeField] string _attack2Bool = "Attack2";
     [SerializeField] string _shootTrigger = "Shoot";
-    [SerializeField] string _attack3Trigger = "Attack3";
+    [SerializeField] string _attack3Bool = "Attack3";
 
     // State Names (for checking current state)
     [SerializeField] string _patrolMovementState = "PatrolMovement";
@@ -32,7 +32,7 @@ public class LazyMiniBossAnimatorAdapter : MonoBehaviour
     int _attack1Hash;
     int _attack2Hash;
     int _shootHash;
-    int _attack3Hash;
+    int _attack3BoolHash;
 
     void Awake()
     {
@@ -45,7 +45,7 @@ public class LazyMiniBossAnimatorAdapter : MonoBehaviour
         _attack1Hash = Animator.StringToHash(_attack1Bool);
         _attack2Hash = Animator.StringToHash(_attack2Bool);
         _shootHash = Animator.StringToHash(_shootTrigger);
-        _attack3Hash = Animator.StringToHash(_attack3Trigger);
+        _attack3BoolHash = Animator.StringToHash(_attack3Bool);
     }
 
     public void SetXVelocity(float value)
@@ -83,9 +83,9 @@ public class LazyMiniBossAnimatorAdapter : MonoBehaviour
         if (_animator) _animator.SetTrigger(_shootHash);
     }
 
-    public void TriggerAttack3()
+    public void SetAttack3(bool value)
     {
-        if (_animator) _animator.SetTrigger(_attack3Hash);
+        if (_animator) _animator.SetBool(_attack3BoolHash, value);
     }
 
     public bool IsInState(string stateName)
