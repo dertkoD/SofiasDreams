@@ -36,7 +36,7 @@ public partial class TriggerPatrolAction : Action
             : bridge.Anim.IsInSleep() || bridge.Anim.IsInPatrolMovement();
 
         if (arrived)
-            return Status.Failure;
+            return Status.Success;
 
         return Status.Running;
     }

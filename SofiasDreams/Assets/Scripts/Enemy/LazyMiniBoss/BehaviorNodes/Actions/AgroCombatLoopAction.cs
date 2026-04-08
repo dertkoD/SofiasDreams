@@ -57,7 +57,7 @@ public partial class AgroCombatLoopAction : Action
         if (b == null) return Status.Failure;
 
         if (b.ForgetTimer <= 0 && !b.SeesPlayer())
-            return Status.Failure;
+            return Status.Success;
 
         b.FacePlayer();
         b.ClampToZone();
