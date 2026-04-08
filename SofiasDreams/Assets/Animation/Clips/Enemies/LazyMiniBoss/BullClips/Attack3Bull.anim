@@ -116,7 +116,8 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 2.3166666
-    functionName: AnimationEvent_SpawnProjectile
+  functionName: SpawnAttack3Projectile
+
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

@@ -11,6 +11,7 @@ public class EnemyFacade : MonoBehaviour
     [SerializeField] WormBrain _wormBrain;
     [SerializeField] SwarmEnemyBrain _swarmBrain;
     [SerializeField] LazyMiniBossBrain _lazyMiniBossBrain;
+    [SerializeField] LazyMiniBossGraphBridge _lazyMiniBossGraphBridge;
 
     EnemyConfigSO _config;
 
@@ -43,6 +44,7 @@ public class EnemyFacade : MonoBehaviour
         if (_wormBrain) _wormBrain.PatrolPath = path;
         if (_swarmBrain) _swarmBrain.SetPatrolPath(path);
         if (_lazyMiniBossBrain) _lazyMiniBossBrain.PatrolPath = path;
+        if (_lazyMiniBossGraphBridge) _lazyMiniBossGraphBridge.SetPatrolPath(path);
     }
     
     public void ApplyDamage(DamageInfo info)
