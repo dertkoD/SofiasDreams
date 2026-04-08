@@ -45,6 +45,9 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
     public float ZoneMaxX { get; private set; }
     public bool ZoneReady { get; private set; }
 
+    public Vector3 SpawnPosition { get; private set; }
+    public int SpawnFacingSign { get; private set; }
+
     void Awake()
     {
         if (!_graphAgent) _graphAgent = GetComponent<BehaviorGraphAgent>();
@@ -58,6 +61,9 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
 
     void Start()
     {
+        SpawnPosition = transform.position;
+        SpawnFacingSign = (_config != null && _config.spawnFacingLeft) ? -1 : 1;
+
         if (_config != null && _config.spawnFacingLeft)
             _motor.Face(-1);
 

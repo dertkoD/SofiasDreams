@@ -15,6 +15,8 @@ public class LazyMiniBossConfigSO : ScriptableObject
     [Header("Agro Movement")]
     [Min(0f)] public float agroRunSpeed = 4f;
     [Min(0f)] public float agroForgetSeconds = 3.0f;
+    [Tooltip("Секунды движения к игроку после цикла дальних атак (Shoot + Attack3)")]
+    [Min(0f)] public float agroApproachDuration = 0.8f;
 
     [Header("Combat")]
     [Min(0f)] public float closeRangeThreshold = 2.0f;
