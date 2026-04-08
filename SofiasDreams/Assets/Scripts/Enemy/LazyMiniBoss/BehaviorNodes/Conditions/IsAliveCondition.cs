@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Is Alive",
-    story: "[Self] is alive",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb09")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Is Alive", story: "[Self] is alive", category: "Conditions", id: "37e8bc8e49eaee4a9b99131ee43d31ed")]
 public partial class IsAliveCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

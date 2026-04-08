@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Player In Shoot Range",
-    story: "[Self] player in shoot range",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb03")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Player In Shoot Range", story: "[Self] player in shoot range", category: "Conditions", id: "82bf2bce142e0904d1186784fbbee0cf")]
 public partial class PlayerInShootRangeCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

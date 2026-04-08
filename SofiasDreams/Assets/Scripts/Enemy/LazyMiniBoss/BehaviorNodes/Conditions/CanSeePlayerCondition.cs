@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Can See Player",
-    story: "[Self] can see player",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb01")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Can See Player", story: "[Self] can see player", category: "Conditions", id: "058b006d54b9fc040043e486294cd701")]
 public partial class CanSeePlayerCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

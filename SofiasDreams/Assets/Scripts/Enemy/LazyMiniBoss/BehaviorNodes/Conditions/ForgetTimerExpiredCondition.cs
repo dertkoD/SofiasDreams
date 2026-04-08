@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Forget Timer Expired",
-    story: "[Self] forget timer expired",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb07")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Forget Timer Expired", story: "[Self] forget timer expired", category: "Conditions", id: "9c2e2966abc87c073b24d6e296963991")]
 public partial class ForgetTimerExpiredCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Last Ranged Was Shoot",
-    story: "[Self] last ranged was shoot",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb08")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Last Ranged Was Shoot", story: "[Self] last ranged was shoot", category: "Conditions", id: "d6130c9b3c740ad9c1760f7087030f35")]
 public partial class LastRangedWasShootCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

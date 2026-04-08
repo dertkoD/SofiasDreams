@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Shoot Cooldown Ready",
-    story: "[Self] shoot cooldown ready",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb05")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Shoot Cooldown Ready", story: "[Self] shoot cooldown ready", category: "Conditions", id: "cebe5eb8b0caf6ce42f1a58809067405")]
 public partial class ShootCooldownReadyCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;

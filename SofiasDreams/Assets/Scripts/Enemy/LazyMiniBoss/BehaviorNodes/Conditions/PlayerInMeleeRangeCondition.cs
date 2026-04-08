@@ -1,14 +1,9 @@
 using System;
 using Unity.Behavior;
-using Unity.Properties;
 using UnityEngine;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(
-    name: "Player In Melee Range",
-    story: "[Self] player in melee range",
-    category: "Condition/LazyMiniBoss",
-    id: "a1b2c3d4e5f60001000000000000bb02")]
+[Serializable, Unity.Properties.GeneratePropertyBag]
+[Condition(name: "Player In Melee Range", story: "[Self] player in melee range", category: "Conditions", id: "2c85e318712541fac6fd6f809f9e9c8a")]
 public partial class PlayerInMeleeRangeCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<GameObject> Self;
