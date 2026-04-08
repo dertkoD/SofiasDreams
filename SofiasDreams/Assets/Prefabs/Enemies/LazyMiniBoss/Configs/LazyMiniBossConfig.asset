@@ -20,12 +20,12 @@ MonoBehaviour:
   agroRunSpeed: 2
   agroForgetSeconds: 3
   agroApproachDuration: 0.8
-  closeRangeThreshold: 9.72
+  closeRangeThreshold: 6.04
   meleeAttackCooldown: 2
   shootAttackCooldown: 3
   attack3Cooldown: 3
-  shootRangeMin: 9.72
-  projectileSpeed: 15
+  shootRangeMin: 6.04
+  projectileSpeed: 20
   projectileDamage: 1
   projectilePrefab: {fileID: 9070739300854532536, guid: 1d84188b247dd834980ccaa4f172f5c0, type: 3}
   attack3ProjectileSpeed: 15
