@@ -1,12 +1,6 @@
 using Unity.Behavior;
 using UnityEngine;
 
-/// <summary>
-/// Sits on the same GameObject as BehaviorGraphAgent and the existing components.
-/// Keeps Blackboard variables in sync with the live MonoBehaviour state every frame.
-/// The Behavior Graph reads/writes these variables; this bridge pushes results
-/// back to the real components (Motor, Anim, etc.).
-/// </summary>
 public class LazyMiniBossGraphBridge : MonoBehaviour
 {
     [Header("Refs (auto-filled if empty)")]
@@ -26,7 +20,6 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
     [SerializeField] Transform _attack3Muzzle;
     [SerializeField] GameObjectPooler _attack3Pool;
 
-    // Accessors for action nodes
     public LazyMiniBossMotor2D Motor => _motor;
     public LazyMiniBossAnimatorAdapter Anim => _anim;
     public VisionCone2D Vision => _vision;
@@ -39,7 +32,6 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
     public GameObjectPooler Attack3Pool => _attack3Pool;
     public BehaviorGraphAgent GraphAgent => _graphAgent;
 
-    // Runtime state shared between nodes via the bridge (not the Blackboard)
     public Transform Player { get; set; }
     public Vector2 LastSeenPos { get; set; }
     public bool HasSeenPlayer { get; set; }
@@ -49,7 +41,6 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
     public float NextAttack3Time { get; set; }
     public bool LastRangedWasShoot { get; set; }
 
-    // Zone bounds calculated from patrol path
     public float ZoneMinX { get; private set; }
     public float ZoneMaxX { get; private set; }
     public bool ZoneReady { get; private set; }
@@ -61,6 +52,8 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         if (!_anim) _anim = GetComponent<LazyMiniBossAnimatorAdapter>();
         if (!_vision) _vision = GetComponentInChildren<VisionCone2D>();
         if (!_health) _health = GetComponent<Health>();
+
+        EnsureAnimEventForwarder();
     }
 
     void Start()
@@ -77,6 +70,15 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         Anim.SetXVelocity(Mathf.Abs(Motor.Velocity.x));
     }
 
+    /// <summary>
+    /// Called from EnemyFacade.SetPatrolPath at runtime.
+    /// </summary>
+    public void SetPatrolPath(EnemyPatrolPath path)
+    {
+        _patrolPath = path;
+        RecalcZoneBoundsFromPath();
+    }
+
     void UpdateVision()
     {
         if (_vision != null && _vision.TryGetClosestTarget(out Transform target))
@@ -84,7 +86,8 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
             Player = target;
             LastSeenPos = target.position;
             HasSeenPlayer = true;
-            ForgetTimer = _config.agroForgetSeconds;
+            if (_config != null)
+                ForgetTimer = _config.agroForgetSeconds;
         }
         else
         {
@@ -119,6 +122,8 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         pos.x = Mathf.Clamp(pos.x, ZoneMinX, ZoneMaxX);
         transform.position = pos;
     }
+
+    // --- Projectile spawning ---
 
     public void SpawnShootProjectile()
     {
@@ -159,7 +164,8 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         }
     }
 
-    // Animation event receivers — same names as in LazyMiniBossBrain so the same clips work
+    // --- Animation event receivers (called on THIS object) ---
+
     public void AnimationEvent_SpawnShootProjectile() => SpawnShootProjectile();
     public void AnimationEvent_SpawnAttack3Projectile() => SpawnAttack3Projectile();
     public void AnimationEvent_SpawnProjectile()
@@ -167,6 +173,8 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         if (Anim.IsInShoot()) SpawnShootProjectile();
         else if (Anim.IsInAttack3()) SpawnAttack3Projectile();
     }
+
+    // --- Zone ---
 
     void RecalcZoneBoundsFromPath()
     {
@@ -187,5 +195,20 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
         ZoneMinX = minX - pad;
         ZoneMaxX = maxX + pad;
         ZoneReady = true;
+    }
+
+    /// <summary>
+    /// The Animator lives on a child object. Animation events fire on that child.
+    /// This auto-adds a small forwarder script to the child so events reach this bridge.
+    /// </summary>
+    void EnsureAnimEventForwarder()
+    {
+        Animator animator = GetComponentInChildren<Animator>();
+        if (animator == null || animator.gameObject == gameObject) return;
+
+        var fwd = animator.gameObject.GetComponent<LazyBossAnimEventForwarder>();
+        if (fwd == null)
+            fwd = animator.gameObject.AddComponent<LazyBossAnimEventForwarder>();
+        fwd.SetBridge(this);
     }
 }

@@ -16,15 +16,16 @@ public partial class AgroChaseAction : Action
 
     protected override Status OnStart()
     {
-        return Status.Running;
-    }
-
-    protected override Status OnUpdate()
-    {
         if (Self.Value == null) return Status.Failure;
         var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (bridge == null) return Status.Failure;
 
+        DoChase(bridge);
+        return Status.Success;
+    }
+
+    static void DoChase(LazyMiniBossGraphBridge bridge)
+    {
         bridge.FacePlayer();
         bridge.ClampToZone();
 
@@ -50,14 +51,5 @@ public partial class AgroChaseAction : Action
         {
             bridge.Motor.Stop();
         }
-
-        return Status.Running;
-    }
-
-    protected override void OnEnd()
-    {
-        if (Self.Value == null) return;
-        var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
-        if (bridge != null) bridge.Motor.Stop();
     }
 }
