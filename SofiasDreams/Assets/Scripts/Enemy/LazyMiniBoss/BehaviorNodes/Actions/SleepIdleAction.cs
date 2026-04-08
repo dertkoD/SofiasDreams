@@ -30,6 +30,9 @@ public partial class SleepIdleAction : Action
         var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (bridge == null) return Status.Failure;
 
+        if (bridge.Health != null && !((IHealth)bridge.Health).IsAlive)
+            return Status.Failure;
+
         bridge.ClampToZone();
 
         if (bridge.SeesPlayer())

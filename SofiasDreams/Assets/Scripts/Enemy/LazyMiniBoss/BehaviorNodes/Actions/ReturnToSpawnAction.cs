@@ -40,6 +40,9 @@ public partial class ReturnToSpawnAction : Action
         var b = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (b == null) return Status.Failure;
 
+        if (b.Health != null && !((IHealth)b.Health).IsAlive)
+            return Status.Failure;
+
         float dx = b.SpawnPosition.x - b.transform.position.x;
         if (Mathf.Abs(dx) < 0.15f)
         {

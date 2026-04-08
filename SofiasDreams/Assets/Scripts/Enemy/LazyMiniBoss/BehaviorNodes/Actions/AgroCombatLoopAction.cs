@@ -47,6 +47,9 @@ public partial class AgroCombatLoopAction : Action
         var b = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (b == null) return Status.Failure;
 
+        if (b.Health != null && !((IHealth)b.Health).IsAlive)
+            return Status.Failure;
+
         if (b.ForgetTimer <= 0 && !b.SeesPlayer())
             return Status.Success;
 

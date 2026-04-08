@@ -36,6 +36,9 @@ public partial class PatrolWalkAction : Action
 
         bridge.ClampToZone();
 
+        if (bridge.Health != null && !((IHealth)bridge.Health).IsAlive)
+            return Status.Failure;
+
         if (bridge.SeesPlayer())
             return Status.Success;
 

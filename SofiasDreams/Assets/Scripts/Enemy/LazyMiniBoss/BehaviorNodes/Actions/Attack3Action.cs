@@ -35,6 +35,9 @@ public partial class Attack3Action : Action
         var bridge = Self.Value.GetComponent<LazyMiniBossGraphBridge>();
         if (bridge == null) return Status.Failure;
 
+        if (bridge.Health != null && !((IHealth)bridge.Health).IsAlive)
+            return Status.Failure;
+
         if (!_boolReset && bridge.Anim.IsInAttack3())
         {
             bridge.Anim.SetAttack3(false);
