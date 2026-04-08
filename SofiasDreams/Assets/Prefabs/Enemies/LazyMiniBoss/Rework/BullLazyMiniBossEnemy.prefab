@@ -286,6 +286,7 @@ MonoBehaviour:
   _wormBrain: {fileID: 0}
   _swarmBrain: {fileID: 0}
   _lazyMiniBossBrain: {fileID: 8805173338956872490}
+  _lazyMiniBossGraphBridge: {fileID: 3843670223799887389}
 --- !u!114 &8805173338956872490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -345,7 +346,7 @@ MonoBehaviour:
   _attack1Bool: Attack1
   _attack2Bool: Attack2
   _shootTrigger: Shoot
-  _attack3Trigger: Attack3
+  _attack3Bool: Attack3
   _patrolMovementState: PatrolMovement
   _sleepState: Sleep
   _agroMovementState: AgroMovement

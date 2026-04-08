@@ -19,6 +19,7 @@ MonoBehaviour:
   waypointArriveDistance: 0.2
   agroRunSpeed: 2
   agroForgetSeconds: 3
+  agroApproachDuration: 0.8
   closeRangeThreshold: 9.72
   meleeAttackCooldown: 2
   shootAttackCooldown: 3
@@ -30,3 +31,4 @@ MonoBehaviour:
   attack3ProjectileSpeed: 15
   attack3ProjectileDamage: 1
   attack3ProjectilePrefab: {fileID: 9070739300854532536, guid: eb644273753c3b24383c4bf79a1b3fc4, type: 3}
+  attack3AimAtPlayer: 1
