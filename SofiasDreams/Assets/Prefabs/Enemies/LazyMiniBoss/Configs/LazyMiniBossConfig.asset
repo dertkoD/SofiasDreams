@@ -24,9 +24,9 @@ MonoBehaviour:
   shootAttackCooldown: 3
   attack3Cooldown: 3
   shootRangeMin: 9.72
-  projectileSpeed: 10
+  projectileSpeed: 15
   projectileDamage: 1
   projectilePrefab: {fileID: 9070739300854532536, guid: 1d84188b247dd834980ccaa4f172f5c0, type: 3}
-  attack3ProjectileSpeed: 10
+  attack3ProjectileSpeed: 15
   attack3ProjectileDamage: 1
   attack3ProjectilePrefab: {fileID: 9070739300854532536, guid: eb644273753c3b24383c4bf79a1b3fc4, type: 3}
