@@ -224,8 +224,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             }
             else
             {
-                if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
-                    Block(MobilityBlockReason.Attack);
+                _jumpAttack.Request(AttackMode.DaggerFlyUp);
             }
             return;
         }

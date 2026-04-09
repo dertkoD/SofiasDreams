@@ -22,7 +22,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     Coroutine _slowFallCo;
     bool _slowFallActive;
 
-    bool _airFreezeUsedThisJump;
     bool _airFreezeActiveNow;
     bool _parryFreezeActive;
 
@@ -281,7 +280,7 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
         kb.Apply(info);
     }
 
-    // ───── Air attack freeze (once per jump) ─────
+    // ───── Air attack gravity ─────
 
     static bool IsDaggerAirMode(AttackMode m) =>
         m is AttackMode.DaggerFlyUp or AttackMode.DaggerFlyDown;
@@ -290,17 +289,15 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!IsDaggerAirMode(s.mode) || !rb) return;
 
-        if (_airFreezeUsedThisJump) return;
-
-        _airFreezeUsedThisJump = true;
         _airFreezeActiveNow = true;
 
         StopSlowFall();
 
-        rb.gravityScale = 0f;
-        rb.linearVelocity = Vector2.zero;
+        float scale = _cfg ? _cfg.airAttackGravityScale : 0f;
+        rb.gravityScale = scale;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
 
-        Debug.Log("[DaggerCombat] Air-freeze ON (first air attack this jump)");
+        Debug.Log($"[DaggerCombat] Air-attack gravity ON, gravityScale={scale}");
     }
 
     void OnAirAttackFinished(AttackFinished s)
@@ -319,7 +316,6 @@ public class DaggerCombat : MonoBehaviour, IInitializable, IDisposable
     {
         if (!g.grounded) return;
 
-        _airFreezeUsedThisJump = false;
         _airFreezeActiveNow = false;
         _parryFreezeActive = false;
 
