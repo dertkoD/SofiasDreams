@@ -16,9 +16,10 @@ MonoBehaviour:
   damage2: 1
   superDamage: 1
   chargedCooldown: 1.5
-  playerLaunchForce: 15
-  floatGravityScale: 0.1
-  floatGravityDuration: 1
+  playerLaunchForce: 17.5
+  floatGravityScale: 0.3
+  floatGravityDuration: 0.5
+  airAttackGravityScale: 0.5
   segmentsPerLevel: 5
   maxLevels: 2
   speedBonusPerLevel: 0.2
