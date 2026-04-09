@@ -11,13 +11,19 @@ public class SwordAttackConfig : ScriptableObject
     [Tooltip("Upward impulse applied when down-air hits an enemy")]
     public float pogoForce = 12f;
 
+    [Header("Combo timing")]
+    [Tooltip("Extra time window (seconds) after 2nd hit animation event to still register the 3rd hit")]
+    [Min(0)] public float comboFinisherBuffer = 0.15f;
+    [Tooltip("Cooldown (seconds) after the 3rd combo hit before a new combo can start")]
+    [Min(0)] public float comboCooldown = 0.5f;
+
     [Header("Charged attack")]
     [Tooltip("How long the attack button must be held to charge")]
     public float chargeTime = 0.6f;
 
-    [Tooltip("Max hits a single enemy can take during charged attack")]
+    [Tooltip("Total hits dealt to an enemy on a charged attack hit (including the first)")]
     [Min(1)] public int chargedMaxHits = 3;
 
-    [Tooltip("Total active hitbox duration of the charged attack (seconds)")]
-    public float chargedHitDuration = 4f;
+    [Tooltip("Delay (seconds) between each extra hit after the first")]
+    [Min(0)] public float chargedHitInterval = 0.15f;
 }
