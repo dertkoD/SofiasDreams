@@ -16,7 +16,7 @@ MonoBehaviour:
   damage2: 1
   superDamage: 1
   chargedCooldown: 1.5
-  playerLaunchForce: 20
+  playerLaunchForce: 15
   floatGravityScale: 0.1
   floatGravityDuration: 1
   segmentsPerLevel: 5
@@ -24,6 +24,8 @@ MonoBehaviour:
   speedBonusPerLevel: 0.2
   normalHitSegments: 0
   backstabSegments: 1
+  airHitSegments: 1
+  chargedHitSegments: 1
   parrySegments: 5
   decayDelay: 10
   decayRate: 10
