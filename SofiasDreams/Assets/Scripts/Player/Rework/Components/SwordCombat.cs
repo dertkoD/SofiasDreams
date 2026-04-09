@@ -296,21 +296,17 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     void StopAllExtraHits()
     {
         _superActive = false;
-        foreach (var co in _extraHitRoutines.Values)
-            if (co != null) StopCoroutine(co);
-        _extraHitRoutines.Clear();
     }
 
     IEnumerator ExtraHitsRoutine(IDamageable target, Collider2D hurtboxCol)
     {
         int extraHits = (_cfg != null ? _cfg.chargedMaxHits : 3) - 1;
-        float interval = (_cfg != null ? _cfg.chargedHitDuration : 4f) / (_cfg != null ? _cfg.chargedMaxHits : 3);
+        float interval = _cfg != null ? _cfg.chargedHitInterval : 0.15f;
 
         for (int i = 0; i < extraHits; i++)
         {
             yield return new WaitForSeconds(interval);
 
-            if (!_superActive) yield break;
             if (!target.IsAlive) yield break;
 
             swordWeapon.DealDamage(target, hurtboxCol, bypassInvuln: true);
