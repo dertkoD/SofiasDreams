@@ -216,7 +216,15 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
 
         if (_weaponManager.CurrentWeapon == WeaponType.Dagger)
         {
-            if (!_jumper.IsGrounded)
+            if (_jumper.IsGrounded)
+            {
+                if (!_daggerCombat.IsChargedReady) return;
+                _mover.StopHorizontal();
+                Block(MobilityBlockReason.Attack);
+                _daggerCombat.RequestChargedAttack();
+                _state = PlayerState.Attack;
+            }
+            else
             {
                 if (_jumpAttack.Request(AttackMode.DaggerFlyUp))
                     Block(MobilityBlockReason.Attack);
@@ -434,12 +442,7 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
         switch (_weaponManager.CurrentWeapon)
         {
             case WeaponType.Dagger:
-                if (!_daggerCombat.IsChargedReady) return;
-                _mover.StopHorizontal();
-                Block(MobilityBlockReason.Attack);
-                _daggerCombat.RequestChargedAttack();
-                _state = PlayerState.Attack;
-                break;
+                return;
 
             case WeaponType.Sword:
                 if (_jumper.IsGrounded) _mover.StopHorizontal();
