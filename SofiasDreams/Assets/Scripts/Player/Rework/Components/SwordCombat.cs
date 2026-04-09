@@ -24,6 +24,9 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     bool _dashAttackBuffered;
     bool _isDashing;
 
+    float _finisherBufferTimer;
+    float _comboCooldownTimer;
+
     // ───── Multi-hit (charged attack extra ticks) ─────
     bool _superActive;
     readonly Dictionary<IDamageable, Coroutine> _extraHitRoutines = new();
@@ -68,6 +71,9 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     void Update()
     {
+        if (_comboCooldownTimer > 0f)
+            _comboCooldownTimer -= Time.deltaTime;
+
         if (_input == null || _weaponManager == null)
         {
             Debug.LogWarning($"[SwordCombat] Update skip: _input={_input != null}, _weaponManager={_weaponManager != null}");
@@ -83,6 +89,20 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             {
                 _dashAttackBuffered = true;
                 Debug.Log($"[SwordCombat] BUFFERED via Update! AttackPressed={pressed}, AttackHeld={held2}");
+            }
+        }
+
+        if (_finisherBufferTimer > 0f)
+        {
+            _finisherBufferTimer -= Time.deltaTime;
+            if (_queued)
+            {
+                _finisherBufferTimer = 0f;
+                AdvanceComboStep();
+            }
+            else if (_finisherBufferTimer <= 0f)
+            {
+                FinishSwordStep();
             }
         }
 
@@ -138,6 +158,8 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     public void RequestAttack()
     {
+        if (_comboCooldownTimer > 0f) return;
+
         if (_attacking) { if (_step < 3) _queued = true; return; }
 
         _attacking = true;
@@ -149,6 +171,8 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
 
     public void Interrupt()
     {
+        _finisherBufferTimer = 0f;
+
         if (_activeSuperMode.HasValue)
         {
             var mode = _activeSuperMode.Value;
@@ -184,9 +208,23 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
     public void FinishFromSwordAnimation()
     {
         if (!_attacking) return;
-        if (!_queued || _step >= 3) return;
+        if (_step >= 3) return;
 
-        AdvanceComboStep();
+        if (_queued)
+        {
+            AdvanceComboStep();
+            return;
+        }
+
+        if (_step == 2)
+        {
+            float buf = _cfg != null ? _cfg.comboFinisherBuffer : 0.15f;
+            if (buf > 0f)
+            {
+                _finisherBufferTimer = buf;
+                return;
+            }
+        }
     }
 
     public void FinishSwordStep()
@@ -199,10 +237,14 @@ public class SwordCombat : MonoBehaviour, IInitializable, IDisposable
             return;
         }
 
+        bool wasFinisher = _step >= 3;
         _attacking = false;
         ResetKnockback();
         _bus.Fire(new AttackFinished { mode = AttackMode.SwordCombo, index = _step });
         _step = 0;
+
+        if (wasFinisher)
+            _comboCooldownTimer = _cfg != null ? _cfg.comboCooldown : 0.5f;
     }
 
     void AdvanceComboStep()
