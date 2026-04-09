@@ -219,8 +219,6 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
             if (_jumper.IsGrounded)
             {
                 if (!_daggerCombat.IsChargedReady) return;
-                _mover.StopHorizontal();
-                Block(MobilityBlockReason.Attack);
                 _daggerCombat.RequestChargedAttack();
                 _state = PlayerState.Attack;
             }
@@ -564,7 +562,6 @@ public class PlayerStateMachine : IPlayerCommands, IInitializable, IDisposable, 
                 _anim.PlayDaggerAttack(s.index);
                 break;
             case AttackMode.DaggerSuper:
-                Block(MobilityBlockReason.Attack);
                 _anim.PlayDaggerSuperAttack();
                 break;
             case AttackMode.DaggerFlyUp:
