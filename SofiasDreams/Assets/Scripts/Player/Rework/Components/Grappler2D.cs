@@ -24,6 +24,18 @@ public class Grappler2D : MonoBehaviour, IGrappler
     bool      _gravityOverridden;
     Coroutine _routine;
 
+    [Header("Safety")]
+    [Tooltip("Extra seconds added on top of the expected zip duration before the zip is force-aborted. Prevents the player from getting stuck when a grapple point is partially behind geometry.")]
+    [Min(0f)] [SerializeField] float zipTimeoutExtra = 0.75f;
+    [Tooltip("Multiplier over expected zip duration (distance / moveSpeed) before the zip is force-aborted.")]
+    [Min(1f)] [SerializeField] float zipTimeoutMultiplier = 2.5f;
+    [Tooltip("If the squared distance to the target does not shrink by at least this value for several fixed updates, the zip is considered blocked and aborted.")]
+    [Min(0f)] [SerializeField] float zipProgressEpsilon = 0.0001f;
+    [Tooltip("How many consecutive FixedUpdate steps with no progress are allowed before the zip is force-aborted.")]
+    [Min(1)]  [SerializeField] int zipStagnationFrames = 12;
+    [Tooltip("Hard cap on total routine time (zip + exit blend). Always unblocks the player if exceeded. Set to 0 to disable.")]
+    [Min(0f)] [SerializeField] float routineHardTimeout = 4.0f;
+
     [Header("Grapple Point Light")]
     [SerializeField] float highlightScanInterval = 0.10f;
 
@@ -296,6 +308,16 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         rb.linearVelocity = Vector2.zero;
 
+        // Global watchdog: always releases the player no matter what path
+        // the routine takes (zip, exit blend, guard window). Without this
+        // the player could get stuck in the Grapple state forever if the
+        // zip loop was blocked by a collider.
+        float routineStartTime = Time.time;
+        if (routineHardTimeout > 0f)
+        {
+            StartCoroutine(RoutineWatchdog(routineStartTime, routineHardTimeout));
+        }
+
         if (_s.startupDelay > 0f)
         {
             float t = 0f;
@@ -308,6 +330,7 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         Vector2 startPos = rb.position;
         Vector2 toTargetStart = target - startPos;
+        float startDist = toTargetStart.magnitude;
 
         _savedTravelDir = toTargetStart.sqrMagnitude > 1e-6f
             ? toTargetStart.normalized
@@ -319,7 +342,19 @@ public class Grappler2D : MonoBehaviour, IGrappler
         stopSqr *= stopSqr;
         float dt = Time.fixedDeltaTime;
 
-        // zip
+        // Compute a safe upper bound for the zip duration. The zip is a
+        // straight-line MovePosition at moveSpeed, so (startDist / moveSpeed)
+        // is the expected nominal duration. We multiply and add slack so
+        // normal zips are never aborted, only truly stuck ones.
+        float nominalZipTime = _s.moveSpeed > 0.01f ? startDist / _s.moveSpeed : 1f;
+        float zipTimeout = Mathf.Max(0.25f, nominalZipTime * Mathf.Max(1f, zipTimeoutMultiplier) + Mathf.Max(0f, zipTimeoutExtra));
+
+        float zipElapsed = 0f;
+        float lastD2 = float.PositiveInfinity;
+        int stagnantFrames = 0;
+        int stagnationLimit = Mathf.Max(1, zipStagnationFrames);
+        float progressEps = Mathf.Max(0f, zipProgressEpsilon);
+
         while (true)
         {
             Vector2 pos = rb.position;
@@ -327,12 +362,32 @@ public class Grappler2D : MonoBehaviour, IGrappler
             float d2 = to.sqrMagnitude;
             if (d2 <= stopSqr) break;
 
+            // Stagnation check: if we are not making forward progress for
+            // several fixed updates in a row, the path is physically blocked
+            // (e.g. the grapple point is right next to a wall). Bail out.
+            if (lastD2 - d2 < progressEps)
+            {
+                stagnantFrames++;
+                if (stagnantFrames >= stagnationLimit)
+                    break;
+            }
+            else
+            {
+                stagnantFrames = 0;
+            }
+            lastD2 = d2;
+
             Vector2 dir = to.normalized;
             float step = _s.moveSpeed * dt;
             float dist = Mathf.Sqrt(d2);
             if (step > dist) step = dist;
 
             rb.MovePosition(pos + dir * step);
+
+            zipElapsed += dt;
+            if (zipElapsed >= zipTimeout)
+                break;
+
             yield return new WaitForFixedUpdate();
         }
 
@@ -465,6 +520,42 @@ public class Grappler2D : MonoBehaviour, IGrappler
 
         ReleaseLatchedPoint(rescanCandidates: true);
         _routine = null;
+    }
+
+    /// <summary>
+    /// Last-resort safety net. If the main grapple routine has not
+    /// completed after <paramref name="limit"/> seconds (for any reason —
+    /// physics wedge, NaN input, coroutine race, etc.) we forcibly release
+    /// the player so they never stay frozen on a grapple point.
+    /// </summary>
+    IEnumerator RoutineWatchdog(float startTime, float limit)
+    {
+        while (_isGrappling && Time.time - startTime < limit)
+            yield return null;
+
+        if (!_isGrappling) yield break;
+
+        Debug.LogWarning("[Grappler2D] Routine watchdog fired — force-releasing grapple.");
+
+        if (_routine != null)
+        {
+            StopCoroutine(_routine);
+            _routine = null;
+        }
+
+        if (_gravityOverridden && rb)
+        {
+            rb.gravityScale = _originalGravity;
+            _gravityOverridden = false;
+        }
+
+        _gate?.UnblockMovement(MobilityBlockReason.Grapple);
+        _gate?.UnblockJump(MobilityBlockReason.Grapple);
+
+        _isGrappling = false;
+        _bus?.Fire(new GrappleFinished { interrupted = true });
+
+        ReleaseLatchedPoint(rescanCandidates: true);
     }
 
 #if UNITY_EDITOR
