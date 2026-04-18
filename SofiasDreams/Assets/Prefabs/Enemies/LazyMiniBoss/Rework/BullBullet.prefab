@@ -314,9 +314,9 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 128
-  speed: 0
-  travelTime: 1
-  arcHeight: 3
+  speed: 14
+  travelTime: 2
+  arcHeight: 1
   rotateTowardsVelocity: 1
   _dissolveSettings: {fileID: 11400000, guid: c40af5cea2564434e86d2deab58e1a98, type: 2}
 --- !u!114 &3851364739468567059
