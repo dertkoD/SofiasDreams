@@ -670,18 +670,25 @@ public class LazyAttackThreeState : IEnemyState
 
         Vector3 spawnPos = muzzle ? muzzle.position : _brain.transform.position;
 
-        Vector2 direction;
-        if (cfg.attack3AimAtPlayer && _brain.Player != null)
+        Vector2 aimPoint;
+        if (cfg.attack3AimAtPlayer)
         {
-            direction = ((Vector2)_brain.Player.position - (Vector2)spawnPos).normalized;
-            if (direction.sqrMagnitude < 1e-6f)
-                direction = new Vector2(_brain.Motor.IsFacingRight ? 1 : -1, 0);
+            if (_brain.HasSeenPlayer)
+                aimPoint = _brain.LastSeenPos;
+            else if (_brain.Player != null)
+                aimPoint = _brain.Player.position;
+            else
+                aimPoint = (Vector2)spawnPos + new Vector2(_brain.Motor.IsFacingRight ? 5f : -5f, 0f);
         }
         else
         {
-            int dir = _brain.Motor.IsFacingRight ? 1 : -1;
-            direction = new Vector2(dir, 0);
+            aimPoint = (Vector2)spawnPos + new Vector2(_brain.Motor.IsFacingRight ? 5f : -5f, 0f);
         }
+
+        Vector2 direction = aimPoint - (Vector2)spawnPos;
+        if (direction.sqrMagnitude < 1e-6f)
+            direction = new Vector2(_brain.Motor.IsFacingRight ? 1 : -1, 0);
+        direction.Normalize();
 
         Quaternion rot = Quaternion.FromToRotation(Vector3.right, (Vector3)direction);
 
@@ -689,14 +696,21 @@ public class LazyAttackThreeState : IEnemyState
             ? pool.Get(spawnPos, rot)
             : Object.Instantiate(cfg.attack3ProjectilePrefab, spawnPos, rot);
 
-        if (go)
+        if (!go) return;
+
+        var arc = go.GetComponent<BullArcProjectile>();
+        if (arc)
         {
-            var proj = go.GetComponent<FistProjectile>();
-            if (proj)
-            {
-                proj.Setup(cfg.attack3ProjectileDamage);
-                proj.Fire(direction, cfg.attack3ProjectileSpeed);
-            }
+            arc.Setup(cfg.attack3ProjectileDamage);
+            arc.Fire(aimPoint);
+            return;
+        }
+
+        var proj = go.GetComponent<FistProjectile>();
+        if (proj)
+        {
+            proj.Setup(cfg.attack3ProjectileDamage);
+            proj.Fire(direction, cfg.attack3ProjectileSpeed);
         }
     }
 

@@ -306,15 +306,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 9070739300854532536}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc16aca2b22ead444b3216eb96f047b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 80d59bd969f44d4cbb10b0786c949f99, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FistProjectile
-  speed: 15
-  lifetime: 5
+  m_EditorClassIdentifier: Assembly-CSharp::BullArcProjectile
   damage: 1
+  lifetime: 5
   groundLayers:
     serializedVersion: 2
     m_Bits: 128
+  travelTime: 1
+  arcHeight: 3
+  rotateTowardsVelocity: 1
   _dissolveSettings: {fileID: 11400000, guid: c40af5cea2564434e86d2deab58e1a98, type: 2}
 --- !u!114 &3851364739468567059
 MonoBehaviour:
