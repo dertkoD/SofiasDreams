@@ -14,7 +14,9 @@ public class BullArcProjectile : MonoBehaviour
     [SerializeField] LayerMask groundLayers;
 
     [Header("Arc")]
-    [Tooltip("Flight time from muzzle to target, in seconds.")]
+    [Tooltip("Horizontal speed (units/sec). If > 0, overrides Travel Time by deriving it from the horizontal distance to the target (travelTime = |dx| / speed). Set to 0 to use Travel Time directly.")]
+    [Min(0f)] [SerializeField] float speed = 0f;
+    [Tooltip("Flight time from muzzle to target, in seconds. Used when Speed is 0.")]
     [Min(0.05f)] [SerializeField] float travelTime = 1.0f;
     [Tooltip("Extra peak height of the parabola above the straight line between muzzle and target.")]
     [Min(0f)] [SerializeField] float arcHeight = 3.0f;
@@ -62,18 +64,32 @@ public class BullArcProjectile : MonoBehaviour
     /// <summary>
     /// Fires the projectile so that it follows a parabola from its current position
     /// to <paramref name="targetPosition"/>. The arc is determined by the prefab
-    /// settings (travelTime and arcHeight). Optional overrides allow the shooter
-    /// to tune the arc per shot.
+    /// settings (speed / travelTime and arcHeight). Optional overrides allow the
+    /// shooter to tune the arc per shot.
     /// </summary>
     public void Fire(Vector2 targetPosition, float travelTimeOverride = -1f, float arcHeightOverride = -1f)
     {
-        float T = travelTimeOverride > 0f ? travelTimeOverride : travelTime;
         float h = arcHeightOverride >= 0f ? arcHeightOverride : arcHeight;
-        if (T < 0.05f) T = 0.05f;
 
         Vector2 origin = transform.position;
         float dx = targetPosition.x - origin.x;
         float dy = targetPosition.y - origin.y;
+
+        float T;
+        if (travelTimeOverride > 0f)
+        {
+            T = travelTimeOverride;
+        }
+        else if (speed > 0f)
+        {
+            float absDx = Mathf.Abs(dx);
+            T = absDx > 0.0001f ? absDx / speed : travelTime;
+        }
+        else
+        {
+            T = travelTime;
+        }
+        if (T < 0.05f) T = 0.05f;
 
         // Derived from projectile motion with fixed travel time T and extra peak
         // height h above the midpoint of the O->T segment:

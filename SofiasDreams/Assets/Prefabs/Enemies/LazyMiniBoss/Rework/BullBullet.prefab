@@ -314,6 +314,7 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 128
+  speed: 0
   travelTime: 1
   arcHeight: 3
   rotateTowardsVelocity: 1
