@@ -308,7 +308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc16aca2b22ead444b3216eb96f047b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FistProjectile
-  speed: 10
+  speed: 6
   lifetime: 5
   damage: 1
   groundLayers:

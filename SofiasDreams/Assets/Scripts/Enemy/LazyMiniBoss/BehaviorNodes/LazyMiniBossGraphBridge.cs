@@ -140,24 +140,58 @@ public class LazyMiniBossGraphBridge : MonoBehaviour
 
     public void SpawnAttack3Projectile()
     {
-        Vector2 direction;
+        if (_config.attack3ProjectilePrefab == null && _attack3Pool == null) return;
+
         Vector3 spawnPos = _attack3Muzzle ? _attack3Muzzle.position : transform.position;
 
-        if (_config.attack3AimAtPlayer && Player != null)
-        {
-            direction = ((Vector2)Player.position - (Vector2)spawnPos).normalized;
-            if (direction.sqrMagnitude < 1e-6f)
-                direction = new Vector2(_motor.IsFacingRight ? 1 : -1, 0);
-        }
-        else
-        {
+        Vector2 aimPoint = ResolveRangedAimPoint(spawnPos);
+
+        Vector2 direction = aimPoint - (Vector2)spawnPos;
+        if (direction.sqrMagnitude < 1e-6f)
             direction = new Vector2(_motor.IsFacingRight ? 1 : -1, 0);
+        direction.Normalize();
+
+        Quaternion rot = Quaternion.FromToRotation(Vector3.right, (Vector3)direction);
+
+        GameObject go = _attack3Pool != null
+            ? _attack3Pool.Get(spawnPos, rot)
+            : Instantiate(_config.attack3ProjectilePrefab, spawnPos, rot);
+
+        if (!go) return;
+
+        var arc = go.GetComponent<BullArcProjectile>();
+        if (arc)
+        {
+            arc.Setup(_config.attack3ProjectileDamage);
+            arc.Fire(aimPoint);
+            return;
         }
 
-        SpawnProjectileInternal(
-            _attack3Muzzle, _attack3Pool,
-            _config.attack3ProjectilePrefab, _config.attack3ProjectileDamage, _config.attack3ProjectileSpeed,
-            direction);
+        var fist = go.GetComponent<FistProjectile>();
+        if (fist)
+        {
+            fist.Setup(_config.attack3ProjectileDamage);
+            fist.Fire(direction, _config.attack3ProjectileSpeed);
+        }
+    }
+
+    /// <summary>
+    /// Returns the world-space point the boss should aim its ranged attack at.
+    /// Prefers the last known player position, falling back to the current player
+    /// position and finally to a point in front of the muzzle.
+    /// </summary>
+    Vector2 ResolveRangedAimPoint(Vector3 spawnPos)
+    {
+        if (_config != null && _config.attack3AimAtPlayer)
+        {
+            if (HasSeenPlayer)
+                return LastSeenPos;
+            if (Player != null)
+                return (Vector2)Player.position;
+        }
+
+        float sign = _motor != null && _motor.IsFacingRight ? 1f : -1f;
+        return new Vector2(spawnPos.x + sign * 5f, spawnPos.y);
     }
 
     void SpawnProjectileInternal(Transform muzzle, GameObjectPooler pool,
