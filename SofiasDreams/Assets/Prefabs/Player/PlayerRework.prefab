@@ -925,6 +925,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5395965832727822489}
+  zipTimeoutExtra: 0.75
+  zipTimeoutMultiplier: 2.5
+  zipProgressEpsilon: 0.0001
+  zipStagnationFrames: 12
+  routineHardTimeout: 4
   highlightScanInterval: 0.1
 --- !u!114 &2648787401972596842
 MonoBehaviour:
