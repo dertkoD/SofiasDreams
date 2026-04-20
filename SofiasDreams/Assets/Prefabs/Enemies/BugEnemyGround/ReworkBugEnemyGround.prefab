@@ -257,7 +257,16 @@ VisualEffect:
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: 5.18
+        m_Name: VoronoiSpeed
+        m_Overridden: 1
+      - m_Value: 0.94
+        m_Name: VoronoiScale
+        m_Overridden: 1
+      - m_Value: 32
+        m_Name: SpawnAmount
+        m_Overridden: 0
     m_Vector2f:
       m_Array: []
     m_Vector3f:
@@ -941,9 +950,10 @@ MonoBehaviour:
   headAnchor: {fileID: 3731291160963796231}
   bodyAnchor: {fileID: 7167294418188750545}
   vfx: {fileID: 1208980402635742273}
-  particlesPerUnit: 25
+  particlesPerUnit: 15
   travelSpeed: 3
   lifetimeFactor: 0.35
+  reverseDirection: 0
 --- !u!1 &8288131572571801195
 GameObject:
   m_ObjectHideFlags: 0

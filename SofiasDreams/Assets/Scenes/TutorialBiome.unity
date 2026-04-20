@@ -88989,7 +88989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d5579472a33444cbcc2791b02b903b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPos: {x: 86.8, y: -21.6, z: 0}
+  startPos: {x: 8.55, y: -19.8, z: 0}
   _enemySpawnPoints:
   - {fileID: 783268736}
   - {fileID: 767699206}
