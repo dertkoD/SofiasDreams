@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75b83106c18f82b4495f5cca34cab4ca, type: 3}
   m_Name: EnemyConfig
   m_EditorClassIdentifier: 
-  movementMode: 0
+  movementMode: 1
   moveSpeed: 3
   destinationTolerance: 0.1
   minPauseAtPoint: 0.3
