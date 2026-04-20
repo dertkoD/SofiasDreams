@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/CombatTesting.unity
     guid: 5c9a013ba12ccae438709838db83f31d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TutorialBiome.unity
     guid: 07ac1eb436411354f85cf696eacd6847
+  - enabled: 1
+    path: Assets/Scenes/NewCombatPrototype.unity
+    guid: 18cff78e923e9034aabea1a6bc48ed54
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
