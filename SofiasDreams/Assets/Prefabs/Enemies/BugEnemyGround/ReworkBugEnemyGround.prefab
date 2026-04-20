@@ -238,7 +238,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8228230539158043606}
+  m_Father: {fileID: 656527531570036318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!2083052967 &1208980402635742273
 VisualEffect:
@@ -363,7 +363,6 @@ Transform:
   - {fileID: 970046753291490887}
   - {fileID: 7874104626103507400}
   - {fileID: 3731291160963796231}
-  - {fileID: 8423300418910518478}
   m_Father: {fileID: 656527531570036318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &229822231839039585
@@ -990,6 +989,7 @@ Transform:
   - {fileID: 8228230539158043606}
   - {fileID: 4256050765371105060}
   - {fileID: 8047333651823701988}
+  - {fileID: 8423300418910518478}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8635480262362212034
